@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-brand: #0176d3;
+  --color-brand-dark: #014486;
+  --color-slds-text: #001526;
+  --color-slds-text-weak: #444746;
+  --color-slds-bg: #f9f9f9;
+  --color-slds-bg-alt: #ffffff;
+  --color-slds-border: #ecebea;
+  --color-slds-success: #2e844a;
+  --color-slds-error: #ea001e;
+  --color-slds-warning: #fe9339;
+  --radius-slds-md: 0.25rem;
+  --radius-slds-lg: 0.5rem;
+  --shadow-slds: 0 2px 4px rgba(0, 0, 0, 0.07);
+  --shadow-slds-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  background: #f9f9f9;
+  color: #001526;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+button:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+@keyframes toast-enter {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.toast-enter {
+  animation: toast-enter 0.2s ease-out;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #d1d1d1; border-radius: 3px; }
