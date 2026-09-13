@@ -1,6 +1,9 @@
 "use client";
 
 import { formatIDR, type OpbRow, type TransaksiRow } from "@/lib/mock-data";
+import { gramToLiter } from "@/lib/formula-utils";
+import { notaNoFromTrxId } from "@/lib/nota-bogor-tarif";
+import { printElementById } from "@/lib/print-doc-utils";
 
 type OpbPreviewProps = {
   opb: OpbRow;
@@ -8,109 +11,130 @@ type OpbPreviewProps = {
   className?: string;
 };
 
-/** Layout OPB referensi contoh OPB.pdf — preview cetak */
+function Field({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="field-row">
+      <span className="field-label">{label}</span>
+      <span className="field-colon">:</span>
+      <span className="field-value">{value}</span>
+    </div>
+  );
+}
+
+/** Rekap OPB bulanan internal — bukan formulir SAP Astra per transaksi */
 export function OpbPreview({ opb, transaksi, className = "" }: OpbPreviewProps) {
   const linked = transaksi.filter(
-    (t) => t.opbId === opb.id || (t.cabang.includes(opb.cabang.split(" ")[0]) && t.status === "Selesai")
-  ).slice(0, opb.jumlahTrx);
+    (t) => t.opbId === opb.id || (t.cabang.includes(opb.cabang.split(" ")[0]) && t.status === "Selesai"),
+  );
 
   const displayTrx =
     linked.length > 0
-      ? linked
-      : transaksi.filter((t) => t.cabang.includes(opb.cabang.split(" ")[0]) && t.status === "Selesai").slice(0, 5);
+      ? linked.slice(0, opb.jumlahTrx)
+      : transaksi.filter((t) => t.cabang.includes(opb.cabang.split(" ")[0]) && t.status === "Selesai").slice(0, opb.jumlahTrx);
+
+  const rows = displayTrx.length > 0 ? displayTrx : [];
 
   return (
-    <div
-      className={`bg-white text-black font-serif text-[11px] leading-snug border border-gray-400 p-4 ${className}`}
-      id="opb-preview"
-    >
-      <div className="text-center border-b-2 border-black pb-2 mb-3">
-        <p className="text-[14px] font-bold uppercase">Order Pembelian Bahan (OPB)</p>
-        <p className="text-[12px] font-bold">PT Daya Oto Asia</p>
-        <p className="text-[10px] mt-1">Cabang / Bengkel Mitra: {opb.cabang}</p>
+    <div className={`doc bg-white text-black ${className}`} id="opb-preview">
+      <p className="doc-center doc-bold doc-upper" style={{ fontSize: "13pt", marginBottom: 2 }}>
+        REKAP OPB BULANAN
+      </p>
+      <p className="doc-center doc-bold" style={{ fontSize: "11pt", marginBottom: 10 }}>PT. DAYA OTO ASIA</p>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 24px", marginBottom: 12 }}>
+        <Field label="No. OPB" value={opb.id} />
+        <Field label="Periode Tagihan" value={opb.periode} />
+        <Field label="Cabang / Bengkel Mitra" value={opb.cabang} />
+        <Field label="Tanggal Cetak" value={new Date().toISOString().slice(0, 10)} />
+        <Field label="Status" value={opb.status} />
+        <Field label="Jumlah Transaksi" value={String(opb.jumlahTrx)} />
+        {opb.sap && <Field label="No. SAP" value={opb.sap} />}
       </div>
 
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1 mb-4 text-[10px]">
-        <div><span className="font-semibold">No. OPB</span><span className="ml-2 font-mono">{opb.id}</span></div>
-        <div><span className="font-semibold">Periode</span><span className="ml-2">{opb.periode}</span></div>
-        <div><span className="font-semibold">Tanggal Cetak</span><span className="ml-2">{new Date().toISOString().slice(0, 10)}</span></div>
-        <div><span className="font-semibold">Status</span><span className="ml-2">{opb.status}</span></div>
-        {opb.sap && (
-          <div className="col-span-2"><span className="font-semibold">No. SAP</span><span className="ml-2 font-mono">{opb.sap}</span></div>
-        )}
-      </div>
-
-      <table className="w-full border-collapse mb-3 text-[10px]">
+      <table className="doc-table" style={{ fontSize: "8pt", marginBottom: 10 }}>
         <thead>
-          <tr className="bg-gray-100">
-            <th className="border border-black px-1 py-1 text-left">No</th>
-            <th className="border border-black px-1 py-1 text-left">No. Transaksi</th>
-            <th className="border border-black px-1 py-1 text-left">Tanggal</th>
-            <th className="border border-black px-1 py-1 text-left">Warna / Kode</th>
-            <th className="border border-black px-1 py-1 text-left">Tinter</th>
-            <th className="border border-black px-1 py-1 text-right">Total (Rp)</th>
+          <tr>
+            <th>No</th>
+            <th>Tanggal</th>
+            <th>No. Nota</th>
+            <th>No. PKB</th>
+            <th>No. Polisi</th>
+            <th>Type Mobil</th>
+            <th>Warna</th>
+            <th style={{ textAlign: "right" }}>Pemakaian (L)</th>
+            <th style={{ textAlign: "right" }}>Jumlah (Rp)</th>
           </tr>
         </thead>
         <tbody>
-          {(displayTrx.length > 0 ? displayTrx : [{ id: "—", tanggal: "—", warna: "—", kodeWarna: "—", tinter: "—", total: 0 }] as TransaksiRow[]).map((t, i) => (
-            <tr key={String(t.id) + i}>
-              <td className="border border-black px-1 py-0.5">{i + 1}</td>
-              <td className="border border-black px-1 py-0.5 font-mono">{t.id}</td>
-              <td className="border border-black px-1 py-0.5">{t.tanggal}</td>
-              <td className="border border-black px-1 py-0.5">{t.warna} ({t.kodeWarna})</td>
-              <td className="border border-black px-1 py-0.5">{t.tinter}</td>
-              <td className="border border-black px-1 py-0.5 text-right">{formatIDR(t.total)}</td>
-            </tr>
-          ))}
-          {displayTrx.length < opb.jumlahTrx && (
+          {rows.length === 0 ? (
             <tr>
-              <td className="border border-black px-1 py-0.5 italic text-gray-600" colSpan={6}>
-                + {opb.jumlahTrx - displayTrx.length} transaksi lainnya (ringkas di dokumen final)
+              <td colSpan={9} style={{ textAlign: "center", fontStyle: "italic" }}>
+                Belum ada transaksi ter-link
+              </td>
+            </tr>
+          ) : (
+            rows.map((t, i) => {
+              const gram = t.bahan.reduce((s, b) => s + b.gram, 0);
+              return (
+                <tr key={t.id}>
+                  <td className="doc-center">{i + 1}</td>
+                  <td>{t.tanggal}</td>
+                  <td style={{ fontFamily: "monospace" }}>{notaNoFromTrxId(t.id)}</td>
+                  <td>{t.noPkb ?? "—"}</td>
+                  <td>{t.platNomor}</td>
+                  <td>{t.mobil}</td>
+                  <td>{t.warna} ({t.kodeWarna})</td>
+                  <td style={{ textAlign: "right" }}>{gramToLiter(gram)}</td>
+                  <td style={{ textAlign: "right" }}>{formatIDR(t.total)}</td>
+                </tr>
+              );
+            })
+          )}
+          {rows.length > 0 && rows.length < opb.jumlahTrx && (
+            <tr>
+              <td colSpan={9} style={{ fontStyle: "italic", fontSize: "8pt" }}>
+                + {opb.jumlahTrx - rows.length} transaksi lainnya (lihat lampiran rekap admin)
               </td>
             </tr>
           )}
         </tbody>
         <tfoot>
-          <tr className="font-bold">
-            <td className="border border-black px-1 py-1" colSpan={5}>TOTAL TAGIHAN</td>
-            <td className="border border-black px-1 py-1 text-right">{formatIDR(opb.total)}</td>
-          </tr>
-          <tr>
-            <td className="border border-black px-1 py-1" colSpan={5}>Jumlah Transaksi</td>
-            <td className="border border-black px-1 py-1 text-right">{opb.jumlahTrx}</td>
+          <tr className="doc-bold">
+            <td colSpan={8} style={{ textAlign: "right" }}>TOTAL TAGIHAN OPB</td>
+            <td style={{ textAlign: "right" }}>{formatIDR(opb.total)}</td>
           </tr>
         </tfoot>
       </table>
 
-      <div className="grid grid-cols-3 gap-4 mt-6 text-[9px] text-center">
-        <div>
-          <div className="border-b border-black h-12 mb-1" />
-          <p>Admin Cabang</p>
-          <p className="text-gray-500">TTD DocuMatrix</p>
+      <p style={{ fontSize: "8pt", marginBottom: 8 }}>
+        Rekap bulanan untuk rekonsiliasi HO. Formulir SAP Astra per PKB dicetak dari detail transaksi.
+      </p>
+
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16, fontSize: "9pt" }}>
+        <div style={{ width: "30%" }}>
+          <p className="doc-bold">Yang Menyerahkan,</p>
+          <div className="sig-line" />
+          <p style={{ textAlign: "center" }}>( Admin Cabang )</p>
         </div>
-        <div>
-          <div className="border-b border-black h-12 mb-1" />
-          <p>Supervisor HO</p>
-          <p className="text-gray-500">Rekonsiliasi</p>
+        <div style={{ width: "30%" }}>
+          <p className="doc-bold">Yang Menerima,</p>
+          <div className="sig-line" />
+          <p style={{ textAlign: "center" }}>( Supervisor HO )</p>
         </div>
-        <div>
-          <div className="border-b border-black h-12 mb-1" />
-          <p>Finance</p>
-          <p className="text-gray-500">Input SAP</p>
+        <div style={{ width: "30%" }}>
+          <p className="doc-bold">Finance / SAP,</p>
+          <div className="sig-line" />
+          <p style={{ textAlign: "center" }}>( Input SAP )</p>
         </div>
+      </div>
+
+      <div className="footer-alamat">
+        <p>PT. DAYA OTO ASIA — Rekap Order Pembelian Bahan Cat Body Repair</p>
       </div>
     </div>
   );
 }
 
 export function printOpbPreview() {
-  const el = document.getElementById("opb-preview");
-  if (!el) return;
-  const w = window.open("", "_blank", "width=800,height=900");
-  if (!w) return;
-  w.document.write(`<!DOCTYPE html><html><head><title>OPB</title>
-    <style>body{margin:16px;font-family:Georgia,serif}</style></head><body>${el.outerHTML}</body></html>`);
-  w.document.close();
-  w.focus();
-  w.print();
+  printElementById("opb-preview", "OPB", "table.doc-table { font-size: 7.5pt; }");
 }

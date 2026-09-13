@@ -6,8 +6,7 @@ import { Plus, MapPin, Camera, ChevronRight } from "lucide-react";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { useToast } from "@/components/ui/toast";
 import { useLemburList } from "@/lib/preview-store";
-
-const MOBILE_USER = "Andi Wijaya";
+import { MOBILE_USER } from "@/lib/mobile-app-utils";
 
 function calcJam(mulai: string, selesai: string) {
   const [h1, m1] = mulai.split(":").map(Number);

@@ -121,7 +121,7 @@ export default function OpbDetailPage() {
               onClick={() => { printOpbPreview(); toast("OPB dicetak", "success"); }}
               className="w-full inline-flex items-center justify-center gap-1 px-3 py-2 border border-slds-border rounded-md text-[12px] font-semibold hover:bg-slds-bg"
             >
-              <Printer className="h-3.5 w-3.5" /> Cetak Dokumen OPB
+              <Printer className="h-3.5 w-3.5" /> Cetak Rekap Bulanan
             </button>
           </div>
         </div>
@@ -188,7 +188,7 @@ export default function OpbDetailPage() {
         </div>
 
         <div className="max-w-xl">
-          <h3 className="text-[13px] font-bold text-slds-text mb-2">Preview Dokumen</h3>
+          <h3 className="text-[13px] font-bold text-slds-text mb-2">Preview Rekap OPB Bulanan</h3>
           <OpbPreview opb={row} transaksi={transaksi} />
         </div>
       </div>

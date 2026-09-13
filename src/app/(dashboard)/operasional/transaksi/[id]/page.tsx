@@ -7,6 +7,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatIDR, formatWaktu, formatDurasi } from "@/lib/mock-data";
 import { NotaPreview, printNotaPreview } from "@/components/ui/nota-preview";
+import { NotaPenjualanPreview, printNotaPenjualanPreview } from "@/components/ui/nota-penjualan-preview";
+import { SapOpbPreview, printSapOpbPreview } from "@/components/ui/sap-opb-preview";
 import { useNotaPrint, useTransaksiList } from "@/lib/preview-store";
 import { CetakNotaAudit } from "@/components/ui/cetak-nota-audit";
 import { useToast } from "@/components/ui/toast";
@@ -57,13 +59,35 @@ export default function TransaksiDetailPage() {
               type="button"
               data-no-toast
               onClick={() => {
-                const isReprint = recordPrint(trx.id, trx.tinter, trx.cabang, "Admin HO");
-                printNotaPreview();
-                toast(isReprint ? "Cetak ulang tercatat di audit log" : "Nota dicetak", isReprint ? "error" : "success");
+                printSapOpbPreview();
+                toast("OPB SAP dicetak", "success");
               }}
               className="inline-flex items-center gap-1.5 px-3 py-2 border border-slds-border rounded-md text-[12px] font-semibold hover:bg-slds-bg"
             >
-              <Printer className="h-3.5 w-3.5" /> Cetak Nota
+              <FileText className="h-3.5 w-3.5" /> Cetak OPB SAP
+            </button>
+            <button
+              type="button"
+              data-no-toast
+              onClick={() => {
+                printNotaPenjualanPreview();
+                toast("Nota penjualan dicetak", "success");
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-2 border border-slds-border rounded-md text-[12px] font-semibold hover:bg-slds-bg"
+            >
+              <FileText className="h-3.5 w-3.5" /> Cetak Nota Penjualan
+            </button>
+            <button
+              type="button"
+              data-no-toast
+              onClick={() => {
+                const isReprint = recordPrint(trx.id, trx.tinter, trx.cabang, "Admin HO");
+                printNotaPreview();
+                toast(isReprint ? "Cetak ulang tercatat di audit log" : "Nota pemakaian dicetak", isReprint ? "error" : "success");
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-2 border border-slds-border rounded-md text-[12px] font-semibold hover:bg-slds-bg"
+            >
+              <Printer className="h-3.5 w-3.5" /> Cetak Nota Pemakaian
             </button>
             <StatusBadge status={trx.status} />
           </div>
@@ -147,8 +171,18 @@ export default function TransaksiDetailPage() {
         </div>
       )}
 
-      <div className="mb-4 max-w-2xl">
-        <h3 className="text-[13px] font-bold text-slds-text mb-2">Preview Nota (DOA Bogor)</h3>
+      <div className="mb-4 overflow-x-auto">
+        <h3 className="text-[13px] font-bold text-slds-text mb-2">Preview OPB SAP (One Time Material)</h3>
+        <SapOpbPreview trx={trx} />
+      </div>
+
+      <div className="mb-4 overflow-x-auto">
+        <h3 className="text-[13px] font-bold text-slds-text mb-2">Preview Nota Penjualan</h3>
+        <NotaPenjualanPreview trx={trx} />
+      </div>
+
+      <div className="mb-4 overflow-x-auto">
+        <h3 className="text-[13px] font-bold text-slds-text mb-2">Preview Nota Pemakaian (DOA Cabang Bogor)</h3>
         <NotaPreview trx={trx} />
       </div>
 

@@ -18,7 +18,7 @@ export type LaporanPemakaianFilters = {
 
 export function buildLaporanPemakaian(
   transaksi: TransaksiRow[],
-  filters: LaporanPemakaianFilters
+  filters: LaporanPemakaianFilters,
 ): LaporanPemakaianRow[] {
   const rows: LaporanPemakaianRow[] = [];
 
@@ -51,6 +51,75 @@ export function totalGramLaporan(rows: LaporanPemakaianRow[]) {
 
 export function uniqueTinters(transaksi: TransaksiRow[]) {
   return ["Semua Tinter", ...Array.from(new Set(transaksi.map((t) => t.tinter))).sort()];
+}
+
+/** Baris grid — kolom = tanggal, referensi DOA Bogor hal. 2 */
+export type LaporanGridRow = {
+  no: number;
+  namaBarang: string;
+  kodeBarang: string;
+  noPolisi: string;
+  byDay: Record<number, number>;
+};
+
+export function buildLaporanGrid(rows: LaporanPemakaianRow[]): LaporanGridRow[] {
+  const grid: LaporanGridRow[] = [];
+  for (const r of rows) {
+    const existing = grid.find(
+      (g) => g.namaBarang === r.namaBarang && g.kodeBarang === r.kodeBarang && g.noPolisi === r.noPolisi,
+    );
+    if (existing) {
+      existing.byDay[r.tanggal] = (existing.byDay[r.tanggal] ?? 0) + r.totalGram;
+    } else {
+      grid.push({
+        no: grid.length + 1,
+        namaBarang: r.namaBarang,
+        kodeBarang: r.kodeBarang,
+        noPolisi: r.noPolisi,
+        byDay: { [r.tanggal]: r.totalGram },
+      });
+    }
+  }
+  return grid;
+}
+
+/** Pad baris kosong supaya form print mirip blanko (min 12 baris per blok) */
+export function padLaporanGrid(grid: LaporanGridRow[], minRows = 12): LaporanGridRow[] {
+  if (grid.length >= minRows) return grid;
+  const padded = [...grid];
+  while (padded.length < minRows) {
+    padded.push({
+      no: padded.length + 1,
+      namaBarang: "",
+      kodeBarang: "",
+      noPolisi: "",
+      byDay: {},
+    });
+  }
+  return padded;
+}
+
+export function totalGramByDay(rows: LaporanPemakaianRow[], day: number) {
+  const sum = rows.filter((r) => r.tanggal === day).reduce((s, r) => s + r.totalGram, 0);
+  return sum > 0 ? Math.round(sum * 10) / 10 : 0;
+}
+
+export function rowGramTotal(row: LaporanGridRow) {
+  const sum = Object.values(row.byDay).reduce((s, v) => s + v, 0);
+  return sum > 0 ? Math.round(sum * 10) / 10 : 0;
+}
+
+export function formatBulanLaporan(bulan: string) {
+  return new Date(`${bulan}-01`).toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+}
+
+export function formatTanggalCetakLaporan() {
+  const d = new Date();
+  return `${d.getDate()}-${d.toLocaleDateString("id-ID", { month: "short" })}-${String(d.getFullYear()).slice(-2)}`;
+}
+
+export function formatPolisiLaporan(plat: string) {
+  return plat.replace(/\s+/g, " ").trim();
 }
 
 export function uniqueCabangShort(transaksi: TransaksiRow[]) {

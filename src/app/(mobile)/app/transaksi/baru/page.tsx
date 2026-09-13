@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronRight, Printer, Check, PenLine, Clock, Plus, Scale } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
-import { NotaPreview, printNotaPreview } from "@/components/ui/nota-preview";
+import { NotaPenjualanPreview, printNotaPenjualanPreview } from "@/components/ui/nota-penjualan-preview";
 import { useNotaPrint, useTransaksiList } from "@/lib/preview-store";
 import { formatDurasi, formatIDR, getHargaKategori, MOCK_KODE_WARNA } from "@/lib/mock-data";
 import type { TransaksiRow } from "@/lib/mock-data";
@@ -116,8 +116,8 @@ function BuatTransaksiContent() {
     recordPrint(trxId, "Andi Wijaya", "Auto 2000 Surabaya");
     setShowNota(true);
     setPrinted(true);
-    printNotaPreview();
-    toast("Nota dicetak — stok dikurangi", "success");
+    printNotaPenjualanPreview();
+    toast("Nota penjualan dicetak — stok dikurangi", "success");
   }
 
   function handleSelesai() {
@@ -442,12 +442,12 @@ function BuatTransaksiContent() {
 
           {showNota && (
             <div className="overflow-x-auto -mx-1">
-              <NotaPreview trx={previewTrx} className="min-w-[320px] shadow-sm" />
+              <NotaPenjualanPreview trx={previewTrx} className="min-w-[320px] shadow-sm" />
             </div>
           )}
 
           <div className="bg-red-50 border border-red-200 rounded-xl p-3">
-            <p className="text-[12px] font-bold text-red-800">Wajib cetak nota sebelum selesai</p>
+            <p className="text-[12px] font-bold text-red-800">Wajib cetak nota penjualan sebelum selesai</p>
           </div>
 
           {!printed ? (
@@ -457,7 +457,7 @@ function BuatTransaksiContent() {
               onClick={handleCetakNota}
               className="w-full py-3.5 bg-slds-text text-white rounded-xl font-bold text-[14px] flex items-center justify-center gap-2"
             >
-              <Printer className="h-4 w-4" /> Cetak Nota
+              <Printer className="h-4 w-4" /> Cetak Nota Penjualan
             </button>
           ) : (
             <>

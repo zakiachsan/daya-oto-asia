@@ -77,21 +77,6 @@ export default function ModulesPage() {
           })}
         </div>
 
-        <div className="mb-6 rounded-lg border border-brand/30 bg-brand/5 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <p className="text-[13px] font-bold text-slds-text">Demo Walkthrough</p>
-            <p className="text-[12px] text-slds-text-weak">Checklist interaktif untuk presentasi ke Pak David — progress tersimpan di browser</p>
-          </div>
-          <button
-            type="button"
-            data-no-toast
-            onClick={() => router.push("/demo")}
-            className="shrink-0 px-4 py-2 bg-brand text-white rounded-md text-[13px] font-semibold hover:bg-brand-dark"
-          >
-            Buka Checklist
-          </button>
-        </div>
-
         <div className="border-t border-slds-border pt-6">
           <p className="text-[11px] font-bold uppercase tracking-wider text-slds-text-weak mb-3">Aplikasi Lapangan</p>
           <button

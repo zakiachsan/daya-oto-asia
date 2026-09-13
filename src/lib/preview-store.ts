@@ -250,7 +250,15 @@ export function useKlaimWarna() {
     [],
   );
 
-  return { items, updateStatus };
+  const add = useCallback((row: KlaimWarnaRow) => {
+    setItems((prev) => {
+      const next = [row, ...prev];
+      write(KLAIM_KEY, next);
+      return next;
+    });
+  }, []);
+
+  return { items, updateStatus, add };
 }
 
 export function slugify(name: string) {

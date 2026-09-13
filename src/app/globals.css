@@ -48,3 +48,765 @@ button:disabled {
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: #d1d1d1; border-radius: 3px; }
+
+/* Formulir cetak DOA Bogor — preview on-screen + print popup */
+.doc {
+  font-family: "Times New Roman", Times, Georgia, serif;
+  color: #000;
+  font-size: 10pt;
+  line-height: 1.25;
+  padding: 16px;
+  border: 1px solid #999;
+}
+.doc-center { text-align: center; }
+.doc-bold { font-weight: bold; }
+.doc-upper { text-transform: uppercase; }
+.doc-border { border: 1px solid #000; }
+table.doc-table { width: 100%; border-collapse: collapse; }
+table.doc-table th,
+table.doc-table td { border: 1px solid #000; padding: 2px 4px; vertical-align: top; }
+table.doc-table th { font-weight: bold; background: #f5f5f5; }
+.doc .sig-line { border-bottom: 1px solid #000; height: 48px; margin-bottom: 4px; }
+.doc .field-row { display: flex; margin-bottom: 2px; font-size: 10pt; }
+.doc .field-label { min-width: 110px; font-weight: 600; }
+.doc .field-colon { width: 12px; }
+.doc .field-value { flex: 1; border-bottom: 1px dotted #666; min-height: 14px; }
+.doc .tarif-grup { margin-bottom: 4px; }
+.doc .tarif-judul { font-weight: bold; text-decoration: underline; margin-bottom: 2px; }
+.doc .tarif-baris { display: flex; justify-content: space-between; padding-left: 8px; font-size: 8.5pt; }
+.doc .footer-alamat { font-size: 8pt; text-align: center; margin-top: 8px; line-height: 1.3; }
+
+/* Nota DOA Cabang Bogor — clone layout PDF hal. 1 */
+.nota-bogor {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  color: #000;
+  background: #fff;
+  padding: 20px 24px;
+  max-width: 720px;
+  line-height: 1.35;
+  border: 1px solid #ccc;
+}
+
+.nota-bogor-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.nota-bogor-left { flex: 1.1; min-width: 0; }
+.nota-bogor-right { flex: 0.9; min-width: 200px; }
+
+.nota-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.nota-brand-name {
+  font-weight: 700;
+  font-size: 12pt;
+  letter-spacing: 0.02em;
+}
+
+.nota-alamat-kepada {
+  font-size: 8.5pt;
+  margin: 2px 0 8px 0;
+  line-height: 1.35;
+  padding-left: 0;
+}
+
+.nota-field {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 5px;
+  font-size: 10pt;
+}
+
+.nota-field-wide .nota-field-label { min-width: 72px; }
+
+.nota-field-label {
+  flex-shrink: 0;
+  min-width: 68px;
+}
+
+.nota-field-colon {
+  flex-shrink: 0;
+  width: 10px;
+}
+
+.nota-field-value {
+  flex: 1;
+  border-bottom: 1px solid #000;
+  min-height: 14px;
+  padding-bottom: 1px;
+}
+
+.nota-no-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-bottom: 10px;
+  font-weight: 700;
+  font-size: 11pt;
+}
+
+.nota-no-label { letter-spacing: 0.03em; }
+.nota-no-value {
+  border-bottom: 1px solid #000;
+  min-width: 100px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.nota-bogor-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 3px double #000;
+  font-size: 9pt;
+  margin-bottom: 28px;
+}
+
+.nota-bogor-table th,
+.nota-bogor-table td {
+  border: 1px solid #000;
+  padding: 3px 6px;
+  vertical-align: middle;
+}
+
+.nota-bogor-table thead th {
+  font-weight: 700;
+  text-align: center;
+  background: #fff;
+}
+
+.nota-bogor-table .col-nama { width: 38%; text-align: left; }
+.nota-bogor-table .col-pemakaian { width: 18%; }
+.nota-bogor-table .col-harga { width: 24%; }
+.nota-bogor-table .col-jumlah { width: 20%; }
+
+.nota-bogor-table .indent { padding-left: 14px; }
+.nota-bogor-table .center { text-align: center; }
+.nota-bogor-table .right { text-align: right; }
+
+.nota-grup-row td {
+  font-weight: 700;
+  background: #fff;
+  padding-top: 5px;
+}
+
+.nota-row-active td {
+  background: #fffde7;
+}
+
+.nota-total-row td {
+  font-weight: 700;
+}
+
+.nota-bogor-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 10pt;
+}
+
+.nota-sig-block {
+  width: 42%;
+}
+
+.nota-sig-label { font-weight: 600; }
+
+.nota-sig-paren {
+  display: block;
+  margin-top: 32px;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+/* Form OPB SAP Astra — ONE TIME MATERIAL per transaksi */
+.sap-opb {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  color: #000;
+  background: #fff;
+  padding: 20px 24px;
+  max-width: 720px;
+  line-height: 1.35;
+  border: 1px solid #ccc;
+}
+
+.sap-opb-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.sap-opb-header-left { flex: 1.2; min-width: 0; }
+.sap-opb-header-right { flex: 0.8; min-width: 180px; }
+
+.sap-opb-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.sap-opb-brand-name {
+  font-weight: 700;
+  font-size: 10pt;
+  letter-spacing: 0.02em;
+}
+
+.sap-opb-brand-unit {
+  font-size: 9pt;
+  font-weight: 600;
+}
+
+.sap-opb-alamat {
+  font-size: 8pt;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.sap-opb-no-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-bottom: 8px;
+  font-weight: 700;
+  font-size: 10pt;
+}
+
+.sap-opb-no-value {
+  border-bottom: 1px solid #000;
+  min-width: 90px;
+  text-align: center;
+}
+
+.sap-opb-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 12pt;
+  letter-spacing: 0.04em;
+  margin: 10px 0 2px;
+}
+
+.sap-opb-subtitle {
+  text-align: center;
+  font-weight: 700;
+  font-size: 10pt;
+  letter-spacing: 0.06em;
+  margin: 0 0 12px;
+}
+
+.sap-opb-vendor-block {
+  border: 1px solid #000;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  font-size: 9pt;
+}
+
+.sap-opb-vendor-label {
+  font-size: 8pt;
+  font-weight: 600;
+  margin: 0 0 2px;
+  text-transform: uppercase;
+}
+
+.sap-opb-vendor-name {
+  font-weight: 700;
+  font-size: 10pt;
+  margin: 0;
+}
+
+.sap-opb-vendor-alamat {
+  font-size: 8.5pt;
+  margin: 2px 0 0;
+}
+
+.sap-opb-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 16px;
+  margin-bottom: 10px;
+}
+
+.sap-opb-field {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 4px;
+  font-size: 9pt;
+}
+
+.sap-opb-field-wide { grid-column: 1 / -1; }
+
+.sap-opb-field-label {
+  flex-shrink: 0;
+  min-width: 88px;
+  font-weight: 600;
+}
+
+.sap-opb-field-colon {
+  flex-shrink: 0;
+  width: 10px;
+}
+
+.sap-opb-field-value {
+  flex: 1;
+  border-bottom: 1px solid #000;
+  min-height: 14px;
+  padding-bottom: 1px;
+}
+
+.sap-opb-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #000;
+  font-size: 9pt;
+  margin-bottom: 24px;
+}
+
+.sap-opb-table th,
+.sap-opb-table td {
+  border: 1px solid #000;
+  padding: 3px 5px;
+  vertical-align: middle;
+}
+
+.sap-opb-table thead th {
+  font-weight: 700;
+  text-align: center;
+  background: #fff;
+}
+
+.sap-opb-table .col-no { width: 6%; }
+.sap-opb-table .col-kode { width: 16%; }
+.sap-opb-table .col-nama { width: 34%; }
+.sap-opb-table .col-qty { width: 14%; }
+.sap-opb-table .col-harga { width: 15%; }
+.sap-opb-table .col-total { width: 15%; }
+
+.sap-opb-table .center { text-align: center; }
+.sap-opb-table .right { text-align: right; }
+.sap-opb-table .mono { font-family: "Courier New", monospace; font-size: 8.5pt; }
+
+.sap-opb-total-row td {
+  font-weight: 700;
+}
+
+.sap-opb-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 9pt;
+}
+
+.sap-opb-sig-block {
+  flex: 1;
+  text-align: center;
+}
+
+.sap-opb-sig-label { font-weight: 600; margin: 0; }
+
+.sap-opb-sig-paren {
+  display: block;
+  margin-top: 36px;
+  letter-spacing: 0.05em;
+}
+
+/* Nota penjualan terisi — referensi scan nota penjualan.pdf */
+.nota-penjualan {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  color: #000;
+  background: #fff;
+  padding: 20px 24px;
+  max-width: 720px;
+  line-height: 1.35;
+  border: 1px solid #ccc;
+}
+
+.nota-penjualan .np-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.nota-penjualan .np-header-left { flex: 1.1; min-width: 0; }
+.nota-penjualan .np-header-right { flex: 0.9; min-width: 200px; }
+
+.nota-penjualan .np-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.nota-penjualan .np-brand-name {
+  font-weight: 700;
+  font-size: 12pt;
+  letter-spacing: 0.02em;
+}
+
+.nota-penjualan .np-alamat {
+  font-size: 8.5pt;
+  margin: 2px 0 8px;
+  line-height: 1.35;
+}
+
+.nota-penjualan .np-field {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 4px;
+  font-size: 10pt;
+}
+
+.nota-penjualan .np-field-label { flex-shrink: 0; min-width: 88px; }
+.nota-penjualan .np-field-colon { flex-shrink: 0; width: 10px; }
+.nota-penjualan .np-field-value {
+  flex: 1;
+  border-bottom: 1px solid #000;
+  min-height: 14px;
+  padding-bottom: 1px;
+}
+
+.nota-penjualan .np-no-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-bottom: 8px;
+  font-weight: 700;
+  font-size: 11pt;
+}
+
+.nota-penjualan .np-no-value {
+  border-bottom: 1px solid #000;
+  min-width: 72px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.nota-penjualan .np-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #000;
+  font-size: 9pt;
+  margin-bottom: 20px;
+}
+
+.nota-penjualan .np-table th,
+.nota-penjualan .np-table td {
+  border: 1px solid #000;
+  padding: 3px 5px;
+  vertical-align: middle;
+}
+
+.nota-penjualan .np-table thead th {
+  font-weight: 700;
+  text-align: center;
+  background: #fff;
+}
+
+.nota-penjualan .np-table .col-no { width: 8%; }
+.nota-penjualan .np-table .col-nama { width: 36%; text-align: left; }
+.nota-penjualan .np-table .col-ml { width: 18%; }
+.nota-penjualan .np-table .col-harga { width: 18%; }
+.nota-penjualan .np-table .col-jumlah { width: 20%; }
+
+.nota-penjualan .np-table .indent { padding-left: 10px; }
+.nota-penjualan .np-table .center { text-align: center; }
+.nota-penjualan .np-table .right { text-align: right; }
+
+.nota-penjualan .np-grup-row td {
+  font-weight: 700;
+  background: #fff;
+  padding-top: 5px;
+}
+
+.nota-penjualan .np-row-active td { background: #fffde7; }
+.nota-penjualan .np-total-row td { font-weight: 700; }
+
+.nota-penjualan .np-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 10pt;
+}
+
+.nota-penjualan .np-sig-block { width: 42%; }
+.nota-penjualan .np-sig-label { font-weight: 600; }
+
+.nota-penjualan .np-sig-paren {
+  display: block;
+  margin-top: 32px;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+/* Rekap admin lampiran invoice — referensi scan rekap admin PDF */
+.rekap-invoice {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9pt;
+  color: #000;
+  background: #fff;
+  padding: 20px 24px;
+  max-width: 820px;
+  line-height: 1.35;
+  border: 1px solid #ccc;
+}
+
+.rekap-invoice-brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.rekap-invoice-company {
+  font-weight: 700;
+  font-size: 11pt;
+  margin: 0 0 2px;
+}
+
+.rekap-invoice-pelanggan {
+  font-weight: 600;
+  font-size: 9pt;
+  margin: 0;
+}
+
+.rekap-invoice-ref {
+  font-size: 8pt;
+  margin: 4px 0 0;
+  color: #444746;
+}
+
+.rekap-invoice-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 12pt;
+  letter-spacing: 0.04em;
+  margin: 0 0 12px;
+}
+
+.rekap-invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #000;
+  font-size: 8.5pt;
+}
+
+.rekap-invoice-table th,
+.rekap-invoice-table td {
+  border: 1px solid #000;
+  padding: 3px 5px;
+  vertical-align: middle;
+}
+
+.rekap-invoice-table thead th {
+  font-weight: 700;
+  text-align: center;
+  background: #fff;
+}
+
+.rekap-invoice-table .col-no { width: 6%; }
+.rekap-invoice-table .col-tgl { width: 12%; }
+.rekap-invoice-table .col-pol { width: 14%; }
+.rekap-invoice-table .col-sap { width: 18%; }
+.rekap-invoice-table .col-dpp { width: 25%; }
+.rekap-invoice-table .col-ppn { width: 25%; }
+
+.rekap-invoice-table .center { text-align: center; }
+.rekap-invoice-table .right { text-align: right; }
+.rekap-invoice-table .mono {
+  font-family: "Courier New", monospace;
+  font-size: 8pt;
+}
+
+.rekap-row-real td { background: #fffde7; }
+.rekap-total-row td { font-weight: 700; }
+
+.rekap-invoice-note {
+  font-size: 7.5pt;
+  font-style: italic;
+  margin-top: 8px;
+  color: #444746;
+}
+
+/* Laporan pemakaian base — DOA Bogor hal. 2, side-by-side TGL 1–15 | 16–31 */
+.laporan-pemakaian {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 8pt;
+  color: #000;
+  background: #fff;
+  padding: 16px 20px;
+  min-width: 720px;
+  max-width: 980px;
+  line-height: 1.3;
+  border: 1px solid #ccc;
+}
+
+.laporan-pemakaian .lp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.laporan-pemakaian .lp-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.laporan-pemakaian .lp-company {
+  font-weight: 700;
+  font-size: 10pt;
+  letter-spacing: 0.02em;
+}
+
+.laporan-pemakaian .lp-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 11pt;
+  letter-spacing: 0.03em;
+  margin: 0 0 10px;
+}
+
+.laporan-pemakaian .lp-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 10px;
+}
+
+.laporan-pemakaian .lp-meta-col { flex: 1; }
+
+.laporan-pemakaian .lp-field {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 3px;
+  font-size: 9pt;
+}
+
+.laporan-pemakaian .lp-field-label {
+  font-weight: 700;
+  min-width: 96px;
+  flex-shrink: 0;
+}
+
+.laporan-pemakaian .lp-field-colon { width: 10px; flex-shrink: 0; }
+
+.laporan-pemakaian .lp-field-value {
+  flex: 1;
+  border-bottom: 1px solid #000;
+  min-height: 14px;
+  padding-bottom: 1px;
+}
+
+.laporan-pemakaian .lp-split {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.laporan-pemakaian .lp-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.laporan-pemakaian .lp-block-label {
+  font-weight: 700;
+  font-size: 8pt;
+  text-align: center;
+  margin: 0 0 3px;
+}
+
+.laporan-pemakaian .lp-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #000;
+  font-size: 6.5pt;
+  table-layout: fixed;
+}
+
+.laporan-pemakaian .lp-table th,
+.laporan-pemakaian .lp-table td {
+  border: 1px solid #000;
+  padding: 1px 2px;
+  vertical-align: middle;
+}
+
+.laporan-pemakaian .lp-table thead th {
+  font-weight: 700;
+  text-align: center;
+  background: #fff;
+}
+
+.laporan-pemakaian .lp-table .col-no { width: 6%; }
+.laporan-pemakaian .lp-table .col-kode { width: 11%; }
+.laporan-pemakaian .lp-table .col-nama { width: 22%; }
+.laporan-pemakaian .lp-table .col-pol { width: 12%; }
+.laporan-pemakaian .lp-table .col-day { width: 4%; font-size: 6pt; }
+.laporan-pemakaian .lp-table .col-sum { width: 7%; }
+
+.laporan-pemakaian .lp-table .center { text-align: center; }
+.laporan-pemakaian .lp-table .right { text-align: right; }
+.laporan-pemakaian .lp-table .mono {
+  font-family: "Courier New", monospace;
+  font-size: 6pt;
+}
+
+.laporan-pemakaian .lp-table .nama {
+  font-size: 5.5pt;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.laporan-pemakaian .lp-table .pol { font-size: 6pt; }
+
+.laporan-pemakaian .lp-row-data .day-val {
+  font-weight: 700;
+  background: #fffde7;
+}
+
+.laporan-pemakaian .lp-total-row td {
+  font-weight: 700;
+  background: #f5f5f5;
+}
+
+.laporan-pemakaian .lp-grand-total {
+  border: 2px solid #000;
+  padding: 5px 8px;
+  text-align: right;
+  font-weight: 700;
+  font-size: 9pt;
+  margin-top: 8px;
+}
+
+.laporan-pemakaian .lp-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  font-size: 8pt;
+}
+
+.laporan-pemakaian .lp-sig {
+  width: 38%;
+  text-align: center;
+}
+
+.laporan-pemakaian .lp-sig-line {
+  border-bottom: 1px solid #000;
+  height: 40px;
+  margin-bottom: 4px;
+}
+
+.laporan-pemakaian .lp-sig p { margin: 0; }

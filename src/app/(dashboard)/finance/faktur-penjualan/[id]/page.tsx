@@ -111,8 +111,8 @@ export default function FakturPenjualanDetailPage() {
       </div>
 
       {opb && (
-        <div className="max-w-2xl">
-          <h3 className="text-[13px] font-bold text-slds-text mb-2">Lampiran — Rekap Admin</h3>
+        <div className="overflow-x-auto">
+          <h3 className="text-[13px] font-bold text-slds-text mb-2">Lampiran — Rekap Order Pembelian Bahan</h3>
           <RekapInvoicePreview opb={opb} transaksi={transaksi} invoiceId={row.id} />
         </div>
       )}

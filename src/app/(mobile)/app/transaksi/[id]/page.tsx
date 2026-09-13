@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, Printer, PenLine, Clock, Plus } from "lucide-react";
+import { ArrowLeft, Printer, PenLine, Clock, Plus, Palette } from "lucide-react";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatIDR, formatWaktu, formatDurasi } from "@/lib/mock-data";
-import { NotaPreview, printNotaPreview } from "@/components/ui/nota-preview";
+import { NotaPenjualanPreview, printNotaPenjualanPreview } from "@/components/ui/nota-penjualan-preview";
 import { useToast } from "@/components/ui/toast";
 import { useNotaPrint, useTransaksiList } from "@/lib/preview-store";
 import { CetakNotaAudit } from "@/components/ui/cetak-nota-audit";
@@ -68,6 +68,13 @@ export default function TransaksiDetailPage() {
         </Link>
       )}
 
+      <Link
+        href={`/app/klaim-warna?kode=${encodeURIComponent(trx.kodeWarna)}&plat=${encodeURIComponent(trx.platNomor)}`}
+        className="flex items-center justify-center gap-2 w-full py-3 border border-slds-border text-slds-text rounded-xl font-semibold text-[14px] bg-white"
+      >
+        <Palette className="h-4 w-4 text-brand" /> Ajukan Klaim Warna
+      </Link>
+
       <div className="bg-white rounded-xl p-4 border border-slds-border">
         <p className="text-[12px] font-bold text-slds-text mb-2">Bahan Digunakan</p>
         {trx.bahan.map((b) => (
@@ -86,9 +93,10 @@ export default function TransaksiDetailPage() {
         <div className="flex justify-between"><span className="text-slds-text-weak">TTD DocuMatrix</span><span>{formatWaktu(trx.waktuTTD)}</span></div>
       </div>
 
-      {(showNota || trx.waktuCetakNota) && (
+      {(showNota || trx.waktuCetakNota || trx.status === "Menunggu TTD") && (
         <div className="overflow-x-auto">
-          <NotaPreview trx={trx} className="min-w-[320px] shadow-sm" />
+          <p className="text-[12px] font-bold text-slds-text mb-2">Nota Penjualan</p>
+          <NotaPenjualanPreview trx={trx} className="min-w-[320px] shadow-sm" />
         </div>
       )}
 
@@ -106,12 +114,12 @@ export default function TransaksiDetailPage() {
               const isReprint = recordPrint(trx.id, trx.tinter, trx.cabang);
               setPrinted(true);
               setShowNota(true);
-              printNotaPreview();
-              toast(isReprint ? "Cetak ulang tercatat di audit log" : "Nota berhasil dicetak", isReprint ? "error" : "success");
+              printNotaPenjualanPreview();
+              toast(isReprint ? "Cetak ulang tercatat di audit log" : "Nota penjualan berhasil dicetak", isReprint ? "error" : "success");
             }}
             className="w-full py-3.5 bg-slds-text text-white rounded-xl font-bold text-[14px] flex items-center justify-center gap-2"
           >
-            <Printer className="h-4 w-4" /> {printed ? "Cetak Ulang Nota" : "Cetak Nota"}
+            <Printer className="h-4 w-4" /> {printed ? "Cetak Ulang Nota" : "Cetak Nota Penjualan"}
           </button>
           <button type="button" data-no-toast onClick={() => { setSigned(true); toast("Tanda tangan DocuMatrix berhasil", "success"); }} disabled={!printed || signed} className="w-full py-3 border-2 border-brand text-brand rounded-xl font-bold text-[14px] flex items-center justify-center gap-2 disabled:opacity-50">
             <PenLine className="h-4 w-4" /> {signed ? "Sudah Ditandatangani" : "DocuMatrix — TTD Kepala Bengkel"}

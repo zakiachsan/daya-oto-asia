@@ -44,7 +44,7 @@ export default function LaporanPemakaianPage() {
     <div>
       <PageHeader
         title="Laporan Pemakaian Base"
-        desc="Grid pemakaian bahan cat per gram — referensi form DOA Cabang Bogor"
+        desc="Grid side-by-side TGL 1–15 | 16–31 per gram — referensi DOA Cabang Bogor hal. 2"
         breadcrumb={[
           { label: "Operasional", href: "/operasional" },
           { label: "Laporan Pemakaian Base" },
@@ -96,7 +96,7 @@ export default function LaporanPemakaianPage() {
           Tidak ada transaksi dengan nota tercetak untuk filter ini. Coba ubah bulan/cabang/tinter.
         </div>
       ) : (
-        <div className="max-w-4xl">
+        <div className="overflow-x-auto">
           <LaporanPemakaianPreview
             bengkel={bengkelLabel}
             tinter={tinterLabel}

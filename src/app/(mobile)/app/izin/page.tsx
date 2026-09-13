@@ -6,8 +6,7 @@ import { Plus, Calendar, ChevronRight } from "lucide-react";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { useToast } from "@/components/ui/toast";
 import { useIzinList } from "@/lib/preview-store";
-
-const MOBILE_USER = "Andi Wijaya";
+import { MOBILE_USER } from "@/lib/mobile-app-utils";
 
 export default function AppIzinPage() {
   const { toast } = useToast();
