@@ -30,6 +30,7 @@ const sslB64 = Buffer.from(ssl).toString("base64");
 const conn = new Client();
 conn.on("ready", async () => {
   try {
+    await exec(conn, "cd /var/www/daya-oto-asia-production && git pull origin main");
     await exec(conn, `echo '${nginxB64}' | base64 -d | sudo tee /etc/nginx/sites-available/daya-oto-asia.conf > /dev/null`);
     await exec(conn, "sudo ln -sf /etc/nginx/sites-available/daya-oto-asia.conf /etc/nginx/sites-enabled/daya-oto-asia.conf && sudo nginx -t && sudo systemctl reload nginx");
     await exec(conn, `echo '${sslB64}' | base64 -d > /tmp/setup-ssl.sh && chmod +x /tmp/setup-ssl.sh && bash /tmp/setup-ssl.sh`);
