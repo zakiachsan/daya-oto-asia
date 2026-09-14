@@ -14,10 +14,7 @@ const financeRedirects = [
   ["/finance/perpajakan", "/finance/laporan/perpajakan"],
 ] as const;
 
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
-
 const nextConfig: NextConfig = {
-  ...(basePath ? { basePath } : {}),
   async redirects() {
     return financeRedirects.map(([source, destination]) => ({
       source,
