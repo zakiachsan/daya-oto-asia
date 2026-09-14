@@ -74,6 +74,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const activeModule = getModuleByPath(pathname);
   const isMobileApp = pathname.startsWith("/app");
+  const isGuidePage = pathname.endsWith("/panduan");
 
   const isActive = (href: string) =>
     pathname === href || (href !== `/${activeModule?.id}` && pathname.startsWith(href + "/"));
@@ -170,7 +171,15 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           </div>
           <span className="text-[11px] text-slds-text-weak hidden sm:block">UI Preview — Mock Data</span>
         </header>
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+        <main
+          className={
+            isGuidePage
+              ? "flex-1 overflow-hidden p-0 flex flex-col min-h-0"
+              : "flex-1 overflow-y-auto p-4 md:p-6"
+          }
+        >
+          {children}
+        </main>
       </div>
     </div>
   );
