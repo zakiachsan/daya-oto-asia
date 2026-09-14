@@ -1,0 +1,40 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: production
+        type: choice
+        options:
+          - production
+          - staging
+
+concurrency:
+  group: vps-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: VPS Deploy (${{ github.ref_name }})
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+              bash /var/www/daya-oto-asia-production/deploy/deploy-app.sh production
+            else
+              bash /var/www/daya-oto-asia-staging/deploy/deploy-app.sh staging
+            fi
