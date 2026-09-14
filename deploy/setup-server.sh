@@ -76,4 +76,5 @@ sudo env PATH="$PATH:/usr/bin" pm2 startup systemd -u "$DEPLOY_USER" --hp "/home
 echo "==> Done"
 pm2 status
 echo "Production: http://$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')/"
-echo "Staging:    http://$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}'):8080/"
+echo "Staging:    http://$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')/staging/"
+echo "Staging alt: http://$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}'):8080/ (if firewall allows)"

@@ -25,6 +25,7 @@ module.exports = {
       env: {
         NODE_ENV: "production",
         PORT: "3301",
+        NEXT_PUBLIC_BASE_PATH: "/staging",
       },
     },
   ],
