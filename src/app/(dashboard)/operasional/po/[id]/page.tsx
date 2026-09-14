@@ -6,7 +6,9 @@ import { ArrowLeft, Package } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatIDR } from "@/lib/mock-data";
-import { usePoList } from "@/lib/preview-store";
+import { FinanceLinkBadge } from "@/components/finance/finance-link-badge";
+import { useFakturBeli, useFinancePayments, useHutangPiutang, usePoList } from "@/lib/preview-store";
+import { fakturBeliForPo, getPoFinanceStatus } from "@/lib/ops-finance-bridge";
 import { useToast } from "@/components/ui/toast";
 
 export default function PoDetailPage() {
@@ -14,6 +16,9 @@ export default function PoDetailPage() {
   const id = String(params.id);
   const { toast } = useToast();
   const { items, update } = usePoList();
+  const { all: fakturBeli } = useFakturBeli();
+  const { items: hutang } = useHutangPiutang();
+  const { items: payments } = useFinancePayments();
   const found = items.find((r) => r.id === id);
 
   if (!found) {
@@ -26,6 +31,8 @@ export default function PoDetailPage() {
   }
 
   const row = found;
+  const faktur = fakturBeliForPo(row.id, fakturBeli);
+  const financeStatus = getPoFinanceStatus(row.id, fakturBeli, hutang, payments);
 
   function handleTerimaBarang() {
     const grId = row.id.replace("PO", "GR");
@@ -62,6 +69,19 @@ export default function PoDetailPage() {
           {row.gr && (
             <div className="flex justify-between"><span className="text-slds-text-weak">Goods Received</span><span className="font-mono font-semibold text-green-700">{row.gr}</span></div>
           )}
+          <div className="flex justify-between items-center pt-2 border-t border-slds-border">
+            <span className="text-slds-text-weak">Status Finance</span>
+            <FinanceLinkBadge
+              status={financeStatus}
+              href={faktur ? `/finance/pembelian/pembayaran-pembelian?faktur=${encodeURIComponent(faktur.id)}` : row.gr ? "/finance/pembelian/faktur-pembelian" : undefined}
+            />
+          </div>
+          {faktur && (
+            <div className="flex justify-between">
+              <span className="text-slds-text-weak">Faktur Pembelian</span>
+              <Link href="/finance/pembelian/faktur-pembelian" className="font-mono font-semibold text-brand hover:underline">{faktur.id}</Link>
+            </div>
+          )}
           {row.catatan && (
             <div className="pt-2 border-t border-slds-border">
               <p className="text-[11px] text-slds-text-weak uppercase font-semibold mb-1">Catatan</p>
@@ -72,6 +92,14 @@ export default function PoDetailPage() {
             <button type="button" data-no-toast onClick={handleTerimaBarang} className="w-full mt-3 inline-flex items-center justify-center gap-1 px-3 py-2 bg-green-600 text-white rounded-md text-[12px] font-semibold">
               <Package className="h-3.5 w-3.5" /> Konfirmasi Terima Barang
             </button>
+          )}
+          {row.gr && !faktur && (
+            <Link
+              href="/finance/pembelian/faktur-pembelian"
+              className="w-full mt-3 inline-flex items-center justify-center gap-1 px-3 py-2 bg-brand text-white rounded-md text-[12px] font-semibold hover:bg-brand-dark"
+            >
+              Generate Faktur Pembelian
+            </Link>
           )}
         </div>
 

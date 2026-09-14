@@ -9,7 +9,10 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { OpbPreview, printOpbPreview } from "@/components/ui/opb-preview";
 import { formatIDR, type OpbRow } from "@/lib/mock-data";
 import { getOpbTransaksi, OPB_PIPELINE } from "@/lib/opb-utils";
-import { useOpbList, useTransaksiList } from "@/lib/preview-store";
+import { FinanceLinkBadge } from "@/components/finance/finance-link-badge";
+import { useFakturJual, useHutangPiutang, useOpbList, useTransaksiList } from "@/lib/preview-store";
+import { fakturJualForOpb, getOpbFinanceStatus } from "@/lib/ops-finance-bridge";
+import { fakturSlug } from "@/lib/faktur-utils";
 import { useToast } from "@/components/ui/toast";
 
 export default function OpbDetailPage() {
@@ -18,6 +21,8 @@ export default function OpbDetailPage() {
   const { toast } = useToast();
   const { items, updateStatus, setSap } = useOpbList();
   const { all: transaksi } = useTransaksiList();
+  const { all: fakturJual } = useFakturJual();
+  const { items: hutang } = useHutangPiutang();
   const opb = items.find((o) => o.id === id);
   const [sapInput, setSapInput] = useState(opb?.sap ?? "");
 
@@ -31,6 +36,8 @@ export default function OpbDetailPage() {
   }
 
   const row = opb;
+  const faktur = fakturJualForOpb(row.id, fakturJual);
+  const financeStatus = getOpbFinanceStatus(row.id, fakturJual, hutang);
   const linkedTrx = getOpbTransaksi(row, transaksi);
   const pipelineIdx = OPB_PIPELINE.findIndex((p) => p.status === row.status);
 
@@ -83,9 +90,36 @@ export default function OpbDetailPage() {
             {row.sap && (
               <div className="flex justify-between"><span className="text-slds-text-weak">No. SAP</span><span className="font-mono font-semibold">{row.sap}</span></div>
             )}
+            <div className="flex justify-between items-center pt-2 border-t border-slds-border">
+              <span className="text-slds-text-weak">Status Finance</span>
+              <FinanceLinkBadge
+                status={financeStatus}
+                href={
+                  faktur
+                    ? `/finance/penjualan/faktur-penjualan/${fakturSlug(faktur.id)}`
+                    : row.status === "Ditagihkan"
+                      ? "/finance/penjualan/faktur-penjualan"
+                      : undefined
+                }
+              />
+            </div>
+            {faktur && (
+              <div className="flex justify-between">
+                <span className="text-slds-text-weak">Faktur Penjualan</span>
+                <Link href={`/finance/penjualan/faktur-penjualan/${fakturSlug(faktur.id)}`} className="font-mono font-semibold text-brand hover:underline">{faktur.id}</Link>
+              </div>
+            )}
           </div>
 
           <div className="pt-3 border-t border-slds-border space-y-2">
+            {row.status === "Ditagihkan" && !faktur && (
+              <Link
+                href="/finance/penjualan/faktur-penjualan"
+                className="w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-green-600 text-white rounded-md text-[12px] font-semibold hover:bg-green-700"
+              >
+                Generate Faktur Penjualan
+              </Link>
+            )}
             {(row.status === "Draft" || row.status === "Menunggu TTD") && (
               <button
                 type="button"

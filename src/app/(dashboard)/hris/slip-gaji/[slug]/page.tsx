@@ -31,7 +31,7 @@ export default function SlipGajiDetailPage() {
     <div>
       <PageHeader
         title={row.nama}
-        desc={`Slip Gaji — ${row.bulan}`}
+        desc={`Slip Gaji â ${row.bulan}`}
         breadcrumb={[
           { label: "HRIS", href: "/hris" },
           { label: "Slip Gaji", href: "/hris/slip-gaji" },
@@ -48,8 +48,8 @@ export default function SlipGajiDetailPage() {
         <div className="bg-white border border-slds-border rounded-lg overflow-hidden">
           <div className="px-4 py-3 bg-brand text-white">
             <p className="text-[11px] opacity-80">PT Daya Oto Asia</p>
-            <p className="text-base font-bold">Slip Gaji — {row.bulan}</p>
-            <p className="text-[12px] opacity-90">{row.nama} · {row.cabangFull}</p>
+            <p className="text-base font-bold">Slip Gaji â {row.bulan}</p>
+            <p className="text-[12px] opacity-90">{row.nama} Â· {row.cabangFull}</p>
           </div>
           <div className="p-4 space-y-2 text-[13px]">
             <div className="flex justify-between"><span className="text-slds-text-weak">Gaji Pokok</span><span className="font-semibold">{formatIDR(row.gajiPokok)}</span></div>
@@ -86,9 +86,9 @@ export default function SlipGajiDetailPage() {
           <div className="bg-white border border-slds-border rounded-lg p-4">
             <h3 className="text-[13px] font-bold text-slds-text mb-2">Sumber Perhitungan</h3>
             <div className="text-[13px] space-y-2">
-              <div className="flex justify-between"><span className="text-slds-text-weak">Kehadiran — Telat</span><span className="font-semibold">{row.telat} kali</span></div>
-              <div className="flex justify-between"><span className="text-slds-text-weak">Kehadiran — Alpha</span><span className="font-semibold">{row.alpha} hari</span></div>
-              <div className="flex justify-between"><span className="text-slds-text-weak">Tarif lembur</span><span>PP 35/2021 (1.5×)</span></div>
+              <div className="flex justify-between"><span className="text-slds-text-weak">Kehadiran â Telat</span><span className="font-semibold">{row.telat} kali</span></div>
+              <div className="flex justify-between"><span className="text-slds-text-weak">Kehadiran â Alpha</span><span className="font-semibold">{row.alpha} hari</span></div>
+              <div className="flex justify-between"><span className="text-slds-text-weak">Tarif lembur</span><span>PP 35/2021 (1.5Ã-)</span></div>
             </div>
           </div>
 

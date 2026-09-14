@@ -9,7 +9,10 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { ActionFormPanel, fieldClass, labelClass } from "@/components/ui/action-form-panel";
 import { MOCK_CABANG, formatIDR, type OpbRow } from "@/lib/mock-data";
 import { useToast } from "@/components/ui/toast";
-import { useOpbList, useTransaksiList } from "@/lib/preview-store";
+import { FinanceLinkBadge } from "@/components/finance/finance-link-badge";
+import { useFakturJual, useHutangPiutang, useOpbList, useTransaksiList } from "@/lib/preview-store";
+import { fakturJualForOpb, getOpbFinanceStatus } from "@/lib/ops-finance-bridge";
+import { fakturSlug } from "@/lib/faktur-utils";
 
 function cabangShort(nama: string) {
   return nama.replace(/^Bengkel /, "");
@@ -26,6 +29,8 @@ export default function OPBPage() {
   const { toast } = useToast();
   const { items, add } = useOpbList();
   const { all: transaksi } = useTransaksiList();
+  const { all: fakturJual } = useFakturJual();
+  const { items: hutang } = useHutangPiutang();
   const [showForm, setShowForm] = useState(false);
   const [periode, setPeriode] = useState("September 2026");
   const [cabang, setCabang] = useState(CABANG_OPTIONS[0].label);
@@ -176,6 +181,26 @@ export default function OPBPage() {
           { key: "periode", label: "Periode" },
           { key: "total", label: "Total", render: (r) => formatIDR(Number(r.total)) },
           { key: "status", label: "Status", render: (r) => <StatusBadge status={String(r.status)} /> },
+          {
+            key: "finance",
+            label: "Finance",
+            render: (r) => {
+              const status = getOpbFinanceStatus(String(r.id), fakturJual, hutang);
+              const faktur = fakturJualForOpb(String(r.id), fakturJual);
+              return (
+                <FinanceLinkBadge
+                  status={status}
+                  href={
+                    faktur
+                      ? `/finance/penjualan/faktur-penjualan/${fakturSlug(faktur.id)}`
+                      : r.status === "Ditagihkan"
+                        ? "/finance/penjualan/faktur-penjualan"
+                        : undefined
+                  }
+                />
+              );
+            },
+          },
         ]}
         data={filtered}
       />

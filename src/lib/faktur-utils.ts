@@ -8,6 +8,7 @@ export type FakturJualRow = {
   total: number;
   status: "Draft" | "Posted";
   opbId?: string;
+  jurnalId?: string;
 };
 
 export function findOpbForFaktur(faktur: FakturJualRow, opbList: OpbRow[]): OpbRow | undefined {

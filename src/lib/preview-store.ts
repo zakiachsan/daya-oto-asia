@@ -7,11 +7,15 @@ import {
   MOCK_KLAIM,
   MOCK_KARYAWAN,
   MOCK_FAKTUR_JUAL,
+  MOCK_FAKTUR_BELI,
+  MOCK_KAS_BANK,
   type TransaksiRow,
   type OpbRow,
   type KlaimWarnaRow,
 } from "./mock-data";
 import type { FakturJualRow } from "./faktur-utils";
+import type { FakturBeliRow } from "./faktur-beli-utils";
+import type { FinancePaymentRow } from "./finance-payment-utils";
 import { MOCK_JURNAL_DETAILS, type JurnalDetail } from "./jurnal-utils";
 import { INITIAL_STOCK_OPNAME, type StockOpnameRow } from "./stock-opname-utils";
 import { INITIAL_PO, type PoDetail } from "./po-utils";
@@ -21,6 +25,16 @@ import { INITIAL_PENYESUAIAN, type PenyesuaianDetail } from "./penyesuaian-stok-
 import { INITIAL_HUTANG_PIUTANG, type HutangPiutangDetail } from "./hutang-piutang-utils";
 import { INITIAL_IZIN, type IzinDetail } from "./izin-utils";
 import { INITIAL_LEMBUR, type LemburDetail } from "./lembur-utils";
+import {
+  INITIAL_PELANGGAN,
+  INITIAL_PEMASOK,
+  INITIAL_SYARAT_PEMBAYARAN,
+  INITIAL_TRANSFER_BANK,
+  type PelangganRow,
+  type PemasokRow,
+  type SyaratPembayaranRow,
+  type TransferBankRow,
+} from "./finance-master-data";
 
 export type AjuanStokRow = AjuanStokDetail;
 
@@ -49,9 +63,16 @@ const PO_KEY = "daya-oto-po";
 const DIST_KEY = "daya-oto-distribusi";
 const PENYESUAIAN_KEY = "daya-oto-penyesuaian-stok";
 const HUTANG_KEY = "daya-oto-hutang-piutang";
+const FAKTUR_BELI_KEY = "daya-oto-faktur-beli";
+const PAYMENT_KEY = "daya-oto-finance-payments";
+const KAS_BANK_KEY = "daya-oto-kas-bank";
 const IZIN_KEY = "daya-oto-izin";
 const LEMBUR_KEY = "daya-oto-lembur";
 const DEMO_CHECKLIST_KEY = "daya-oto-demo-checklist";
+const SYARAT_BAYAR_KEY = "daya-oto-syarat-pembayaran";
+const PELANGGAN_KEY = "daya-oto-pelanggan";
+const PEMASOK_KEY = "daya-oto-pemasok";
+const TRANSFER_BANK_KEY = "daya-oto-transfer-bank";
 
 export type AssignmentMap = Record<string, string>;
 
@@ -374,7 +395,15 @@ export function useFakturJual() {
     [],
   );
 
-  return { all: items, add, updateStatus };
+  const update = useCallback((id: string, patch: Partial<FakturJualRow>) => {
+    setItems((prev) => {
+      const next = prev.map((r) => (r.id === id ? { ...r, ...patch } : r));
+      write(FAKTUR_KEY, next);
+      return next;
+    });
+  }, []);
+
+  return { all: items, add, updateStatus, update };
 }
 
 export function useJurnalList() {
@@ -514,6 +543,11 @@ export function useHutangPiutang() {
     setItems(read(HUTANG_KEY, INITIAL_HUTANG_PIUTANG));
   }, []);
 
+  const persist = useCallback((next: HutangPiutangDetail[]) => {
+    setItems(next);
+    write(HUTANG_KEY, next);
+  }, []);
+
   const update = useCallback((id: string, patch: Partial<HutangPiutangDetail>) => {
     setItems((prev) => {
       const next = prev.map((r) => (r.id === id ? { ...r, ...patch } : r));
@@ -522,7 +556,108 @@ export function useHutangPiutang() {
     });
   }, []);
 
-  return { items, update };
+  const replaceAll = useCallback(
+    (next: HutangPiutangDetail[]) => {
+      persist(next);
+    },
+    [persist],
+  );
+
+  return { items, update, replaceAll };
+}
+
+const INITIAL_FAKTUR_BELI: FakturBeliRow[] = MOCK_FAKTUR_BELI.map((f) => ({
+  ...f,
+  status: f.status as FakturBeliRow["status"],
+}));
+
+export function useFakturBeli() {
+  const [items, setItems] = useState<FakturBeliRow[]>(INITIAL_FAKTUR_BELI);
+
+  useEffect(() => {
+    setItems(read(FAKTUR_BELI_KEY, INITIAL_FAKTUR_BELI));
+  }, []);
+
+  const updateStatus = useCallback((id: string, status: FakturBeliRow["status"]) => {
+    setItems((prev) => {
+      const next = prev.map((r) => (r.id === id ? { ...r, status } : r));
+      write(FAKTUR_BELI_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const update = useCallback((id: string, patch: Partial<FakturBeliRow>) => {
+    setItems((prev) => {
+      const next = prev.map((r) => (r.id === id ? { ...r, ...patch } : r));
+      write(FAKTUR_BELI_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const add = useCallback((row: FakturBeliRow) => {
+    setItems((prev) => {
+      const next = [row, ...prev];
+      write(FAKTUR_BELI_KEY, next);
+      return next;
+    });
+  }, []);
+
+  return { all: items, add, updateStatus, update };
+}
+
+export type KasBankRow = {
+  id: string;
+  tanggal: string;
+  tipe: "Penerimaan" | "Pembayaran";
+  akun: string;
+  keterangan: string;
+  jumlah: number;
+  jurnalId?: string;
+};
+
+const INITIAL_KAS_BANK: KasBankRow[] = MOCK_KAS_BANK.map((r): KasBankRow => ({
+  id: r.id,
+  tanggal: r.tanggal,
+  tipe: r.tipe === "Penerimaan" ? "Penerimaan" : "Pembayaran",
+  akun: r.akun,
+  keterangan: r.keterangan,
+  jumlah: r.jumlah,
+}));
+
+export function useKasBank() {
+  const [items, setItems] = useState<KasBankRow[]>(INITIAL_KAS_BANK);
+
+  useEffect(() => {
+    setItems(read(KAS_BANK_KEY, INITIAL_KAS_BANK));
+  }, []);
+
+  const add = useCallback((row: KasBankRow) => {
+    setItems((prev) => {
+      const next = [row, ...prev];
+      write(KAS_BANK_KEY, next);
+      return next;
+    });
+  }, []);
+
+  return { items, add };
+}
+
+export function useFinancePayments() {
+  const [items, setItems] = useState<FinancePaymentRow[]>([]);
+
+  useEffect(() => {
+    setItems(read(PAYMENT_KEY, []));
+  }, []);
+
+  const add = useCallback((row: FinancePaymentRow) => {
+    setItems((prev) => {
+      const next = [row, ...prev];
+      write(PAYMENT_KEY, next);
+      return next;
+    });
+  }, []);
+
+  return { items, add };
 }
 
 export function useIzinList() {
@@ -598,4 +733,108 @@ export function useDemoChecklist() {
   }, []);
 
   return { checked, toggle, reset };
+}
+
+export function useSyaratPembayaran() {
+  const [items, setItems] = useState<SyaratPembayaranRow[]>(INITIAL_SYARAT_PEMBAYARAN);
+
+  useEffect(() => {
+    setItems(read(SYARAT_BAYAR_KEY, INITIAL_SYARAT_PEMBAYARAN));
+  }, []);
+
+  const add = useCallback((row: SyaratPembayaranRow) => {
+    setItems((prev) => {
+      const next = [...prev, row];
+      write(SYARAT_BAYAR_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const update = useCallback((id: string, patch: Partial<SyaratPembayaranRow>) => {
+    setItems((prev) => {
+      const next = prev.map((r) => (r.id === id ? { ...r, ...patch } : r));
+      write(SYARAT_BAYAR_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const remove = useCallback((id: string) => {
+    setItems((prev) => {
+      const next = prev.filter((r) => r.id !== id);
+      write(SYARAT_BAYAR_KEY, next);
+      return next;
+    });
+  }, []);
+
+  return { items, add, update, remove };
+}
+
+export function usePelanggan() {
+  const [items, setItems] = useState<PelangganRow[]>(INITIAL_PELANGGAN);
+
+  useEffect(() => {
+    setItems(read(PELANGGAN_KEY, INITIAL_PELANGGAN));
+  }, []);
+
+  const add = useCallback((row: PelangganRow) => {
+    setItems((prev) => {
+      const next = [row, ...prev];
+      write(PELANGGAN_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const update = useCallback((id: string, patch: Partial<PelangganRow>) => {
+    setItems((prev) => {
+      const next = prev.map((r) => (r.id === id ? { ...r, ...patch } : r));
+      write(PELANGGAN_KEY, next);
+      return next;
+    });
+  }, []);
+
+  return { items, add, update };
+}
+
+export function usePemasok() {
+  const [items, setItems] = useState<PemasokRow[]>(INITIAL_PEMASOK);
+
+  useEffect(() => {
+    setItems(read(PEMASOK_KEY, INITIAL_PEMASOK));
+  }, []);
+
+  const add = useCallback((row: PemasokRow) => {
+    setItems((prev) => {
+      const next = [row, ...prev];
+      write(PEMASOK_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const update = useCallback((id: string, patch: Partial<PemasokRow>) => {
+    setItems((prev) => {
+      const next = prev.map((r) => (r.id === id ? { ...r, ...patch } : r));
+      write(PEMASOK_KEY, next);
+      return next;
+    });
+  }, []);
+
+  return { items, add, update };
+}
+
+export function useTransferBank() {
+  const [items, setItems] = useState<TransferBankRow[]>(INITIAL_TRANSFER_BANK);
+
+  useEffect(() => {
+    setItems(read(TRANSFER_BANK_KEY, INITIAL_TRANSFER_BANK));
+  }, []);
+
+  const add = useCallback((row: TransferBankRow) => {
+    setItems((prev) => {
+      const next = [row, ...prev];
+      write(TRANSFER_BANK_KEY, next);
+      return next;
+    });
+  }, []);
+
+  return { items, add };
 }

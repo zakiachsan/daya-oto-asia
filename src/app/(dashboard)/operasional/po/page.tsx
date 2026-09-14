@@ -8,7 +8,9 @@ import { DataTable } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { MOCK_PRODUK, formatIDR } from "@/lib/mock-data";
 import { HARGA_EST, PO_SUPPLIERS, type PoDetail, type PoLine } from "@/lib/po-utils";
-import { usePoList } from "@/lib/preview-store";
+import { FinanceLinkBadge } from "@/components/finance/finance-link-badge";
+import { useFakturBeli, useFinancePayments, useHutangPiutang, usePoList } from "@/lib/preview-store";
+import { getPoFinanceStatus } from "@/lib/ops-finance-bridge";
 import { useToast } from "@/components/ui/toast";
 
 type LineItem = { kode: string; qty: number; harga: number };
@@ -29,6 +31,9 @@ function toLines(validLines: LineItem[]): PoLine[] {
 export default function POPage() {
   const { toast } = useToast();
   const { items, add } = usePoList();
+  const { all: fakturBeli } = useFakturBeli();
+  const { items: hutang } = useHutangPiutang();
+  const { items: payments } = useFinancePayments();
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Semua Status");
@@ -199,6 +204,26 @@ export default function POPage() {
             key: "gr",
             label: "GR",
             render: (r) => (r.gr ? <span className="font-mono text-green-700 text-[12px]">{String(r.gr)}</span> : <span className="text-slds-text-weak">—</span>),
+          },
+          {
+            key: "finance",
+            label: "Finance",
+            render: (r) => {
+              const status = getPoFinanceStatus(String(r.id), fakturBeli, hutang, payments);
+              const faktur = fakturBeli.find((f) => f.po === r.id);
+              return (
+                <FinanceLinkBadge
+                  status={status}
+                  href={
+                    faktur
+                      ? `/finance/pembelian/faktur-pembelian`
+                      : r.gr
+                        ? `/finance/pembelian/faktur-pembelian`
+                        : undefined
+                  }
+                />
+              );
+            },
           },
         ]}
         data={filtered}

@@ -6,7 +6,9 @@ import { ArrowLeft, Scale, Check, AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { TOLERANSI_GRAM, isDalamToleransi } from "@/lib/stock-opname-utils";
-import { useStockOpname } from "@/lib/preview-store";
+import { usePenyesuaianStok, useStockOpname } from "@/lib/preview-store";
+import { penyesuaianForOpname } from "@/lib/ops-finance-bridge";
+import { penyesuaianSlug } from "@/lib/penyesuaian-stok-utils";
 import { useToast } from "@/components/ui/toast";
 import { formatWaktu } from "@/lib/mock-data";
 
@@ -15,6 +17,7 @@ export default function StockOpnameDetailPage() {
   const id = String(params.id);
   const { toast } = useToast();
   const { items, updateStatus } = useStockOpname();
+  const { items: penyesuaian } = usePenyesuaianStok();
   const found = items.find((r) => r.id === id);
 
   if (!found) {
@@ -28,14 +31,16 @@ export default function StockOpnameDetailPage() {
 
   const row = found;
   const ok = isDalamToleransi(row.selisih);
+  const existingAdj = penyesuaianForOpname(row.id, penyesuaian);
+  const needsAdj = row.selisih !== 0 && !existingAdj;
 
   function handleApprove() {
-    updateStatus(row.id, "Selesai", { supervisor: "Pak Ahmad", catatan: "Disetujui supervisor — dalam toleransi" });
+    updateStatus(row.id, "Selesai", { supervisor: "Pak Ahmad", catatan: "Disetujui supervisor â dalam toleransi" });
     toast("Opname di-approve", "success");
   }
 
   function handleFlag() {
-    updateStatus(row.id, "Perlu Review", { catatan: "Selisih melebihi toleransi — investigasi tinter" });
+    updateStatus(row.id, "Perlu Review", { catatan: "Selisih melebihi toleransi â investigasi tinter" });
     toast("Opname di-flag untuk review", "info");
   }
 
@@ -43,7 +48,7 @@ export default function StockOpnameDetailPage() {
     <div>
       <PageHeader
         title={row.produk}
-        desc={`${row.id} · ${row.tanggal}`}
+        desc={`${row.id} Â· ${row.tanggal}`}
         breadcrumb={[
           { label: "Operasional", href: "/operasional" },
           { label: "Stock Opname", href: "/operasional/stock-opname" },
@@ -78,7 +83,7 @@ export default function StockOpnameDetailPage() {
             </div>
           </div>
           <p className={`text-[12px] font-semibold ${ok ? "text-green-700" : "text-red-700"}`}>
-            {ok ? `✓ Dalam toleransi ±${TOLERANSI_GRAM} gram` : `✗ Melebihi toleransi ±${TOLERANSI_GRAM} gram`}
+            {ok ? `â Dalam toleransi Â±${TOLERANSI_GRAM} gram` : `â- Melebihi toleransi Â±${TOLERANSI_GRAM} gram`}
           </p>
         </div>
 
@@ -86,8 +91,8 @@ export default function StockOpnameDetailPage() {
           <h3 className="text-[13px] font-bold text-slds-text mb-2">Info Opname</h3>
           <div className="flex justify-between"><span className="text-slds-text-weak">Cabang</span><span className="font-semibold">{row.cabang}</span></div>
           <div className="flex justify-between"><span className="text-slds-text-weak">Tinter</span><span>{row.tinter}</span></div>
-          <div className="flex justify-between"><span className="text-slds-text-weak">Waktu Timbang</span><span>{row.waktuTimbang ? formatWaktu(row.waktuTimbang) : "—"}</span></div>
-          <div className="flex justify-between"><span className="text-slds-text-weak">Supervisor</span><span>{row.supervisor ?? "—"}</span></div>
+          <div className="flex justify-between"><span className="text-slds-text-weak">Waktu Timbang</span><span>{row.waktuTimbang ? formatWaktu(row.waktuTimbang) : "â"}</span></div>
+          <div className="flex justify-between"><span className="text-slds-text-weak">Supervisor</span><span>{row.supervisor ?? "â"}</span></div>
           {row.catatan && (
             <div className="pt-2 border-t border-slds-border">
               <p className="text-[11px] text-slds-text-weak uppercase font-semibold mb-1">Catatan</p>
@@ -113,6 +118,33 @@ export default function StockOpnameDetailPage() {
               </button>
             )}
           </div>
+        </div>
+      )}
+
+      {(row.status === "Selesai" || row.status === "Perlu Review") && needsAdj && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <p className="text-[13px] font-bold text-amber-900 mb-1">Selisih perlu penyesuaian persediaan</p>
+          <p className="text-[12px] text-amber-800 mb-3">
+            Selisih {row.selisih}gr terdeteksi — buat penyesuaian di Finance untuk koreksi stok & jurnal.
+          </p>
+          <Link
+            href={`/finance/persediaan/penyesuaian-persediaan?opname=${encodeURIComponent(row.id)}`}
+            className="inline-flex items-center gap-1 px-4 py-2 bg-brand text-white rounded-md text-[12px] font-semibold hover:bg-brand-dark"
+          >
+            Buat Penyesuaian Persediaan
+          </Link>
+        </div>
+      )}
+
+      {existingAdj && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <p className="text-[13px] font-bold text-green-900 mb-1">Penyesuaian sudah dibuat</p>
+          <Link
+            href={`/finance/persediaan/penyesuaian-persediaan/${penyesuaianSlug(existingAdj.id)}`}
+            className="font-mono text-[12px] font-semibold text-brand hover:underline"
+          >
+            {existingAdj.id} · {existingAdj.status}
+          </Link>
         </div>
       )}
     </div>

@@ -389,6 +389,78 @@ export const MOCK_LABA_RUGI = [
   { akun: "Beban Gaji", jumlah: -45000000 },
 ];
 
+export const MOCK_ARUS_KAS = {
+  masuk: 8300000,
+  keluar: 23500000,
+  neto: 32000000,
+  rows: [
+    { item: "Penerimaan dari bengkel", jumlah: 8300000 },
+    { item: "Pembayaran ke pabrik", jumlah: -8500000 },
+    { item: "Pembayaran gaji", jumlah: -15000000 },
+  ],
+};
+
+export const MOCK_GRAFIK_PENJUALAN = [
+  { bulan: "Apr", penjualan: 38, penerimaan: 35 },
+  { bulan: "Mei", penjualan: 42, penerimaan: 40 },
+  { bulan: "Jun", penjualan: 39, penerimaan: 38 },
+  { bulan: "Jul", penjualan: 45, penerimaan: 43 },
+  { bulan: "Agu", penjualan: 48, penerimaan: 46 },
+  { bulan: "Sep", penjualan: 26, penerimaan: 18 },
+];
+
+export const MOCK_GRAFIK_BEBAN = [
+  { bulan: "Apr", hpp: 14, operasional: 8 },
+  { bulan: "Mei", hpp: 15, operasional: 9 },
+  { bulan: "Jun", hpp: 14, operasional: 8.5 },
+  { bulan: "Jul", hpp: 16, operasional: 9.5 },
+  { bulan: "Agu", hpp: 18, operasional: 10 },
+  { bulan: "Sep", hpp: 9, operasional: 5 },
+];
+
+export const MOCK_RASIO_KEUANGAN = [
+  { nama: "Current Ratio", rumus: "Aset Lancar / Hutang Lancar", nilai: "27.9x", benchmark: "> 1.5x", status: "Baik" },
+  { nama: "Quick Ratio", rumus: "(Aset Lancar - Persediaan) / Hutang Lancar", nilai: "21.7x", benchmark: "> 1.0x", status: "Baik" },
+  { nama: "Debt to Equity", rumus: "Total Hutang / Total Ekuitas", nilai: "0.04x", benchmark: "< 1.0x", status: "Baik" },
+  { nama: "Gross Profit Margin", rumus: "(Pendapatan - HPP) / Pendapatan", nilai: "60.2%", benchmark: "> 40%", status: "Baik" },
+  { nama: "Net Profit Margin", rumus: "Laba Bersih / Pendapatan", nilai: "28.5%", benchmark: "> 10%", status: "Baik" },
+  { nama: "ROA", rumus: "Laba Bersih / Total Aktiva", nilai: "2.5%", benchmark: "> 2%", status: "Baik" },
+];
+
+export const MOCK_LABA_DITAHAN = {
+  saldoAwal: 678000000,
+  labaBersih: 32000000,
+  dividen: 0,
+  penyesuaian: 0,
+  saldoAkhir: 710000000,
+  mutasi: [
+    { tanggal: "2026-09-01", keterangan: "Saldo awal periode", jumlah: 678000000 },
+    { tanggal: "2026-09-30", keterangan: "Laba bersih September 2026", jumlah: 32000000 },
+  ],
+};
+
+export const MOCK_PERUBAHAN_EKUITAS = [
+  { komponen: "Modal Disetor", saldoAwal: 500000000, penambahan: 0, pengurangan: 0, saldoAkhir: 500000000 },
+  { komponen: "Laba Ditahan", saldoAwal: 678000000, penambahan: 32000000, pengurangan: 0, saldoAkhir: 710000000 },
+  { komponen: "Laba Tahun Berjalan", saldoAwal: 0, penambahan: 0, pengurangan: 0, saldoAkhir: 0 },
+];
+
+export const MOCK_PPN = {
+  keluaran: 4520000,
+  masukan: 1370000,
+  neto: 3150000,
+  faktur: [
+    { no: "INV-2026-0087", tanggal: "2026-09-01", pihak: "Cakrawala Malang", dpp: 5225225, ppn: 522477, tipe: "Keluaran" },
+    { no: "INV-2026-0086", tanggal: "2026-09-01", pihak: "Prima Jember", dpp: 7387387, ppn: 738613, tipe: "Keluaran" },
+    { no: "PINV-2026-034", tanggal: "2026-09-06", pihak: "PT Axalta Indonesia", dpp: 7657658, ppn: 842342, tipe: "Masukan" },
+  ],
+};
+
+export const MOCK_HISTORI_AKUN = [
+  { tanggal: "2026-09-01", jurnalId: "JU/2026/09/001", keterangan: "Tagihan OPB Auto 2000 Agustus", debit: 12500000, credit: 0, saldo: 125000000 },
+  { tanggal: "2026-09-05", jurnalId: "TRM/2026/09/014", keterangan: "Penerimaan transfer Cakrawala", debit: 0, credit: 5800000, saldo: 119200000 },
+];
+
 export const MOCK_KODE_WARNA = [
   { kode: "1G3", nama: "Silver Metallic", kategori: "Silver", formula: "AXT-207 + AXT-814 + AXT-811" },
   { kode: "3R1", nama: "Merah Solid", kategori: "Red", formula: "AXT-207 + AXT-501" },

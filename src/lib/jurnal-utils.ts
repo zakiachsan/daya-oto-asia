@@ -1,6 +1,29 @@
 import type { OpbRow } from "./mock-data";
 import { MOCK_COA } from "./mock-data";
 
+export type JurnalSourceType =
+  | "faktur-jual"
+  | "faktur-beli"
+  | "penerimaan-penjualan"
+  | "pembayaran-pembelian"
+  | "penyesuaian-stok"
+  | "kas-penerimaan"
+  | "kas-pembayaran"
+  | "transfer-bank"
+  | "jurnal-manual";
+
+export const JURNAL_SOURCE_LABELS: Record<JurnalSourceType, string> = {
+  "faktur-jual": "Faktur Penjualan",
+  "faktur-beli": "Faktur Pembelian",
+  "penerimaan-penjualan": "Penerimaan Penjualan",
+  "pembayaran-pembelian": "Pembayaran Pembelian",
+  "penyesuaian-stok": "Penyesuaian Persediaan",
+  "kas-penerimaan": "Penerimaan Kas/Bank",
+  "kas-pembayaran": "Pembayaran Kas/Bank",
+  "transfer-bank": "Transfer Bank",
+  "jurnal-manual": "Jurnal Manual",
+};
+
 export type JurnalLine = {
   accountKode: string;
   accountNama: string;
@@ -16,7 +39,11 @@ export type JurnalDetail = {
   kredit: number;
   status: "Posted" | "Draft";
   lines: JurnalLine[];
+  sourceType?: JurnalSourceType;
   refOpb?: string;
+  refFaktur?: string;
+  refAdj?: string;
+  refPayment?: string;
 };
 
 export const MOCK_JURNAL_DETAILS: JurnalDetail[] = [
@@ -27,7 +54,9 @@ export const MOCK_JURNAL_DETAILS: JurnalDetail[] = [
     debit: 12500000,
     kredit: 12500000,
     status: "Posted",
+    sourceType: "faktur-jual",
     refOpb: "OPB-2026-0089",
+    refFaktur: "INV-2026-0088",
     lines: [
       { accountKode: "110301", accountNama: "Piutang Usaha", debit: 12500000, credit: 0 },
       { accountKode: "410101", accountNama: "Pendapatan Jasa Cat", debit: 0, credit: 12500000 },
@@ -40,6 +69,8 @@ export const MOCK_JURNAL_DETAILS: JurnalDetail[] = [
     debit: 8500000,
     kredit: 8500000,
     status: "Posted",
+    sourceType: "faktur-beli",
+    refFaktur: "PINV-2026-034",
     lines: [
       { accountKode: "130101", accountNama: "Persediaan Bahan Cat", debit: 8500000, credit: 0 },
       { accountKode: "210101", accountNama: "Hutang Usaha", debit: 0, credit: 8500000 },
@@ -51,7 +82,9 @@ export const MOCK_JURNAL_DETAILS: JurnalDetail[] = [
     keterangan: "Penyesuaian stok opname Surabaya",
     debit: 250000,
     kredit: 250000,
-    status: "Draft",
+    status: "Posted",
+    sourceType: "penyesuaian-stok",
+    refAdj: "ADJ-2026-012",
     lines: [
       { accountKode: "510101", accountNama: "HPP Bahan Cat", debit: 250000, credit: 0 },
       { accountKode: "130101", accountNama: "Persediaan Bahan Cat", debit: 0, credit: 250000 },
@@ -71,6 +104,14 @@ export function jurnalFromSlug(slug: string) {
 
 export function accountName(kode: string) {
   return MOCK_COA.find((a) => a.kode === kode)?.nama ?? kode;
+}
+
+export function nextJurnalId(seq: number) {
+  return `JU/2026/09/${String(seq).padStart(3, "0")}`;
+}
+
+export function allocateJurnalId(jurnalList: JurnalDetail[]) {
+  return nextJurnalId(jurnalList.length + 4);
 }
 
 export function linesFromDraft(drafts: { accountKode: string; debit: number; credit: number }[]): JurnalLine[] {
