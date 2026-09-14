@@ -1,595 +1,674 @@
-import { MODULES } from "@/lib/modules";
-import { buildSectionsFromMenus } from "./build-nav";
-import { a, g, simpleGuide } from "./helpers";
+import { a, g } from "./helpers";
 import type { GuideModuleId, ModuleGuideNav } from "./types";
 
 const F = "finance" as GuideModuleId;
 const O = "operasional" as GuideModuleId;
 const H = "hris" as GuideModuleId;
 
-const financeMenus = MODULES.find((m) => m.id === "finance")!.menus;
-
 export const financeGuideNav: ModuleGuideNav = {
   moduleId: "finance",
   title: "Panduan Finance",
   subtitle: "Klik menu di kiri — alur kerja ditampilkan dari atas ke bawah.",
-  sections: buildSectionsFromMenus(financeMenus),
+  sections: [
+    { key: "dashboard", label: "Dashboard", items: [{ id: "dashboard", label: "Dashboard" }] },
+    {
+      key: "buku-besar",
+      label: "Buku Besar",
+      items: [
+        { id: "akun-perkiraan", label: "Akun Perkiraan" },
+        { id: "pencatatan-beban", label: "Pencatatan Beban" },
+        { id: "jurnal-umum", label: "Jurnal Umum" },
+        { id: "anggaran", label: "Anggaran" },
+        { id: "histori-akun", label: "Histori Akun" },
+        { id: "log-aktivitas-jurnal", label: "Log Aktivitas Jurnal" },
+      ],
+    },
+    {
+      key: "kas-bank",
+      label: "Kas & Bank",
+      items: [
+        { id: "pembayaran", label: "Pembayaran" },
+        { id: "penerimaan", label: "Penerimaan" },
+        { id: "transfer-bank", label: "Transfer Bank" },
+        { id: "rekening-koran", label: "Rekening Koran" },
+        { id: "rekonsiliasi-bank", label: "Rekonsiliasi Bank" },
+        { id: "histori-bank", label: "Histori Bank" },
+      ],
+    },
+    {
+      key: "penjualan",
+      label: "Penjualan",
+      items: [
+        { id: "faktur-penjualan", label: "Faktur Penjualan" },
+        { id: "penerimaan-penjualan", label: "Penerimaan Penjualan" },
+        { id: "uang-muka-penjualan", label: "Uang Muka Penjualan" },
+        { id: "retur-penjualan", label: "Retur Penjualan" },
+        { id: "pelanggan", label: "Pelanggan" },
+      ],
+    },
+    {
+      key: "pembelian",
+      label: "Pembelian",
+      items: [
+        { id: "pesanan-pembelian", label: "Pesanan Pembelian" },
+        { id: "penerimaan-barang-pembelian", label: "Penerimaan Barang" },
+        { id: "faktur-pembelian", label: "Faktur Pembelian" },
+        { id: "uang-muka-pembelian", label: "Uang Muka Pembelian" },
+        { id: "pembayaran-pembelian", label: "Pembayaran Pembelian" },
+        { id: "pemasok", label: "Pemasok" },
+      ],
+    },
+    {
+      key: "persediaan",
+      label: "Persediaan",
+      items: [
+        { id: "penerimaan-barang-persediaan", label: "Penerimaan Barang" },
+        { id: "penyesuaian-persediaan", label: "Penyesuaian Persediaan" },
+        { id: "barang-jasa", label: "Barang & Jasa" },
+        { id: "barang-per-gudang", label: "Barang Per Gudang" },
+        { id: "barang-stok-minimum", label: "Barang Stok Minimum" },
+      ],
+    },
+    {
+      key: "laporan",
+      label: "Laporan Keuangan",
+      items: [
+        { id: "laba-rugi", label: "Laba Rugi" },
+        { id: "neraca", label: "Neraca" },
+        { id: "arus-kas", label: "Arus Kas" },
+        { id: "hutang-piutang", label: "Laporan Hutang Piutang" },
+        { id: "laporan-penjualan", label: "Laporan Penjualan" },
+        { id: "laporan-pembelian", label: "Laporan Pembelian" },
+        { id: "laba-ditahan", label: "Laba Ditahan" },
+        { id: "rasio-keuangan", label: "Rasio Keuangan" },
+        { id: "perubahan-equitas", label: "Perubahan Equitas" },
+        { id: "grafik", label: "Grafik" },
+        { id: "perpajakan", label: "Perpajakan" },
+      ],
+    },
+    {
+      key: "aset-tetap",
+      label: "Aset Tetap",
+      items: [
+        { id: "aset-tetap", label: "Aset Tetap" },
+        { id: "kategori-aset", label: "Kategori Aset" },
+        { id: "perubahan-aset-tetap", label: "Perubahan Aset Tetap" },
+        { id: "disposisi-aset", label: "Disposisi Aset Tetap" },
+        { id: "pindah-aset", label: "Pindah Aset" },
+        { id: "aset-per-lokasi", label: "Aset per Lokasi" },
+      ],
+    },
+    {
+      key: "perusahaan",
+      label: "Perusahaan",
+      items: [
+        { id: "syarat-pembayaran", label: "Syarat Pembayaran" },
+        { id: "proses-akhir-bulan", label: "Proses Akhir Bulan" },
+        { id: "gaji-tunjangan", label: "Gaji & Tunjangan" },
+        { id: "karyawan", label: "Karyawan" },
+        { id: "transaksi-berulang", label: "Transaksi Berulang" },
+        { id: "kalender", label: "Kalender" },
+        { id: "kontak", label: "Kontak" },
+        { id: "transaksi-favorit", label: "Transaksi Favorit" },
+        { id: "log-aktivitas", label: "Log Aktivitas" },
+      ],
+    },
+    { key: "daftar-laporan", label: "Daftar Laporan", items: [{ id: "daftar-laporan", label: "Daftar Laporan" }] },
+  ],
   guides: {
     dashboard: g(
       "dashboard",
-      "Ringkasan Modul Finance",
+      "Dashboard Keuangan",
       "Dashboard",
       "/finance",
-      "Pembukuan Accurate-style — buku besar, kas/bank, penjualan, pembelian, persediaan, laporan.",
+      "Ringkasan KPI keuangan, todo perlu tindakan, jurnal terbaru, dan piutang outstanding.",
       [
-        a(O, "Sumber transaksi: OPB, PO, Stock Opname", "/operasional"),
-        a(F, "Post faktur → jurnal otomatis"),
-        a(F, "Kas/Bank: penerimaan & pembayaran"),
-        a(F, "Laporan keuangan: Laba Rugi, Neraca, Arus Kas"),
-        a(H, "Payroll → Gaji & Tunjangan", "/finance/perusahaan/gaji-tunjangan"),
-      ],
+        a(F, "Pilih Periode Bulan"),
+        a(F, "Lihat KPI Keuangan"),
+        a(F, "Tindak Item Perlu Tindakan"),
+        a(F, "Buat Jurnal Baru", "/finance/buku-besar/jurnal-umum"),
+        a(F, "Semua Jurnal", "/finance/buku-besar/jurnal-umum"),
+        a(F, "Buka Daftar Laporan", "/finance/daftar-laporan"),
+        a(F, "Terima Pembayaran Piutang", "/finance/penjualan/penerimaan-penjualan"),
+      ]
     ),
-
-    // ── Buku Besar ──
-    "buku-besar-akun-perkiraan": simpleGuide(
-      "buku-besar-akun-perkiraan",
+    "akun-perkiraan": g(
+      "akun-perkiraan",
+      "Akun Perkiraan",
       "Akun Perkiraan",
       "/finance/buku-besar/akun-perkiraan",
-      "Chart of accounts (COA) — struktur akun debit/kredit.",
-      F,
-      ["Buka Akun Perkiraan", "Review hierarki akun", "Tambah / edit akun", "Set tipe & saldo normal"],
+      "Chart of accounts — tambah/edit akun tersimpan ke API, dasar semua jurnal dan laporan.",
+      [a(F, "Lihat Daftar Akun"), a(F, "Tambah / Edit Akun (simpan ke API)"), a(F, "Review Saldo Akun", "/finance/buku-besar/histori-akun")]
     ),
-    "buku-besar-pencatatan-beban": simpleGuide(
-      "buku-besar-pencatatan-beban",
+    anggaran: g(
+      "anggaran",
+      "Anggaran",
+      "Anggaran",
+      "/finance/buku-besar/anggaran",
+      "Rencana anggaran per akun/periode — master data CONFIG.",
+      [a(F, "Buat Anggaran"), a(F, "Review Realisasi vs Anggaran"), a(F, "Bandingkan Laba Rugi", "/finance/laporan/laba-rugi")]
+    ),
+    "pencatatan-beban": g(
+      "pencatatan-beban",
+      "Pencatatan Beban",
       "Pencatatan Beban",
       "/finance/buku-besar/pencatatan-beban",
-      "Catat beban operasional langsung ke akun beban.",
-      F,
-      ["Buka Pencatatan Beban", "Pilih akun beban & sumber dana", "Isi nominal & keterangan", "Simpan → jurnal otomatis"],
+      "Catat beban — jurnal hutang dibuat saat simpan; bayar kas/bank di langkah terpisah.",
+      [a(F, "Buat Pencatatan Beban"), a(F, "Simpan & Buat Jurnal"), a(F, "Bayar Beban (Kas/Bank)")]
     ),
-    "buku-besar-jurnal-umum": g(
-      "buku-besar-jurnal-umum",
+    "jurnal-umum": g(
+      "jurnal-umum",
       "Jurnal Umum",
       "Jurnal Umum",
       "/finance/buku-besar/jurnal-umum",
-      "Entry jurnal manual — penyesuaian, akrual, koreksi.",
+      "Entri jurnal manual — langsung status Posted saat disimpan.",
       [
-        a(F, "Buka Jurnal Umum", "/finance/buku-besar/jurnal-umum"),
-        a(F, "Buat jurnal baru"),
-        a(F, "Isi baris debit & kredit (balance)"),
-        a(F, "Post jurnal"),
-        a(F, "Review di Histori Akun", "/finance/buku-besar/histori-akun"),
-        a(F, "Log perubahan di Log Aktivitas Jurnal", "/finance/buku-besar/log-aktivitas-jurnal"),
-      ],
+        a(F, "Buat Jurnal Baru"),
+        a(F, "Input Baris Debit/Kredit"),
+        a(F, "Simpan Jurnal"),
+        a(F, "Review Log Aktivitas", "/finance/buku-besar/log-aktivitas-jurnal"),
+      ]
     ),
-    "buku-besar-anggaran": simpleGuide(
-      "buku-besar-anggaran",
-      "Anggaran",
-      "/finance/buku-besar/anggaran",
-      "Budget vs realisasi per akun/periode.",
-      F,
-      ["Buka Anggaran", "Set target per akun", "Monitor realisasi vs budget"],
-    ),
-    "buku-besar-histori-akun": simpleGuide(
-      "buku-besar-histori-akun",
+    "histori-akun": g(
+      "histori-akun",
+      "Histori Akun",
       "Histori Akun",
       "/finance/buku-besar/histori-akun",
-      "Ledger per akun — semua mutasi debit/kredit.",
-      F,
-      ["Pilih akun perkiraan", "Filter periode", "Review saldo berjalan", "Drill-down ke jurnal sumber"],
+      "Mutasi per akun — audit trail transaksi.",
+      [a(F, "Pilih Akun"), a(F, "Filter Periode"), a(F, "Review Mutasi")]
     ),
-    "buku-besar-log-aktivitas-jurnal": simpleGuide(
-      "buku-besar-log-aktivitas-jurnal",
-      "Log Aktivitas Jurnal",
+    "log-aktivitas-jurnal": g(
+      "log-aktivitas-jurnal",
+      "Log Aktifitas Jurnal",
+      "Log Aktifitas Jurnal",
       "/finance/buku-besar/log-aktivitas-jurnal",
-      "Audit trail perubahan jurnal — siapa, kapan, apa.",
-      F,
-      ["Buka Log Aktivitas Jurnal", "Filter user & tanggal", "Review create/edit/delete jurnal"],
+      "Audit trail perubahan jurnal — siapa ubah/apa.",
+      [a(F, "Filter Periode"), a(F, "Cari Nomor Jurnal"), a(F, "Review Aktivitas")]
     ),
-
-    // ── Kas & Bank ──
-    "kas-bank-pembayaran": g(
-      "kas-bank-pembayaran",
-      "Pembayaran",
+    pembayaran: g(
+      "pembayaran",
+      "Pembayaran Kas/Bank",
       "Pembayaran",
       "/finance/kas-bank/pembayaran",
-      "Catat pengeluaran kas/bank — hutang supplier, beban, dll.",
+      "Catat pengeluaran kas — hutang supplier, beban, dll.",
       [
-        a(F, "Buka Pembayaran", "/finance/kas-bank/pembayaran"),
-        a(F, "Pilih sumber kas/bank"),
-        a(F, "Link ke faktur pembelian / beban"),
-        a(F, "Post → jurnal & update saldo hutang"),
-        a(F, "Review di Rekening Koran", "/finance/kas-bank/rekening-koran"),
-      ],
+        a(F, "Buat Pembayaran"),
+        a(F, "Pilih Akun Kas/Bank"),
+        a(F, "Alokasi ke Hutang / Beban"),
+        a(F, "Bayar PO", "/finance/pembelian/pembayaran-pembelian"),
+      ]
     ),
-    "kas-bank-penerimaan": g(
-      "kas-bank-penerimaan",
-      "Penerimaan",
+    penerimaan: g(
+      "penerimaan",
+      "Penerimaan Kas/Bank",
       "Penerimaan",
       "/finance/kas-bank/penerimaan",
-      "Catat penerimaan kas/bank — piutang pelanggan, pendapatan lain.",
+      "Catat penerimaan kas — piutang pelanggan dan pendapatan lain.",
       [
-        a(F, "Buka Penerimaan", "/finance/kas-bank/penerimaan"),
-        a(F, "Pilih rekening tujuan"),
-        a(F, "Link ke faktur penjualan / piutang"),
-        a(F, "Post → jurnal & update saldo piutang"),
-      ],
+        a(F, "Buat Penerimaan"),
+        a(F, "Pilih Akun Kas/Bank"),
+        a(F, "Alokasi ke Piutang"),
+        a(F, "Terima Pembayaran Penjualan", "/finance/penjualan/penerimaan-penjualan"),
+      ]
     ),
-    "kas-bank-transfer-bank": g(
-      "kas-bank-transfer-bank",
+    "transfer-bank": g(
+      "transfer-bank",
       "Transfer Bank",
       "Transfer Bank",
       "/finance/kas-bank/transfer-bank",
-      "Transfer antar rekening bank/kas internal.",
-      [
-        a(F, "Buka Transfer Bank", "/finance/kas-bank/transfer-bank"),
-        a(F, "Pilih rekening asal & tujuan"),
-        a(F, "Isi nominal & keterangan"),
-        a(F, "Post → jurnal transfer otomatis"),
-        a(F, "Verifikasi di Histori Bank", "/finance/kas-bank/histori-bank"),
-      ],
+      "Pindahkan saldo antar rekening kas/bank.",
+      [a(F, "Buat Transfer"), a(F, "Pilih Rekening Asal & Tujuan"), a(F, "Simpan Transfer")]
     ),
-    "kas-bank-rekening-koran": simpleGuide(
-      "kas-bank-rekening-koran",
+    "rekening-koran": g(
+      "rekening-koran",
+      "Rekening Koran",
       "Rekening Koran",
       "/finance/kas-bank/rekening-koran",
-      "Statement mutasi per rekening bank.",
-      F,
-      ["Pilih rekening bank", "Filter periode", "Review mutasi masuk/keluar", "Export statement"],
+      "Saldo dan mutasi kas/bank per rekening.",
+      [a(F, "Pilih Rekening"), a(F, "Filter Periode"), a(F, "Review Mutasi")]
     ),
-    "kas-bank-rekonsiliasi-bank": g(
-      "kas-bank-rekonsiliasi-bank",
+    "rekonsiliasi-bank": g(
+      "rekonsiliasi-bank",
       "Rekonsiliasi Bank",
       "Rekonsiliasi Bank",
       "/finance/kas-bank/rekonsiliasi-bank",
-      "Cocokkan saldo buku vs mutasi bank.",
-      [
-        a(F, "Buka Rekonsiliasi Bank", "/finance/kas-bank/rekonsiliasi-bank"),
-        a(F, "Pilih rekening & periode"),
-        a(F, "Tick transaksi yang sudah cocok"),
-        a(F, "Identifikasi selisih / outstanding"),
-        a(F, "Finalisasi rekonsiliasi"),
-      ],
+      "Cocokkan saldo bank dengan buku.",
+      [a(F, "Pilih Rekening & Periode"), a(F, "Tandai Item Cocok"), a(F, "Selesaikan Rekonsiliasi")]
     ),
-    "kas-bank-histori-bank": simpleGuide(
-      "kas-bank-histori-bank",
+    "histori-bank": g(
+      "histori-bank",
+      "Histori Bank",
       "Histori Bank",
       "/finance/kas-bank/histori-bank",
-      "Riwayat semua transaksi kas & bank.",
-      F,
-      ["Filter rekening & periode", "Review transaksi", "Drill-down ke dokumen sumber"],
+      "Riwayat mutasi semua rekening kas/bank.",
+      [a(F, "Filter Rekening"), a(F, "Filter Periode"), a(F, "Review Mutasi")]
     ),
 
-    // ── Penjualan ──
-    "penjualan-faktur-penjualan": g(
-      "penjualan-faktur-penjualan",
-      "Faktur Penjualan (OPB → Faktur → Jurnal)",
+
+    "faktur-penjualan": g(
+      "faktur-penjualan",
+      "Faktur Penjualan (OPB → Faktur → Piutang)",
       "Faktur Penjualan",
       "/finance/penjualan/faktur-penjualan",
-      "Buat faktur dari OPB yang sudah ditagihkan — post ke jurnal piutang & pendapatan.",
+      "Buat faktur dari OPB yang sudah ditagihkan — post jurnal piutang & pendapatan otomatis.",
       [
-        a(O, "OPB status Ditagihkan di Operasional", "/operasional/opb"),
-        a(F, "Buat Faktur Penjualan dari OPB", "/finance/penjualan/faktur-penjualan"),
-        a(F, "Review item, PPN, total tagihan"),
-        a(F, "Post faktur → jurnal otomatis"),
-        a(F, "Status: Open / Partial / Lunas"),
+        a(O, "OPB Status Ditagihkan", "/operasional/opb", { module: F, href: "/finance/penjualan/faktur-penjualan" }),
+        a(F, "Buat Faktur Penjualan dari OPB"),
+        a(F, "Review PPN & Total Tagihan"),
+        a(F, "Post Faktur → Jurnal Otomatis"),
         a(F, "Catat Penerimaan Penjualan", "/finance/penjualan/penerimaan-penjualan"),
-      ],
+      ]
     ),
-    "penjualan-penerimaan-penjualan": g(
-      "penjualan-penerimaan-penjualan",
+    "penerimaan-penjualan": g(
+      "penerimaan-penjualan",
       "Penerimaan Penjualan",
       "Penerimaan Penjualan",
       "/finance/penjualan/penerimaan-penjualan",
-      "Catat pelunasan faktur penjualan — update piutang & saldo kas.",
+      "Catat pelunasan faktur — update piutang & saldo kas.",
       [
-        a(F, "Buka Penerimaan Penjualan", "/finance/penjualan/penerimaan-penjualan"),
-        a(F, "Pilih faktur open/partial"),
-        a(F, "Isi nominal penerimaan"),
-        a(F, "Post → jurnal piutang & kas"),
-        a(F, "Faktur lunas jika total terbayar"),
-        a(F, "Monitor piutang di Laporan Hutang Piutang", "/finance/laporan/hutang-piutang"),
-      ],
+        a(F, "Buat Penerimaan"),
+        a(F, "Pilih Faktur Open/Partial"),
+        a(F, "Post → Jurnal Piutang & Kas"),
+        a(F, "Review Aging Piutang", "/finance/laporan/hutang-piutang"),
+      ]
     ),
-    "penjualan-uang-muka-penjualan": simpleGuide(
-      "penjualan-uang-muka-penjualan",
-      "Uang Muka Penjualan",
-      "/finance/penjualan/uang-muka-penjualan",
-      "Catat DP/uang muka dari pelanggan sebelum faktur penuh.",
-      F,
-      ["Catat uang muka pelanggan", "Link ke pelanggan/OPB", "Saldo Uang Muka → offset saat faktur"],
-    ),
-    "penjualan-retur-penjualan": simpleGuide(
-      "penjualan-retur-penjualan",
+    "retur-penjualan": g(
+      "retur-penjualan",
+      "Retur Penjualan",
       "Retur Penjualan",
       "/finance/penjualan/retur-penjualan",
-      "Proses retur/koreksi tagihan penjualan.",
-      F,
-      ["Buat retur dari faktur", "Review item & nominal retur", "Post → jurnal koreksi piutang/pendapatan"],
+      "Proses retur barang dari pelanggan.",
+      [
+        a(F, "Buat Retur Penjualan", "/finance/penjualan/retur-penjualan"),
+        a(F, "Posting Retur & Koreksi Piutang"),
+      ]
     ),
-    "penjualan-pelanggan": g(
-      "penjualan-pelanggan",
+    pelanggan: g(
+      "pelanggan",
       "Master Pelanggan",
       "Pelanggan",
       "/finance/penjualan/pelanggan",
-      "Data pelanggan/cabang bengkel untuk faktur penjualan.",
+      "Data pelanggan/cabang bengkel — dipakai di faktur penjualan & OPB.",
       [
-        a(F, "Buka daftar Pelanggan", "/finance/penjualan/pelanggan"),
-        a(F, "Tambah / edit data pelanggan"),
-        a(F, "Set syarat pembayaran", "/finance/perusahaan/syarat-pembayaran"),
-        a(O, "Cabang terkait di Master Cabang", "/operasional/cabang"),
-      ],
+        a(F, "Kelola Data Pelanggan", "/finance/penjualan/pelanggan"),
+        a(O, "Cabang Terkait di Master Cabang", "/operasional/cabang"),
+        a(F, "Set Syarat Pembayaran", "/finance/perusahaan/syarat-pembayaran"),
+      ]
     ),
 
-    // ── Persediaan ──
-    "persediaan-penyesuaian-persediaan": g(
-      "persediaan-penyesuaian-persediaan",
-      "Penyesuaian Persediaan (Stock Opname → Jurnal)",
-      "Penyesuaian Persediaan",
-      "/finance/persediaan/penyesuaian-persediaan",
-      "Koreksi stok setelah stock opname — posting ke jurnal persediaan.",
-      [
-        a(O, "Stock Opname approved di Operasional", "/operasional/stock-opname"),
-        a(F, "Buat Penyesuaian Persediaan", "/finance/persediaan/penyesuaian-persediaan"),
-        a(F, "Review selisih qty & nilai"),
-        a(F, "Post penyesuaian → jurnal otomatis"),
-        a(F, "Saldo persediaan terupdate"),
-      ],
-    ),
-    "persediaan-penerimaan-barang": g(
-      "persediaan-penerimaan-barang",
-      "Penerimaan Barang (Persediaan)",
-      "Penerimaan Barang",
-      "/finance/persediaan/penerimaan-barang",
-      "Mirror penerimaan barang — stok masuk ke gudang.",
-      [
-        a(O, "Goods Received di PO Operasional", "/operasional/po"),
-        a(F, "Review Penerimaan Barang", "/finance/persediaan/penerimaan-barang"),
-        a(F, "Post → jurnal persediaan"),
-      ],
-    ),
-    "persediaan-barang-jasa": simpleGuide(
-      "persediaan-barang-jasa",
-      "Barang & Jasa",
-      "/finance/persediaan/barang-jasa",
-      "Master item persediaan — sync dengan Master Produk Operasional.",
-      F,
-      ["Kelola daftar barang & jasa", "Set akun persediaan & HPP", "Link ke Master Produk Operasional"],
-    ),
-    "persediaan-barang-per-gudang": simpleGuide(
-      "persediaan-barang-per-gudang",
-      "Barang Per Gudang",
-      "/finance/persediaan/barang-per-gudang",
-      "Saldo stok per gudang/lokasi.",
-      F,
-      ["Pilih gudang", "Review saldo per item", "Drill-down mutasi stok"],
-    ),
-    "persediaan-barang-stok-minimum": simpleGuide(
-      "persediaan-barang-stok-minimum",
-      "Barang Stok Minimum",
-      "/finance/persediaan/barang-stok-minimum",
-      "Alert stok di bawah minimum — trigger ajuan stok.",
-      F,
-      ["Review item di bawah minimum", "Alert ke Operasional → Ajuan Stok"],
+    "uang-muka-penjualan": g(
+      "uang-muka-penjualan",
+      "Uang Muka Penjualan",
+      "Uang Muka Penjualan",
+      "/finance/penjualan/uang-muka-penjualan",
+      "Monitor DP pelanggan — catat via Kas Penerimaan (keterangan: uang muka/DP).",
+      [a(F, "Catat di Kas Penerimaan", "/finance/kas-bank/penerimaan"), a(F, "Review Daftar DP")]
     ),
 
-    // ── Pembelian ──
-    "pembelian-pesanan-pembelian": g(
-      "pembelian-pesanan-pembelian",
-      "Pesanan Pembelian",
+
+
+
+
+
+
+    "pesanan-pembelian": g(
+      "pesanan-pembelian",
+      "Pesanan Pembelian (PO)",
       "Pesanan Pembelian",
       "/finance/pembelian/pesanan-pembelian",
-      "Mirror PO Operasional — monitor status pembelian.",
+      "Monitor PO Operasional — urutan: DP (opsional) → terima barang → faktur → pelunasan.",
       [
-        a(O, "Buat PO di Operasional", "/operasional/po"),
-        a(F, "Review Pesanan Pembelian", "/finance/pembelian/pesanan-pembelian"),
-        a(F, "Track status: open / partial / closed"),
-      ],
+        a(O, "Buat PO & Goods Received", "/operasional/po", { module: F, href: "/finance/pembelian/pesanan-pembelian" }),
+        a(F, "Review PO"),
+        a(F, "Bayar Uang Muka (opsional)", "/finance/pembelian/uang-muka-pembelian"),
+        a(F, "Catat Faktur Pembelian", "/finance/pembelian/faktur-pembelian"),
+        a(F, "Bayar / Pelunasan", "/finance/pembelian/pembayaran-pembelian"),
+      ]
     ),
-    "pembelian-faktur-pembelian": g(
-      "pembelian-faktur-pembelian",
-      "Faktur Pembelian (PO → Faktur → Jurnal)",
+    "penerimaan-barang-pembelian": g(
+      "penerimaan-barang-pembelian",
+      "Penerimaan Barang Pembelian",
+      "Penerimaan Barang",
+      "/finance/pembelian/penerimaan-barang",
+      "Mirror penerimaan Operasional — setelah GR lanjut faktur & pelunasan.",
+      [
+        a(O, "Goods Received di Operasional", "/operasional/po", { module: F, href: "/finance/pembelian/penerimaan-barang" }),
+        a(F, "Review GR"),
+        a(F, "Catat Faktur Pembelian", "/finance/pembelian/faktur-pembelian"),
+      ]
+    ),
+    "faktur-pembelian": g(
+      "faktur-pembelian",
+      "Faktur Pembelian",
       "Faktur Pembelian",
       "/finance/pembelian/faktur-pembelian",
-      "Catat faktur supplier setelah penerimaan barang — post ke jurnal hutang.",
+      "Catat faktur supplier — wajib setelah penerimaan barang sebelum pelunasan penuh.",
       [
-        a(O, "PO & Goods Received di Operasional", "/operasional/po"),
-        a(F, "Buat Faktur Pembelian dari PO/GR", "/finance/pembelian/faktur-pembelian"),
-        a(F, "Review PPN & total hutang"),
-        a(F, "Post faktur → jurnal otomatis"),
-        a(F, "Bayar via Pembayaran Pembelian", "/finance/pembelian/pembayaran-pembelian"),
-      ],
+        a(F, "Catat Faktur dari PO"),
+        a(F, "Review PPN & Total"),
+        a(F, "Bayar PO", "/finance/pembelian/pembayaran-pembelian"),
+      ]
     ),
-    "pembelian-uang-muka-pembelian": simpleGuide(
-      "pembelian-uang-muka-pembelian",
+    "uang-muka-pembelian": g(
+      "uang-muka-pembelian",
+      "Uang Muka Pembelian",
       "Uang Muka Pembelian",
       "/finance/pembelian/uang-muka-pembelian",
-      "Catat DP ke supplier sebelum faktur penuh.",
-      F,
-      ["Catat uang muka pembelian", "Link ke PO", "Saldo DP → offset saat faktur"],
+      "Catat DP ke supplier — bisa juga dari menu Pembayaran Pembelian.",
+      [a(F, "Catat Uang Muka (DP)"), a(F, "Review Saldo DP PO")]
     ),
-    "pembelian-pembayaran-pembelian": g(
-      "pembelian-pembayaran-pembelian",
+    "pembayaran-pembelian": g(
+      "pembayaran-pembelian",
       "Pembayaran Pembelian",
       "Pembayaran Pembelian",
       "/finance/pembelian/pembayaran-pembelian",
-      "Urutan: DP → GR → faktur → pelunasan.",
+      "Urutan: bayar DP → GR → faktur → pelunasan. Angsuran setelah ada pembayaran sebelumnya.",
       [
-        a(F, "Catat DP (jika ada)", "/finance/pembelian/uang-muka-pembelian"),
-        a(F, "Catat faktur pembelian", "/finance/pembelian/faktur-pembelian"),
-        a(F, "Catat pelunasan / angsuran", "/finance/pembelian/pembayaran-pembelian"),
-        a(F, "Post → jurnal hutang & kas"),
-        a(F, "Monitor hutang di Laporan Hutang Piutang", "/finance/laporan/hutang-piutang"),
-      ],
+        a(F, "Catat DP", "/finance/pembelian/uang-muka-pembelian"),
+        a(F, "Catat Angsuran"),
+        a(F, "Catat Pelunasan (setelah faktur)"),
+        a(F, "Review Jurnal Pembayaran"),
+      ]
     ),
-    "pembelian-penerimaan-barang": g(
-      "pembelian-penerimaan-barang",
-      "Penerimaan Barang (Pembelian)",
-      "Penerimaan Barang",
-      "/finance/pembelian/penerimaan-barang",
-      "Mirror GR Operasional — verifikasi sebelum faktur.",
-      [
-        a(O, "Goods Received di Operasional", "/operasional/po"),
-        a(F, "Review Penerimaan Barang Pembelian", "/finance/pembelian/penerimaan-barang"),
-        a(F, "Lanjut Faktur Pembelian", "/finance/pembelian/faktur-pembelian"),
-      ],
-    ),
-    "pembelian-pemasok": g(
-      "pembelian-pemasok",
+
+    pemasok: g(
+      "pemasok",
       "Master Pemasok",
       "Pemasok",
       "/finance/pembelian/pemasok",
-      "Data supplier/pabrik cat untuk pembelian.",
+      "Data supplier/pabrik cat — dipakai di PO & faktur pembelian.",
       [
-        a(F, "Buka daftar Pemasok", "/finance/pembelian/pemasok"),
-        a(F, "Tambah / edit data supplier"),
-        a(F, "Set syarat pembayaran & NPWP"),
-        a(O, "PO ke pemasok di Operasional", "/operasional/po"),
-      ],
+        a(F, "Kelola Data Pemasok", "/finance/pembelian/pemasok"),
+        a(O, "Buat PO ke Pemasok", "/operasional/po"),
+      ]
     ),
 
-    // ── Aset Tetap ──
-    "aset-tetap-aset-tetap": simpleGuide(
-      "aset-tetap-aset-tetap",
-      "Aset Tetap",
-      "/finance/aset-tetap/aset-tetap",
-      "Register aset tetap perusahaan — kendaraan, peralatan, dll.",
-      F,
-      ["Daftar aset tetap", "Input harga perolehan & masa manfaat", "Hitung penyusutan otomatis"],
-    ),
-    "aset-tetap-kategori-aset": simpleGuide(
-      "aset-tetap-kategori-aset",
-      "Kategori Aset",
-      "/finance/aset-tetap/kategori-aset",
-      "Kategori & metode penyusutan aset.",
-      F,
-      ["Kelola kategori aset", "Set metode & tarif penyusutan"],
-    ),
-    "aset-tetap-perubahan-aset-tetap": simpleGuide(
-      "aset-tetap-perubahan-aset-tetap",
-      "Perubahan Aset Tetap",
-      "/finance/aset-tetap/perubahan-aset-tetap",
-      "Revaluasi, penambahan nilai, atau koreksi aset.",
-      F,
-      ["Pilih aset", "Catat perubahan nilai", "Post jurnal penyesuaian"],
-    ),
-    "aset-tetap-disposisi-aset-tetap": simpleGuide(
-      "aset-tetap-disposisi-aset-tetap",
-      "Disposisi Aset Tetap",
-      "/finance/aset-tetap/disposisi-aset-tetap",
-      "Jual/hapus aset tetap — hitung gain/loss.",
-      F,
-      ["Pilih aset untuk disposisi", "Input harga jual / alasan hapus", "Post jurnal disposisi"],
-    ),
-    "aset-tetap-pindah-aset": simpleGuide(
-      "aset-tetap-pindah-aset",
-      "Pindah Aset",
-      "/finance/aset-tetap/pindah-aset",
-      "Transfer aset antar lokasi/cabang.",
-      F,
-      ["Pilih aset & lokasi tujuan", "Simpan perpindahan", "Update lokasi aset"],
-    ),
-    "aset-tetap-aset-per-lokasi": simpleGuide(
-      "aset-tetap-aset-per-lokasi",
-      "Aset per Lokasi",
-      "/finance/aset-tetap/aset-per-lokasi",
-      "Daftar aset per cabang/lokasi.",
-      F,
-      ["Filter per lokasi", "Review nilai buku aset", "Export laporan"],
-    ),
 
-    // ── Perusahaan ──
-    "perusahaan-syarat-pembayaran": simpleGuide(
-      "perusahaan-syarat-pembayaran",
-      "Syarat Pembayaran",
-      "/finance/perusahaan/syarat-pembayaran",
-      "Termin pembayaran — net 7, net 30, dll.",
-      F,
-      ["Kelola syarat pembayaran", "Assign ke pelanggan/pemasok"],
-    ),
-    "perusahaan-proses-akhir-bulan": simpleGuide(
-      "perusahaan-proses-akhir-bulan",
-      "Proses Akhir Bulan",
-      "/finance/perusahaan/proses-akhir-bulan",
-      "Closing period — akrual, penyusutan, lock periode.",
-      F,
-      ["Jalankan proses akhir bulan", "Review akrual & penyusutan", "Lock periode akuntansi"],
-    ),
-    "perusahaan-gaji-tunjangan": g(
-      "perusahaan-gaji-tunjangan",
-      "Gaji & Tunjangan (HRIS → Finance)",
-      "Gaji & Tunjangan",
-      "/finance/perusahaan/gaji-tunjangan",
-      "Posting payroll dari HRIS ke jurnal beban gaji.",
+
+    "penerimaan-barang-persediaan": g(
+      "penerimaan-barang-persediaan",
+      "Penerimaan Barang (Persediaan)",
+      "Penerimaan Barang",
+      "/finance/persediaan/penerimaan-barang",
+      "Mirror penerimaan barang masuk gudang pusat — review dari sisi Finance.",
       [
-        a(H, "Slip gaji final di HRIS", "/hris/slip-gaji"),
-        a(F, "Review Gaji & Tunjangan", "/finance/perusahaan/gaji-tunjangan"),
-        a(F, "Post payroll → jurnal beban gaji & hutang"),
-        a(F, "Bayar gaji via Pembayaran", "/finance/kas-bank/pembayaran"),
-      ],
-    ),
-    "perusahaan-karyawan": simpleGuide(
-      "perusahaan-karyawan",
-      "Karyawan (Finance)",
-      "/finance/perusahaan/karyawan",
-      "Mirror data karyawan untuk keperluan akuntansi payroll.",
-      F,
-      ["Review data karyawan", "Sync dengan HRIS Karyawan"],
-    ),
-    "perusahaan-transaksi-berulang": simpleGuide(
-      "perusahaan-transaksi-berulang",
-      "Transaksi Berulang",
-      "/finance/perusahaan/transaksi-berulang",
-      "Template jurnal/transaksi rutin bulanan.",
-      F,
-      ["Setup transaksi berulang", "Set jadwal & nominal", "Generate otomatis per periode"],
-    ),
-    "perusahaan-kalender": simpleGuide(
-      "perusahaan-kalender",
-      "Kalender",
-      "/finance/perusahaan/kalender",
-      "Kalender fiskal & jadwal closing.",
-      F,
-      ["Review kalender fiskal", "Set tanggal closing & libur"],
-    ),
-    "perusahaan-kontak": simpleGuide(
-      "perusahaan-kontak",
-      "Kontak",
-      "/finance/perusahaan/kontak",
-      "Buku alamat kontak bisnis.",
-      F,
-      ["Kelola kontak", "Link ke pelanggan/pemasok"],
-    ),
-    "perusahaan-transaksi-favorit": simpleGuide(
-      "perusahaan-transaksi-favorit",
-      "Transaksi Favorit",
-      "/finance/perusahaan/transaksi-favorit",
-      "Shortcut transaksi yang sering dipakai.",
-      F,
-      ["Simpan template favorit", "Quick entry dari favorit"],
-    ),
-    "perusahaan-log-aktivitas": simpleGuide(
-      "perusahaan-log-aktivitas",
-      "Log Aktivitas",
-      "/finance/perusahaan/log-aktivitas",
-      "Audit log aktivitas modul Finance.",
-      F,
-      ["Review log user & aksi", "Filter periode & modul"],
+        a(O, "Goods Received di Operasional", "/operasional/po"),
+        a(F, "Review Penerimaan Barang", "/finance/persediaan/penerimaan-barang"),
+        a(F, "Post → Jurnal Persediaan"),
+      ]
     ),
 
-    // ── Laporan Keuangan ──
-    "laporan-laba-rugi": simpleGuide(
-      "laporan-laba-rugi",
+    "penyesuaian-persediaan": g(
+      "penyesuaian-persediaan",
+      "Penyesuaian Persediaan",
+      "Penyesuaian Persediaan",
+      "/finance/persediaan/penyesuaian-persediaan",
+      "Koreksi stok setelah stock opname cabang — posting jurnal persediaan.",
+      [
+        a(O, "Stock Opname Approved", "/operasional/stock-opname"),
+        a(F, "Buat Penyesuaian Persediaan"),
+        a(F, "Post → Review Jurnal Persediaan"),
+      ]
+    ),
+
+
+
+    "barang-jasa": g(
+      "barang-jasa",
+      "Barang & Jasa",
+      "Barang & Jasa",
+      "/finance/persediaan/barang-jasa",
+      "Master item persediaan — mirror data produk Operasional.",
+      [
+        a(O, "Kelola Master Produk", "/operasional/produk"),
+        a(F, "Review Master Barang & Jasa", "/finance/persediaan/barang-jasa"),
+      ]
+    ),
+
+
+
+
+    "barang-per-gudang": g(
+      "barang-per-gudang",
+      "Barang Per Gudang",
+      "Barang Per Gudang",
+      "/finance/persediaan/barang-per-gudang",
+      "Stok per gudang — data live dari API stock.",
+      [a(F, "Filter Gudang"), a(F, "Review Qty per Lokasi")]
+    ),
+    "barang-stok-minimum": g(
+      "barang-stok-minimum",
+      "Barang Stok Minimum",
+      "Barang Stok Minimum",
+      "/finance/persediaan/barang-stok-minimum",
+      "Produk di bawah minimum stok — trigger ajuan stok di Operasional.",
+      [
+        a(F, "Review Alert Minimum", "/finance/persediaan/barang-stok-minimum"),
+        a(O, "Proses Ajuan Stok Cabang", "/operasional/ajuan-stok"),
+      ]
+    ),
+    "laba-rugi": g(
+      "laba-rugi",
+      "Laporan Laba Rugi",
       "Laba Rugi",
       "/finance/laporan/laba-rugi",
-      "Profit & loss statement per periode.",
-      F,
-      ["Pilih periode", "Generate Laba Rugi", "Review pendapatan vs beban", "Export PDF/Excel"],
+      "Pendapatan vs beban per periode.",
+      [a(F, "Pilih Periode"), a(F, "Generate Laporan"), a(F, "Export / Cetak")]
     ),
-    "laporan-neraca": simpleGuide(
-      "laporan-neraca",
+    neraca: g(
+      "neraca",
+      "Laporan Neraca",
       "Neraca",
       "/finance/laporan/neraca",
-      "Balance sheet — aset, liabilitas, ekuitas.",
-      F,
-      ["Pilih tanggal neraca", "Generate laporan", "Review pos keuangan"],
+      "Posisi aktiva, hutang, dan ekuitas.",
+      [a(F, "Pilih Tanggal"), a(F, "Generate Neraca"), a(F, "Review Saldo Akun")]
     ),
-    "laporan-arus-kas": simpleGuide(
-      "laporan-arus-kas",
+    "arus-kas": g(
+      "arus-kas",
+      "Laporan Arus Kas",
       "Arus Kas",
       "/finance/laporan/arus-kas",
-      "Cash flow statement — operasi, investasi, pendanaan.",
-      F,
-      ["Pilih periode", "Generate Arus Kas", "Review sumber & penggunaan kas"],
+      "Arus masuk/keluar kas operasi, investasi, pendanaan.",
+      [a(F, "Pilih Periode"), a(F, "Generate Arus Kas")]
     ),
-    "laporan-laba-ditahan": simpleGuide(
-      "laporan-laba-ditahan",
-      "Laba Ditahan",
-      "/finance/laporan/laba-ditahan",
-      "Perubahan saldo laba ditahan.",
-      F,
-      ["Generate laporan laba ditahan", "Review mutasi per periode"],
+    "hutang-piutang": g(
+      "hutang-piutang",
+      "Laporan Hutang Piutang",
+      "Laporan Hutang Piutang",
+      "/finance/laporan/hutang-piutang",
+      "Outstanding AR/AP — aging piutang dan hutang.",
+      [a(F, "Review Piutang"), a(F, "Review Hutang"), a(F, "Filter Aging")]
     ),
-    "laporan-rasio-keuangan": simpleGuide(
-      "laporan-rasio-keuangan",
-      "Rasio Keuangan",
-      "/finance/laporan/rasio-keuangan",
-      "Financial ratios — likuiditas, profitabilitas, leverage.",
-      F,
-      ["Generate rasio keuangan", "Review KPI finansial", "Bandingkan antar periode"],
-    ),
-    "laporan-perubahan-equitas": simpleGuide(
-      "laporan-perubahan-equitas",
-      "Perubahan Equitas",
-      "/finance/laporan/perubahan-equitas",
-      "Statement of changes in equity.",
-      F,
-      ["Generate laporan equitas", "Review komponen perubahan"],
-    ),
-    "laporan-grafik": simpleGuide(
-      "laporan-grafik",
-      "Grafik",
-      "/finance/laporan/grafik",
-      "Visualisasi trend keuangan.",
-      F,
-      ["Pilih metrik & periode", "Review grafik trend", "Export chart"],
-    ),
-    "laporan-laporan-penjualan": g(
-      "laporan-laporan-penjualan",
+    "laporan-penjualan": g(
+      "laporan-penjualan",
       "Laporan Penjualan",
       "Laporan Penjualan",
       "/finance/laporan/laporan-penjualan",
-      "Rekap penjualan per cabang/pelanggan/periode.",
-      [
-        a(F, "Generate Laporan Penjualan", "/finance/laporan/laporan-penjualan"),
-        a(F, "Filter cabang & periode"),
-        a(O, "Cross-check dengan OPB Operasional", "/operasional/opb"),
-      ],
+      "Rekap penjualan per periode — invoice & penerimaan.",
+      [a(F, "Pilih Periode"), a(F, "Generate Laporan"), a(F, "Export")]
     ),
-    "laporan-laporan-pembelian": g(
-      "laporan-laporan-pembelian",
+    "laporan-pembelian": g(
+      "laporan-pembelian",
       "Laporan Pembelian",
       "Laporan Pembelian",
       "/finance/laporan/laporan-pembelian",
-      "Rekap pembelian per supplier/periode.",
-      [
-        a(F, "Generate Laporan Pembelian", "/finance/laporan/laporan-pembelian"),
-        a(O, "Cross-check dengan PO Operasional", "/operasional/po"),
-      ],
+      "Rekap pembelian per periode — PO, faktur, pembayaran.",
+      [a(F, "Pilih Periode"), a(F, "Generate Laporan"), a(F, "Export")]
     ),
-    "laporan-hutang-piutang": g(
-      "laporan-hutang-piutang",
-      "Laporan Hutang Piutang",
-      "Hutang Piutang",
-      "/finance/laporan/hutang-piutang",
-      "Aging piutang pelanggan & hutang supplier.",
-      [
-        a(F, "Generate Laporan Hutang Piutang", "/finance/laporan/hutang-piutang"),
-        a(F, "Review aging piutang (faktur jual)"),
-        a(F, "Review aging hutang (faktur beli)"),
-        a(F, "Follow-up pelunasan", "/finance/kas-bank/penerimaan"),
-      ],
+    "laba-ditahan": g(
+      "laba-ditahan",
+      "Laba Ditahan",
+      "Laba Ditahan",
+      "/finance/laporan/laba-ditahan",
+      "Pergerakan laba ditahan per periode — dari jurnal penutup & operasional.",
+      [a(F, "Pilih Periode"), a(F, "Generate Laporan"), a(F, "Review Jurnal Penutup", "/finance/perusahaan/proses-akhir-bulan")]
     ),
-    "laporan-perpajakan": simpleGuide(
-      "laporan-perpajakan",
-      "Perpajakan",
-      "/finance/laporan/perpajakan",
-      "Rekap PPN masukan/keluaran & kewajiban pajak.",
-      F,
-      ["Generate laporan pajak", "Review PPN & PPh", "Export untuk e-Filing"],
+    "rasio-keuangan": g(
+      "rasio-keuangan",
+      "Rasio Keuangan",
+      "Rasio Keuangan",
+      "/finance/laporan/rasio-keuangan",
+      "Likuiditas, leverage, profitabilitas — data live financial-reports.",
+      [a(F, "Pilih Periode"), a(F, "Generate Rasio")]
+    ),
+    "perubahan-equitas": g(
+      "perubahan-equitas",
+      "Perubahan Equitas",
+      "Perubahan Equitas",
+      "/finance/laporan/perubahan-equitas",
+      "Statement of changes in equity per periode.",
+      [a(F, "Pilih Periode"), a(F, "Generate Laporan")]
+    ),
+    grafik: g(
+      "grafik",
+      "Grafik Keuangan",
+      "Grafik",
+      "/finance/laporan/grafik",
+      "Visualisasi tren pendapatan, beban, dan KPI keuangan.",
+      [a(F, "Pilih Periode"), a(F, "Generate Grafik")]
+    ),
+    "aset-tetap": g(
+      "aset-tetap",
+      "Aset Tetap",
+      "Aset Tetap",
+      "/finance/aset-tetap/aset-tetap",
+      "Register aset, jalankan penyusutan bulanan, dan dispose dengan jurnal otomatis.",
+      [a(F, "Tambah Aset"), a(F, "Jalankan Penyusutan Bulan Ini"), a(F, "Dispose Aset (jurnal AD/)"), a(F, "Review Nilai Buku")]
+    ),
+    "kategori-aset": g(
+      "kategori-aset",
+      "Kategori Aset",
+      "Kategori Aset",
+      "/finance/aset-tetap/kategori-aset",
+      "Klasifikasi aset tetap.",
+      [a(F, "Kelola Kategori Aset")]
+    ),
+    "perubahan-aset-tetap": g(
+      "perubahan-aset-tetap",
+      "Perubahan Aset Tetap",
+      "Perubahan Aset Tetap",
+      "/finance/aset-tetap/perubahan-aset-tetap",
+      "Histori perubahan field aset (nilai, umur, akun) — tercatat di master-data.",
+      [a(F, "Catat Perubahan Field"), a(F, "Review Histori per Aset")]
+    ),
+    "disposisi-aset": g(
+      "disposisi-aset",
+      "Disposisi Aset Tetap",
+      "Disposisi Aset Tetap",
+      "/finance/aset-tetap/disposisi-aset-tetap",
+      "Daftar aset berstatus Disposed — proses dispose dari tab Daftar di Aset Tetap.",
+      [a(F, "Dispose dari Aset Tetap", "/finance/aset-tetap/aset-tetap"), a(F, "Review Jurnal AD/"), a(F, "Review Gain/Loss")]
+    ),
+    "pindah-aset": g(
+      "pindah-aset",
+      "Pindah Aset",
+      "Pindah Aset",
+      "/finance/aset-tetap/pindah-aset",
+      "Transfer aset antar lokasi/cabang.",
+      [a(F, "Catat Pindah Aset"), a(F, "Update Lokasi")]
+    ),
+    "aset-per-lokasi": g(
+      "aset-per-lokasi",
+      "Aset per Lokasi",
+      "Aset per Lokasi",
+      "/finance/aset-tetap/aset-per-lokasi",
+      "Daftar aset per lokasi fisik.",
+      [a(F, "Filter Lokasi"), a(F, "Review Aset per Site")]
+    ),
+    "syarat-pembayaran": g(
+      "syarat-pembayaran",
+      "Syarat Pembayaran",
+      "Syarat Pembayaran",
+      "/finance/perusahaan/syarat-pembayaran",
+      "Master terms (Net 30, COD, dll.) — dipakai di faktur.",
+      [a(F, "Tambah Syarat"), a(F, "Set Default"), a(F, "Nonaktifkan Syarat")]
+    ),
+
+
+    "gaji-tunjangan": g(
+      "gaji-tunjangan",
+      "Gaji & Tunjangan (HRIS → Finance)",
+      "Gaji & Tunjangan",
+      "/finance/perusahaan/gaji-tunjangan",
+      "Posting payroll dari HRIS — jurnal beban gaji & utang gaji.",
+      [
+        a(H, "Finalisasi Slip Gaji", "/hris/slip-gaji"),
+        a(F, "Catat Batch Payroll"),
+        a(F, "Post Jurnal Gaji"),
+        a(F, "Bayar Gaji via Kas/Bank", "/finance/kas-bank/pembayaran"),
+      ]
+    ),
+    karyawan: g(
+      "karyawan",
+      "Karyawan",
+      "Karyawan",
+      "/finance/perusahaan/karyawan",
+      "Data karyawan internal.",
+      [a(F, "Kelola Data Karyawan")]
+    ),
+    "transaksi-berulang": g(
+      "transaksi-berulang",
+      "Transaksi Berulang",
+      "Transaksi Berulang",
+      "/finance/perusahaan/transaksi-berulang",
+      "Template transaksi berkala — jalankan manual per baris atau bulk jatuh tempo (RB/ jurnal). Scheduler otomatis belum tersedia.",
+      [a(F, "Buat Template"), a(F, "Jalankan per Baris"), a(F, "Jalankan Jatuh Tempo")]
+    ),
+    "proses-akhir-bulan": g(
+      "proses-akhir-bulan",
+      "Proses Akhir Bulan",
+      "Proses Akhir Bulan",
+      "/finance/perusahaan/proses-akhir-bulan",
+      "Checklist review + tutup periode — buat jurnal penutup CL/ ke Laba Ditahan. Periode tertutup memblokir posting baru.",
+      [a(F, "Review Checklist"), a(F, "Simpan Checklist"), a(F, "Tutup Periode & Buat Jurnal")]
+    ),
+    kontak: g(
+      "kontak",
+      "Kontak",
+      "Kontak",
+      "/finance/perusahaan/kontak",
+      "Buku alamat kontak bisnis.",
+      [a(F, "Kelola Kontak")]
+    ),
+    "transaksi-favorit": g(
+      "transaksi-favorit",
+      "Transaksi Favorit",
+      "Transaksi Favorit",
+      "/finance/perusahaan/transaksi-favorit",
+      "Shortcut jurnal yang sering dipakai.",
+      [a(F, "Simpan Template Favorit"), a(F, "Pakai Transaksi Favorit")]
+    ),
+    kalender: g(
+      "kalender",
+      "Kalender",
+      "Kalender",
+      "/finance/perusahaan/kalender",
+      "Jatuh tempo piutang/hutang, payroll, transaksi berulang, PO, WO & opname — legend dari data live.",
+      [a(F, "Lihat Event Bulan Ini"), a(F, "Review Kategori Aktif di Sidebar")]
+    ),
+    "log-aktivitas": g(
+      "log-aktivitas",
+      "Log Aktivitas",
+      "Log Aktivitas",
+      "/finance/perusahaan/log-aktivitas",
+      "Audit log aktivitas modul perusahaan.",
+      [a(F, "Filter Aktivitas"), a(F, "Review Log")]
     ),
     "daftar-laporan": g(
       "daftar-laporan",
       "Daftar Laporan",
       "Daftar Laporan",
       "/finance/daftar-laporan",
-      "Katalog semua laporan Finance — shortcut ke laporan spesifik.",
-      [
-        a(F, "Buka Daftar Laporan", "/finance/daftar-laporan"),
-        a(F, "Pilih kategori laporan"),
-        a(F, "Set parameter & generate"),
-        a(F, "Export / print hasil"),
-      ],
+      "Katalog laporan Accurate-style — filter periode & export.",
+      [a(F, "Pilih Kategori Laporan"), a(F, "Atur Filter Periode"), a(F, "Generate & Export")]
+    ),
+    perpajakan: g(
+      "perpajakan",
+      "Laporan Perpajakan",
+      "Perpajakan",
+      "/finance/laporan/perpajakan",
+      "Rekap PPN masukan/keluaran & kewajiban pajak.",
+      [a(F, "Pilih Periode"), a(F, "Generate Laporan Pajak"), a(F, "Export untuk e-Filing")]
     ),
   },
 };

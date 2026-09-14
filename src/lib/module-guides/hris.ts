@@ -1,6 +1,4 @@
-import { MODULES } from "@/lib/modules";
-import { buildSectionsFromMenus } from "./build-nav";
-import { a, g, simpleGuide } from "./helpers";
+import { a, g } from "./helpers";
 import type { GuideModuleId, ModuleGuideNav } from "./types";
 
 const H = "hris" as GuideModuleId;
@@ -8,56 +6,76 @@ const M = "mobile" as GuideModuleId;
 const F = "finance" as GuideModuleId;
 const O = "operasional" as GuideModuleId;
 
-const hrisMenus = MODULES.find((m) => m.id === "hris")!.menus;
-
 export const hrisGuideNav: ModuleGuideNav = {
   moduleId: "hris",
   title: "Panduan HRIS",
   subtitle: "Klik menu di kiri — alur kerja ditampilkan dari atas ke bawah.",
-  sections: buildSectionsFromMenus(hrisMenus),
+  sections: [
+    { key: "dashboard", label: "Dashboard", items: [{ id: "dashboard", label: "Dashboard" }] },
+    {
+      key: "kehadiran",
+      label: "Kehadiran",
+      items: [
+        { id: "absensi", label: "Absensi & Kehadiran" },
+        { id: "assignment", label: "Assignment Cabang" },
+      ],
+    },
+    {
+      key: "approval",
+      label: "Izin & Lembur",
+      items: [
+        { id: "izin-cuti", label: "Izin & Cuti" },
+        { id: "lembur", label: "Lembur" },
+      ],
+    },
+    {
+      key: "payroll",
+      label: "Payroll",
+      items: [{ id: "slip-gaji", label: "Slip Gaji" }],
+    },
+    {
+      key: "kinerja",
+      label: "Monitoring",
+      items: [
+        { id: "kinerja-tinter", label: "Kinerja Tinter" },
+        { id: "hr-analytics", label: "HR Analytics" },
+      ],
+    },
+    {
+      key: "master",
+      label: "Master & Akun",
+      items: [
+        { id: "karyawan", label: "Karyawan" },
+        { id: "users", label: "Users & Akun" },
+      ],
+    },
+  ],
   guides: {
     dashboard: g(
       "dashboard",
-      "Ringkasan Modul HRIS",
+      "Dashboard HRIS",
       "Dashboard",
       "/hris",
-      "Gambaran alur HR — absensi, payroll, izin/lembur, dan integrasi App Tinter.",
+      "Ringkasan kehadiran, payroll pending, izin/lembur menunggu approval.",
       [
-        a(M, "Tinter absensi & ajuan via App", "/app/absensi"),
-        a(H, "Rekap absensi & koreksi manual", "/hris/absensi"),
-        a(H, "Slip gaji per periode", "/hris/slip-gaji"),
-        a(H, "Approve izin & lembur", "/hris/izin"),
-        a(H, "Monitor kinerja tinter", "/hris/kinerja"),
-        a(F, "Posting gaji ke Finance", "/finance/perusahaan/gaji-tunjangan"),
+        a(H, "Review KPI Kehadiran Bulan Ini"),
+        a(H, "Cek Izin/Lembur Pending", "/hris/izin"),
+        a(H, "Monitor Slip Gaji Periode Aktif", "/hris/slip-gaji"),
+        a(H, "Lihat Kinerja Tinter", "/hris/kinerja"),
       ],
     ),
     absensi: g(
       "absensi",
-      "Absensi (App → HRIS)",
-      "Absensi",
+      "Absensi & Kehadiran (App → HRIS)",
+      "Absensi & Kehadiran",
       "/hris/absensi",
-      "Tinter check-in/out via App; HR pantau rekap & koreksi manual.",
+      "Tinter check-in via App dengan geofence cabang. HR monitoring kehadiran harian dan rekap bulanan.",
       [
-        a(M, "Check-in / check-out harian", "/app/absensi"),
-        a(H, "Buka rekap Absensi HRIS", "/hris/absensi"),
-        a(H, "Filter per bulan & cabang"),
-        a(H, "Lihat detail absensi per karyawan"),
-        a(H, "Koreksi / tambah record manual (Admin)"),
-        a(H, "Data absensi masuk perhitungan slip gaji", "/hris/slip-gaji"),
-      ],
-    ),
-    karyawan: g(
-      "karyawan",
-      "Data Karyawan",
-      "Karyawan",
-      "/hris/karyawan",
-      "Master data karyawan/tinter — profil, jabatan, cabang assignment.",
-      [
-        a(H, "Buka daftar Karyawan", "/hris/karyawan"),
-        a(H, "Tambah karyawan baru"),
-        a(H, "Edit profil (jabatan, cabang, kontak)"),
-        a(H, "Assign ke cabang", "/hris/assignment"),
-        a(H, "Link akun App Tinter", "/hris/users"),
+        a(M, "Check-in / Check-out via App", "/app/absensi"),
+        a(H, "Buka Rekap Absensi", "/hris/absensi"),
+        a(H, "Filter Bulan & Cabang"),
+        a(H, "Koreksi Record Manual (Admin)"),
+        a(H, "Data Masuk Perhitungan Slip Gaji", "/hris/slip-gaji"),
       ],
     ),
     assignment: g(
@@ -65,43 +83,26 @@ export const hrisGuideNav: ModuleGuideNav = {
       "Assignment Cabang",
       "Assignment Cabang",
       "/hris/assignment",
-      "Penempatan tinter/manpower ke cabang bengkel.",
+      "HR assign tinter ke bengkel mitra. Kapasitas cabang dibatasi per jumlah tinter.",
       [
         a(H, "Buka Assignment Cabang", "/hris/assignment"),
-        a(H, "Pilih karyawan & cabang tujuan"),
-        a(H, "Set periode penugasan"),
-        a(H, "Simpan — tinter muncul di cabang terkait"),
-        a(M, "Tinter login App → transaksi di cabang assigned"),
+        a(H, "Pilih Karyawan & Cabang Tujuan"),
+        a(H, "Set Periode Penugasan"),
+        a(H, "Simpan — Tinter Aktif di Cabang"),
+        a(M, "Tinter Login App → Transaksi di Cabang Assigned", "/app/transaksi/baru"),
       ],
     ),
-    "slip-gaji": g(
-      "slip-gaji",
-      "Slip Gaji (HRIS → App → Finance)",
-      "Slip Gaji",
-      "/hris/slip-gaji",
-      "Buat slip gaji per periode; tinter lihat di App; posting ke Finance.",
-      [
-        a(H, "Buka daftar Slip Gaji", "/hris/slip-gaji"),
-        a(H, "Pilih periode gaji"),
-        a(H, "Generate slip per karyawan"),
-        a(H, "Komponen: gaji pokok, tunjangan, potongan, lembur"),
-        a(H, "Finalisasi slip gaji"),
-        a(M, "Tinter lihat slip di App", "/app/slip-gaji"),
-        a(F, "Posting gaji & tunjangan", "/finance/perusahaan/gaji-tunjangan"),
-        a(F, "Jurnal beban gaji otomatis"),
-      ],
-    ),
-    izin: g(
-      "izin",
+    "izin-cuti": g(
+      "izin-cuti",
       "Izin & Cuti (App → HRIS)",
       "Izin & Cuti",
       "/hris/izin",
-      "Tinter ajukan izin via App; supervisor/HR approve.",
+      "Karyawan ajukan via App. Supervisor/HR approve atau reject. Status real-time di dashboard HRIS.",
       [
-        a(M, "Ajukan izin/cuti dari App"),
-        a(H, "Review pengajuan di Izin & Cuti", "/hris/izin"),
-        a(H, "Approve / reject dengan catatan"),
-        a(H, "Izin approved → update rekap absensi"),
+        a(M, "Ajukan Izin/Cuti dari App", "/app/izin"),
+        a(H, "Review Pengajuan", "/hris/izin"),
+        a(H, "Approve / Reject + Catatan"),
+        a(H, "Update Rekap Absensi"),
       ],
     ),
     lembur: g(
@@ -109,35 +110,68 @@ export const hrisGuideNav: ModuleGuideNav = {
       "Lembur (App → HRIS → Slip Gaji)",
       "Lembur",
       "/hris/lembur",
-      "Approval jam lembur tinter — masuk perhitungan payroll.",
+      "Approval jam lembur — masuk perhitungan payroll periode berjalan.",
       [
-        a(M, "Ajukan lembur dari App"),
-        a(H, "Review pengajuan Lembur", "/hris/lembur"),
-        a(H, "Approve jam lembur"),
-        a(H, "Lembur approved → masuk Slip Gaji", "/hris/slip-gaji"),
+        a(M, "Ajukan Lembur dari App", "/app/lembur"),
+        a(H, "Review Pengajuan Lembur", "/hris/lembur"),
+        a(H, "Approve Jam Lembur"),
+        a(H, "Otomatis Masuk Slip Gaji", "/hris/slip-gaji"),
       ],
     ),
-    kinerja: g(
-      "kinerja",
+    "slip-gaji": g(
+      "slip-gaji",
+      "Payroll & Slip Gaji (HRIS → App → Finance)",
+      "Slip Gaji",
+      "/hris/slip-gaji",
+      "Slip gaji digenerate per periode. HR finalize sebelum dibagikan ke karyawan via App.",
+      [
+        a(H, "Pilih Periode Gaji", "/hris/slip-gaji"),
+        a(H, "Generate Slip per Karyawan"),
+        a(H, "Komponen: Pokok, Tunjangan, Potongan, Lembur"),
+        a(H, "Finalisasi Slip Gaji"),
+        a(M, "Karyawan Lihat Slip di App", "/app/slip-gaji"),
+        a(F, "Posting Gaji & Tunjangan", "/finance/perusahaan/gaji-tunjangan"),
+        a(F, "Bayar Gaji via Kas/Bank", "/finance/kas-bank/pembayaran"),
+      ],
+    ),
+    "kinerja-tinter": g(
+      "kinerja-tinter",
       "Kinerja Tinter",
       "Kinerja Tinter",
       "/hris/kinerja",
-      "Monitor produktivitas tinter — transaksi, efisiensi mixing, rating.",
+      "Monitoring durasi mixing, jumlah transaksi, pemakaian bahan per tinter. Drill-down ke detail transaksi.",
       [
-        a(O, "Data transaksi dari Operasional", "/operasional/transaksi"),
+        a(O, "Sumber Data Transaksi", "/operasional/transaksi"),
         a(H, "Buka Kinerja Tinter", "/hris/kinerja"),
-        a(H, "Filter per cabang & periode"),
-        a(H, "Review KPI per tinter"),
-        a(H, "Ranking & trend kinerja"),
+        a(H, "Filter Cabang & Periode"),
+        a(H, "Review KPI per Tinter — Durasi, Qty, Efisiensi"),
+        a(H, "Drill-down Detail Transaksi"),
       ],
     ),
-    "hr-analytics": simpleGuide(
+    "hr-analytics": g(
       "hr-analytics",
       "HR Analytics",
+      "HR Analytics",
       "/hris/hr-analytics",
-      "Dashboard analitik HR — turnover, kehadiran, biaya tenaga kerja.",
-      H,
-      ["Buka HR Analytics", "Pilih metrik & periode", "Review trend & grafik", "Export laporan"],
+      "Dashboard analitik — turnover, kehadiran, biaya tenaga kerja.",
+      [
+        a(H, "Pilih Metrik & Periode", "/hris/hr-analytics"),
+        a(H, "Review Trend & Grafik"),
+        a(H, "Export Laporan HR"),
+      ],
+    ),
+    karyawan: g(
+      "karyawan",
+      "Data Karyawan",
+      "Karyawan",
+      "/hris/karyawan",
+      "Master data karyawan/tinter — profil, jabatan, cabang.",
+      [
+        a(H, "Kelola Data Karyawan", "/hris/karyawan"),
+        a(H, "Assign Cabang", "/hris/assignment"),
+        a(H, "Link Akun App", "/hris/users"),
+        a(F, "Mirror di Finance Karyawan", "/finance/perusahaan/karyawan"),
+      ],
     ),
     users: g(
       "users",
@@ -146,10 +180,9 @@ export const hrisGuideNav: ModuleGuideNav = {
       "/hris/users",
       "Kelola akun login App Tinter & role akses dashboard.",
       [
-        a(H, "Buka Users & Akun", "/hris/users"),
-        a(H, "Buat akun untuk tinter/karyawan"),
-        a(H, "Set role & cabang akses"),
-        a(M, "Karyawan login App dengan akun terkait"),
+        a(H, "Buat Akun Karyawan/Tinter", "/hris/users"),
+        a(H, "Set Role & Cabang Akses"),
+        a(M, "Login App dengan Akun Terkait", "/app"),
       ],
     ),
   },
