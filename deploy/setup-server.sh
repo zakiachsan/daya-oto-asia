@@ -51,14 +51,18 @@ clone_or_pull "$STAGE_DIR" staging
 
 build_app() {
   local dir="$1"
+  local with_staging_path="${2:-}"
   echo "==> Build $dir"
   cd "$dir"
   npm ci
+  if [ "$with_staging_path" = "1" ]; then
+    export NEXT_PUBLIC_BASE_PATH=/staging
+  fi
   npm run build
 }
 
 build_app "$PROD_DIR"
-build_app "$STAGE_DIR"
+build_app "$STAGE_DIR" 1
 
 echo "==> Nginx"
 sudo cp "$PROD_DIR/deploy/nginx/daya-oto-asia.conf" /etc/nginx/sites-available/daya-oto-asia.conf
