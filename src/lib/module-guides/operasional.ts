@@ -1,0 +1,237 @@
+import { MODULES } from "@/lib/modules";
+import { buildSectionsFromMenus } from "./build-nav";
+import { a, g, simpleGuide } from "./helpers";
+import type { GuideModuleId, ModuleGuideNav } from "./types";
+
+const O = "operasional" as GuideModuleId;
+const F = "finance" as GuideModuleId;
+const M = "mobile" as GuideModuleId;
+const H = "hris" as GuideModuleId;
+
+const opsMenus = MODULES.find((m) => m.id === "operasional")!.menus;
+
+export const operasionalGuideNav: ModuleGuideNav = {
+  moduleId: "operasional",
+  title: "Panduan Operasional",
+  subtitle: "Klik menu di kiri — alur kerja ditampilkan dari atas ke bawah.",
+  sections: buildSectionsFromMenus(opsMenus),
+  guides: {
+    dashboard: g(
+      "dashboard",
+      "Ringkasan Modul Operasional",
+      "Dashboard",
+      "/operasional",
+      "Gambaran alur operasional Daya Oto Asia — transaksi warna, OPB, WMS, dan integrasi Finance.",
+      [
+        a(M, "Tinter input transaksi via App", "/app/transaksi/baru"),
+        a(O, "Monitoring transaksi & OPB cabang", "/operasional/transaksi"),
+        a(O, "Rekonsiliasi anti-leakage", "/operasional/rekonsiliasi"),
+        a(O, "WMS: PO, distribusi, stock opname", "/operasional/po"),
+        a(F, "Finance: faktur, penerimaan, penyesuaian stok", "/finance"),
+        a(H, "HRIS: absensi & kinerja tinter", "/hris/kinerja"),
+      ],
+    ),
+    transaksi: g(
+      "transaksi",
+      "Transaksi Warna (App → Operasional)",
+      "Transaksi Warna",
+      "/operasional/transaksi",
+      "Tinter buat transaksi di App; supervisor/HO pantau real-time di Operasional.",
+      [
+        a(M, "Buat transaksi — pilih mobil & warna", "/app/transaksi/baru"),
+        a(M, "Mixing timer, cetak nota, TTD DocuMatrix"),
+        a(M, "Finalisasi transaksi (lock mixing)"),
+        a(O, "Pantau daftar transaksi per cabang", "/operasional/transaksi"),
+        a(O, "Filter status: draft / finalized / ditagih"),
+        a(O, "Detail transaksi → link ke OPB terkait"),
+      ],
+    ),
+    opb: g(
+      "opb",
+      "OPB Bulanan & Tagihan",
+      "OPB & Tagihan",
+      "/operasional/opb",
+      "Admin cabang generate OPB dari transaksi finalized, TTD, forward ke HO, lalu Finance buat faktur.",
+      [
+        a(M, "Transaksi finalized masuk pool OPB", "/app/transaksi"),
+        a(O, "Generate OPB bulanan per cabang", "/operasional/opb"),
+        a(O, "Review item & total tagihan"),
+        a(O, "TTD admin cabang & forward ke HO"),
+        a(O, "Input no. SAP — status Ditagihkan"),
+        a(F, "Buat Faktur Penjualan dari OPB", "/finance/penjualan/faktur-penjualan", {
+          module: O,
+          href: "/operasional/opb",
+        }),
+        a(F, "Post faktur → jurnal piutang otomatis"),
+        a(F, "Catat Penerimaan Penjualan", "/finance/penjualan/penerimaan-penjualan"),
+      ],
+    ),
+    rekonsiliasi: g(
+      "rekonsiliasi",
+      "Rekonsiliasi OPB & Anti-Leakage",
+      "Rekonsiliasi",
+      "/operasional/rekonsiliasi",
+      "Supervisor cocokkan OPB vs nota cetak vs pemakaian stok. Deteksi selisih & leakage.",
+      [
+        a(O, "Buka halaman Rekonsiliasi", "/operasional/rekonsiliasi"),
+        a(O, "Pilih cabang & periode"),
+        a(O, "Bandingkan OPB vs nota cetak vs stok"),
+        a(O, "Review selisih di luar toleransi"),
+        a(O, "Flag leakage: stok habis tapi OPB belum terbentuk"),
+        a(O, "Tindak lanjut ke Verifikasi Klaim jika perlu", "/operasional/verifikasi-klaim"),
+      ],
+    ),
+    "verifikasi-klaim": g(
+      "verifikasi-klaim",
+      "Verifikasi Klaim Warna",
+      "Verifikasi Klaim Warna",
+      "/operasional/verifikasi-klaim",
+      "Review klaim warna dari cabang — approve/reject dengan catatan.",
+      [
+        a(O, "Buka daftar klaim pending", "/operasional/verifikasi-klaim"),
+        a(O, "Review detail klaim & bukti"),
+        a(O, "Approve atau reject dengan alasan"),
+        a(O, "Klaim approved → update stok/koreksi"),
+      ],
+    ),
+    inventori: g(
+      "inventori",
+      "Inventori & Stok Cabang",
+      "Inventori & Stok",
+      "/operasional/inventori",
+      "Saldo stok per cabang — base coat, hardener, thinner, dll.",
+      [
+        a(O, "Buka Inventori & Stok", "/operasional/inventori"),
+        a(O, "Filter per cabang & kategori produk"),
+        a(O, "Lihat saldo gram/liter per item"),
+        a(O, "Mutasi dari transaksi, distribusi, stock opname"),
+        a(O, "Pantau stok minimum → Ajuan Stok", "/operasional/ajuan-stok"),
+      ],
+    ),
+    po: g(
+      "po",
+      "PO & Penerimaan Barang",
+      "PO & Penerimaan",
+      "/operasional/po",
+      "Purchase Order ke pabrik/supplier, goods received, lanjut ke Finance faktur pembelian.",
+      [
+        a(O, "Buat PO ke supplier/pabrik", "/operasional/po"),
+        a(O, "Kirim PO & tunggu pengiriman"),
+        a(O, "Goods Received — terima barang ke gudang pusat"),
+        a(O, "Stok pusat bertambah otomatis"),
+        a(F, "Catat Faktur Pembelian dari PO/GR", "/finance/pembelian/faktur-pembelian", {
+          module: O,
+          href: "/operasional/po",
+        }),
+        a(F, "Post faktur → jurnal hutang"),
+        a(F, "Bayar via Pembayaran Pembelian", "/finance/pembelian/pembayaran-pembelian"),
+      ],
+    ),
+    distribusi: g(
+      "distribusi",
+      "Distribusi ke Cabang",
+      "Distribusi Cabang",
+      "/operasional/distribusi",
+      "Transfer stok dari gudang pusat ke cabang-cabang.",
+      [
+        a(O, "Buat dokumen distribusi", "/operasional/distribusi"),
+        a(O, "Pilih item & qty dari stok pusat"),
+        a(O, "Pilih cabang tujuan"),
+        a(O, "Kirim & konfirmasi penerimaan cabang"),
+        a(O, "Stok pusat berkurang, stok cabang bertambah"),
+        a(O, "Verifikasi di Inventori cabang", "/operasional/inventori"),
+      ],
+    ),
+    "stock-opname": g(
+      "stock-opname",
+      "Stock Opname (App → Operasional → Finance)",
+      "Stock Opname",
+      "/operasional/stock-opname",
+      "Tinter timbang stok di App; supervisor rekonsiliasi; Finance posting penyesuaian persediaan.",
+      [
+        a(M, "Tinter input stock opname per item", "/app/stock-opname"),
+        a(O, "Review hasil opname cabang", "/operasional/stock-opname"),
+        a(O, "Rekonsiliasi selisih vs toleransi"),
+        a(O, "Approve stock opname"),
+        a(F, "Buat Penyesuaian Persediaan", "/finance/persediaan/penyesuaian-persediaan", {
+          module: O,
+          href: "/operasional/stock-opname",
+        }),
+        a(F, "Post penyesuaian → jurnal persediaan"),
+      ],
+    ),
+    "ajuan-stok": g(
+      "ajuan-stok",
+      "Ajuan Stok (App → Operasional)",
+      "Ajuan Stok",
+      "/operasional/ajuan-stok",
+      "Cabang ajukan replenishment stok via App; HO approve & proses distribusi.",
+      [
+        a(M, "Ajukan stok dari App", "/app/ajukan-stok"),
+        a(O, "Review ajuan stok masuk", "/operasional/ajuan-stok"),
+        a(O, "Approve / reject dengan catatan"),
+        a(O, "Proses via Distribusi Cabang", "/operasional/distribusi"),
+        a(O, "Update saldo inventori cabang", "/operasional/inventori"),
+      ],
+    ),
+    cabang: simpleGuide(
+      "cabang",
+      "Master Cabang",
+      "/operasional/cabang",
+      "Kelola data cabang/bengkel — nama, alamat, PIC, status aktif.",
+      O,
+      ["Buka Master Cabang", "Tambah / edit data cabang", "Set PIC & kontak", "Aktif/nonaktif cabang"],
+    ),
+    produk: simpleGuide(
+      "produk",
+      "Master Produk",
+      "/operasional/produk",
+      "Master produk cat & material — kode, nama, satuan, kategori.",
+      O,
+      ["Buka Master Produk", "Tambah produk baru", "Edit harga & satuan", "Sync ke Finance Barang & Jasa"],
+    ),
+    "kategori-harga": simpleGuide(
+      "kategori-harga",
+      "Kategori Harga",
+      "/operasional/kategori-harga",
+      "Tier harga per kategori pelanggan/cabang.",
+      O,
+      ["Buka Kategori Harga", "Kelola tier & diskon", "Assign ke cabang/pelanggan"],
+    ),
+    "kode-warna": simpleGuide(
+      "kode-warna",
+      "Kode Warna",
+      "/operasional/kode-warna",
+      "Database kode warna OEM & formula mixing.",
+      O,
+      ["Buka Kode Warna", "Cari kode warna mobil", "Lihat formula & produk terkait"],
+    ),
+    "laporan-pemakaian": g(
+      "laporan-pemakaian",
+      "Laporan Pemakaian Base",
+      "Laporan Pemakaian Base",
+      "/operasional/laporan-pemakaian",
+      "Rekap pemakaian base coat per cabang/periode — dasar analisis efisiensi.",
+      [
+        a(O, "Buka Laporan Pemakaian Base", "/operasional/laporan-pemakaian"),
+        a(O, "Filter cabang & periode"),
+        a(O, "Review pemakaian vs transaksi"),
+        a(O, "Export / print laporan"),
+        a(O, "Cross-check dengan Rekonsiliasi", "/operasional/rekonsiliasi"),
+      ],
+    ),
+    monitoring: g(
+      "monitoring",
+      "Monitoring Operasional",
+      "Monitoring",
+      "/operasional/monitoring",
+      "Dashboard KPI operasional — transaksi, stok, OPB, alert.",
+      [
+        a(O, "Buka Monitoring", "/operasional/monitoring"),
+        a(O, "Lihat KPI transaksi harian/bulanan"),
+        a(O, "Alert stok minimum & OPB pending"),
+        a(O, "Drill-down ke menu terkait"),
+      ],
+    ),
+  },
+};
