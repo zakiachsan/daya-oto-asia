@@ -27,6 +27,9 @@ git fetch origin
 git checkout "$BRANCH"
 git reset --hard "origin/$BRANCH"
 npm ci
+if [ "$ENV" = "staging" ]; then
+  export NEXT_PUBLIC_BASE_PATH=/staging
+fi
 npm run build
 pm2 restart "$PM2_NAME"
 pm2 save
