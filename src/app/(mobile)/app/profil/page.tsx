@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { User, FileText, Calendar, Clock, ChevronRight, LogOut, Paintbrush, Package } from "lucide-react";
+import { User, FileText, Calendar, Clock, ChevronRight, LogOut, Paintbrush, Package, Wallet } from "lucide-react";
 import { MOBILE_USER, MOBILE_CABANG, useMobileHrPending, useMobileKinerjaRingkas } from "@/lib/mobile-app-utils";
 
 function PendingBadge({ count }: { count: number }) {
@@ -14,13 +14,14 @@ function PendingBadge({ count }: { count: number }) {
 }
 
 export default function ProfilPage() {
-  const { izinPending, lemburPending } = useMobileHrPending();
+  const { izinPending, lemburPending, kasbonPending } = useMobileHrPending();
   const kinerja = useMobileKinerjaRingkas();
 
   const menu = [
-    { href: "/app/slip-gaji", icon: FileText, label: "Slip Gaji", badge: 0 },
-    { href: "/app/izin", icon: Calendar, label: "Izin & Cuti", badge: izinPending },
-    { href: "/app/lembur", icon: Clock, label: "Lembur", badge: lemburPending },
+    { href: "/app/slip-gaji", icon: FileText, label: "Slip Gaji", sub: "Gaji bulan berjalan", badge: 0 },
+    { href: "/app/izin", icon: Calendar, label: "Pengajuan Izin & Cuti", sub: "Izin, sakit, cuti tahunan", badge: izinPending },
+    { href: "/app/lembur", icon: Clock, label: "Pengajuan Lembur", sub: "Jam lembur & approval supervisor", badge: lemburPending },
+    { href: "/app/kasbon", icon: Wallet, label: "Pengajuan Kasbon", sub: "Kasbon operasional cabang", badge: kasbonPending },
   ];
 
   return (
@@ -70,15 +71,23 @@ export default function ProfilPage() {
         </div>
       </div>
 
-      <div className="space-y-1">
-        {menu.map(({ href, icon: Icon, label, badge }) => (
-          <Link key={label} href={href} className="flex items-center gap-3 bg-white rounded-xl p-3.5 border border-slds-border">
-            <Icon className="h-5 w-5 text-brand" />
-            <span className="flex-1 text-[14px] font-semibold text-slds-text">{label}</span>
-            <PendingBadge count={badge} />
-            <ChevronRight className="h-4 w-4 text-slds-text-weak" />
-          </Link>
-        ))}
+      <div className="space-y-2">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-slds-text-weak px-1">Menu Profil</p>
+        <div className="space-y-1">
+          {menu.map(({ href, icon: Icon, label, sub, badge }) => (
+            <Link key={label} href={href} className="flex items-center gap-3 bg-white rounded-xl p-3.5 border border-slds-border">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slds-bg">
+                <Icon className="h-5 w-5 text-brand" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[14px] font-semibold text-slds-text">{label}</p>
+                <p className="text-[11px] text-slds-text-weak truncate">{sub}</p>
+              </div>
+              <PendingBadge count={badge} />
+              <ChevronRight className="h-4 w-4 text-slds-text-weak shrink-0" />
+            </Link>
+          ))}
+        </div>
       </div>
 
       <Link

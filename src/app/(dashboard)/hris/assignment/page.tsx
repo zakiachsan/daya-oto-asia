@@ -47,7 +47,7 @@ export default function AssignmentPage() {
     <div>
       <PageHeader
         title="Assignment Cabang"
-        desc="Penugasan tinter ke bengkel/cabang — bisa pindah assignment"
+        desc="Penugasan tinter ke bengkel/cabang · bisa pindah assignment"
         breadcrumb={[{ label: "HRIS", href: "/hris" }, { label: "Assignment Cabang" }]}
       />
 

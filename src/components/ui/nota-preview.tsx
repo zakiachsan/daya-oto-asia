@@ -30,7 +30,7 @@ type NotaPreviewProps = {
     | "jumlahPanel"
     | "noVendor"
   >;
-  /** Nama bengkel penerima — referensi: PT. Astra Daihatsu Tbk - Cabang Bogor */
+  /** Nama bengkel penerima · referensi: PT. Astra Daihatsu Tbk - Cabang Bogor */
   kepada?: string;
   alamatKepada?: string;
   className?: string;
@@ -57,7 +57,7 @@ function DoaLogo() {
 }
 
 /**
- * Layout nota DOA Cabang Bogor — clone struktur PDF hal. 1:
+ * Layout nota DOA Cabang Bogor · clone struktur PDF hal. 1:
  * logo+header kiri, NOTA NO kanan, tabel 4 kolom (tarif di dalam tabel), TTD bawah.
  */
 const ALAMAT_BOGOR =

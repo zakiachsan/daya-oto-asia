@@ -21,7 +21,7 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 
-/** Rekap OPB bulanan internal — bukan formulir SAP Astra per transaksi */
+/** Rekap OPB bulanan internal · bukan formulir SAP Astra per transaksi */
 export function OpbPreview({ opb, transaksi, className = "" }: OpbPreviewProps) {
   const linked = transaksi.filter(
     (t) => t.opbId === opb.id || (t.cabang.includes(opb.cabang.split(" ")[0]) && t.status === "Selesai"),
@@ -80,7 +80,7 @@ export function OpbPreview({ opb, transaksi, className = "" }: OpbPreviewProps) 
                   <td className="doc-center">{i + 1}</td>
                   <td>{t.tanggal}</td>
                   <td style={{ fontFamily: "monospace" }}>{notaNoFromTrxId(t.id)}</td>
-                  <td>{t.noPkb ?? "—"}</td>
+                  <td>{t.noPkb ?? "-"}</td>
                   <td>{t.platNomor}</td>
                   <td>{t.mobil}</td>
                   <td>{t.warna} ({t.kodeWarna})</td>
@@ -129,7 +129,7 @@ export function OpbPreview({ opb, transaksi, className = "" }: OpbPreviewProps) 
       </div>
 
       <div className="footer-alamat">
-        <p>PT. DAYA OTO ASIA — Rekap Order Pembelian Bahan Cat Body Repair</p>
+        <p>PT. DAYA OTO ASIA · Rekap Order Pembelian Bahan Cat Body Repair</p>
       </div>
     </div>
   );

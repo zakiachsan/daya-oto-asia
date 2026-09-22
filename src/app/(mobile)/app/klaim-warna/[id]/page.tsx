@@ -97,7 +97,7 @@ export default function MobileKlaimDetailPage() {
           </div>
         ) : (
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-[12px] text-amber-800">
-            Belum ditemukan transaksi cocok — supervisor akan review manual.
+            Belum ditemukan transaksi cocok · supervisor akan review manual.
           </div>
         )}
       </div>

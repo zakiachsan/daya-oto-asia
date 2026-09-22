@@ -34,7 +34,7 @@ export default function CabangPage() {
 
   function handleSaveGeofence() {
     if (!editId) return;
-    toast(`Geofence diperbarui — radius ${radius}m`, "success");
+    toast(`Geofence diperbarui · radius ${radius}m`, "success");
     setEditId(null);
   }
 
@@ -74,7 +74,7 @@ export default function CabangPage() {
       )}
 
       {editId && editing && (
-        <ActionFormPanel title={`Edit Geofence — ${editing.nama}`} onClose={() => setEditId(null)} onSave={handleSaveGeofence} saveLabel="Simpan Lokasi">
+        <ActionFormPanel title={`Edit Geofence · ${editing.nama}`} onClose={() => setEditId(null)} onSave={handleSaveGeofence} saveLabel="Simpan Lokasi">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>Radius Geofence (meter)</label>

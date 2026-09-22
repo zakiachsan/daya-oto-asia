@@ -2,15 +2,24 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Plus, Truck, Search } from "lucide-react";
+import { Plus, Truck, Search, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { DataTable } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ActionFormPanel, fieldClass, labelClass } from "@/components/ui/action-form-panel";
-import { MOCK_CABANG, MOCK_PRODUK } from "@/lib/mock-data";
-import type { DistribusiDetail } from "@/lib/distribusi-utils";
+import { MOCK_CABANG } from "@/lib/mock-data";
+import type { DistLine, DistribusiDetail } from "@/lib/distribusi-utils";
+import { listProdukAktif } from "@/lib/inventori-utils";
 import { useDistribusiList } from "@/lib/preview-store";
 import { useToast } from "@/components/ui/toast";
+import { ProductSearchSelect } from "@/components/ui/product-search-select";
+
+const PRODUK_AKTIF = listProdukAktif();
+
+function emptyLine(kode?: string): DistLine {
+  const p = PRODUK_AKTIF.find((x) => x.kode === kode) ?? PRODUK_AKTIF[0];
+  return { kode: p.kode, nama: p.nama, qty: 1 };
+}
 
 export default function DistribusiPage() {
   const { toast } = useToast();
@@ -20,8 +29,10 @@ export default function DistribusiPage() {
   const [statusFilter, setStatusFilter] = useState("Semua Status");
   const [ke, setKe] = useState(MOCK_CABANG[0].kota);
   const [tanggal, setTanggal] = useState(new Date().toISOString().slice(0, 10));
-  const [produk, setProduk] = useState(MOCK_PRODUK[0].kode);
-  const [qty, setQty] = useState(12);
+  const [lines, setLines] = useState<DistLine[]>([
+    emptyLine(),
+    emptyLine(PRODUK_AKTIF[1]?.kode ?? "AXT-814"),
+  ]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -32,27 +43,48 @@ export default function DistribusiPage() {
     });
   }, [items, search, statusFilter]);
 
+  function updateLine(idx: number, patch: Partial<DistLine>) {
+    setLines((prev) =>
+      prev.map((ln, i) => {
+        if (i !== idx) return ln;
+        const next = { ...ln, ...patch };
+        if (patch.kode) {
+          const p = PRODUK_AKTIF.find((x) => x.kode === patch.kode);
+          next.nama = p?.nama ?? patch.kode;
+        }
+        if (patch.nama) next.nama = patch.nama;
+        return next;
+      }),
+    );
+  }
+
   function handleSave() {
-    const p = MOCK_PRODUK.find((x) => x.kode === produk);
+    const valid = lines.filter((l) => l.qty > 0);
+    if (valid.length === 0) {
+      toast("Tambahkan minimal 1 item produk", "error");
+      return;
+    }
+    const totalQty = valid.reduce((s, l) => s + l.qty, 0);
     const newRow: DistribusiDetail = {
       id: `DIST-2026-${String(21 + items.length).padStart(3, "0")}`,
       tanggal,
       dari: "Pusat",
       ke,
-      items: qty,
+      items: totalQty,
       status: "Draft",
-      lines: [{ kode: produk, nama: p?.nama ?? produk, qty }],
+      lines: valid,
     };
     add(newRow);
     setShowForm(false);
-    toast(`Distribusi ${newRow.id} dibuat`, "success");
+    setLines([emptyLine()]);
+    toast(`Distribusi ${newRow.id} · ${valid.length} jenis produk`, "success");
   }
 
   return (
     <div>
       <PageHeader
         title="Distribusi Cabang"
-        desc="Kirim barang pusat → cabang — klik no. distribusi untuk detail item"
+        desc="Kirim beberapa item produk sekaligus dari pusat ke cabang"
         breadcrumb={[{ label: "Operasional", href: "/operasional" }, { label: "Distribusi Cabang" }]}
         actions={
           <button type="button" data-no-toast onClick={() => setShowForm(!showForm)} className="inline-flex items-center gap-1.5 px-3 py-2 bg-brand text-white rounded-md text-[13px] font-semibold hover:bg-brand-dark">
@@ -62,8 +94,8 @@ export default function DistribusiPage() {
       />
 
       {showForm && (
-        <ActionFormPanel title="Distribusi Baru" onClose={() => setShowForm(false)} onSave={handleSave} saveLabel="Kirim Distribusi">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <ActionFormPanel title="Distribusi Baru · Multi Item" onClose={() => setShowForm(false)} onSave={handleSave} saveLabel="Kirim Distribusi">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
             <div>
               <label className={labelClass}>Dari</label>
               <input disabled value="Gudang Pusat" className={`${fieldClass} bg-slds-bg`} />
@@ -80,19 +112,51 @@ export default function DistribusiPage() {
               <label className={labelClass}>Tanggal</label>
               <input type="date" value={tanggal} onChange={(e) => setTanggal(e.target.value)} className={fieldClass} />
             </div>
-            <div>
-              <label className={labelClass}>Produk</label>
-              <select value={produk} onChange={(e) => setProduk(e.target.value)} className={`${fieldClass} bg-white`}>
-                {MOCK_PRODUK.slice(0, 15).map((p) => (
-                  <option key={p.kode} value={p.kode}>{p.kode}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className={labelClass}>Jumlah</label>
-              <input type="number" min={1} value={qty} onChange={(e) => setQty(Number(e.target.value) || 1)} className={fieldClass} />
-            </div>
           </div>
+
+          <p className="text-[12px] font-bold text-slds-text mb-2">Item Produk ({lines.length})</p>
+          <div className="space-y-2 mb-3">
+            {lines.map((ln, idx) => (
+              <div key={idx} className="grid grid-cols-[1fr_100px_40px] gap-2 items-end">
+                <div>
+                  {idx === 0 && <label className={labelClass}>Produk</label>}
+                  <ProductSearchSelect
+                    value={ln.kode}
+                    onChange={(kode, nama) => updateLine(idx, { kode, nama })}
+                    className={idx > 0 ? "mt-1" : ""}
+                  />
+                </div>
+                <div>
+                  {idx === 0 && <label className={labelClass}>Qty (kaleng)</label>}
+                  <input
+                    type="number"
+                    min={1}
+                    value={ln.qty}
+                    onChange={(e) => updateLine(idx, { qty: Number(e.target.value) || 1 })}
+                    className={`${fieldClass} ${idx > 0 ? "mt-1" : ""}`}
+                  />
+                </div>
+                <button
+                  type="button"
+                  data-no-toast
+                  disabled={lines.length <= 1}
+                  onClick={() => setLines((prev) => prev.filter((_, i) => i !== idx))}
+                  className="h-10 flex items-center justify-center text-red-500 disabled:opacity-30"
+                  aria-label="Hapus baris"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            data-no-toast
+            onClick={() => setLines((prev) => [...prev, emptyLine()])}
+            className="inline-flex items-center gap-1 text-[12px] font-semibold text-brand"
+          >
+            <Plus className="h-3.5 w-3.5" /> Tambah Produk
+          </button>
         </ActionFormPanel>
       )}
 
@@ -140,7 +204,15 @@ export default function DistribusiPage() {
           },
           { key: "ke", label: "Ke Cabang" },
           { key: "tanggal", label: "Tanggal" },
-          { key: "items", label: "Items", render: (r) => `${r.items}` },
+          {
+            key: "items",
+            label: "Items",
+            render: (r) => {
+              const detail = items.find((i) => i.id === r.id);
+              const kinds = detail?.lines.length ?? 0;
+              return `${kinds} jenis · ${r.items} kaleng`;
+            },
+          },
           { key: "status", label: "Status", render: (r) => <StatusBadge status={String(r.status)} /> },
         ]}
         data={filtered}

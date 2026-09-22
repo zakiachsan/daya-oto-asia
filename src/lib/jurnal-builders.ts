@@ -197,7 +197,7 @@ export function buildTransferBankJurnal(transfer: TransferBankRow, jurnalId: str
     ...jurnalHeader(
       jurnalId,
       transfer.tanggal,
-      `Transfer ${transfer.dari} → ${transfer.ke} — ${transfer.keterangan}`,
+      `Transfer ${transfer.dari} → ${transfer.ke} · ${transfer.keterangan}`,
       amount,
       "transfer-bank",
       { refPayment: transfer.id },

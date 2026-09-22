@@ -45,7 +45,7 @@ export const INITIAL_DISTRIBUSI: DistribusiDetail[] = [
   },
   {
     ...MOCK_DISTRIBUSI[2],
-    driver: "—",
+    driver: "-",
     lines: [
       distLine("AXT-207", 8),
       distLine("AXT-910", 10),

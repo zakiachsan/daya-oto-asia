@@ -12,7 +12,7 @@ const FIN_FAKTUR_BELI = "/finance/pembelian/faktur-pembelian";
 export const operasionalGuideNav: ModuleGuideNav = {
   moduleId: "operasional",
   title: "Panduan Operasional",
-  subtitle: "Klik menu di kiri — alur kerja ditampilkan dari atas ke bawah.",
+  subtitle: "Klik menu di kiri · alur kerja ditampilkan dari atas ke bawah.",
   sections: [
     { key: "dashboard", label: "Dashboard", items: [{ id: "dashboard", label: "Dashboard" }] },
     {
@@ -82,7 +82,7 @@ export const operasionalGuideNav: ModuleGuideNav = {
       [
         a(M, "Buat Transaksi", "/app/transaksi/baru"),
         a(M, "Pilih Mobil & Kode Warna"),
-        a(M, "Mixing — Timer Durasi Aktif"),
+        a(M, "Mixing · Timer Durasi Aktif"),
         a(M, "Penambahan Bahan (sebelum lock, mobil sama)"),
         a(M, "Cetak Nota Wajib + TTD DocuMatrix"),
         a(M, "Finalisasi / Lock Transaksi"),
@@ -101,7 +101,7 @@ export const operasionalGuideNav: ModuleGuideNav = {
         a(O, "Review Item & Total Tagihan"),
         a(O, "TTD Admin Cabang"),
         a(O, "Forward ke HO"),
-        a(O, "Input No. SAP — Status Ditagihkan"),
+        a(O, "Input No. SAP · Status Ditagihkan"),
         a(F, "Buat Faktur Penjualan dari OPB", FIN_FAKTUR, { module: O, href: "/operasional/opb" }),
       ],
     ),
@@ -116,7 +116,7 @@ export const operasionalGuideNav: ModuleGuideNav = {
         a(O, "Pilih Cabang & Periode"),
         a(O, "Cocokkan OPB vs Nota Cetak vs Stok"),
         a(O, "Review Selisih di Luar Toleransi"),
-        a(O, "Flag Leakage — Tindak Lanjut"),
+        a(O, "Flag Leakage · Tindak Lanjut"),
         a(O, "Verifikasi Klaim jika perlu", "/operasional/verifikasi-klaim"),
       ],
     ),
@@ -129,7 +129,7 @@ export const operasionalGuideNav: ModuleGuideNav = {
       [
         a(O, "Buat PO ke Supplier/Pabrik", "/operasional/po"),
         a(O, "Kirim PO & Tunggu Pengiriman"),
-        a(O, "Goods Received — Terima ke Gudang Pusat"),
+        a(O, "Goods Received · Terima ke Gudang Pusat"),
         a(O, "Stok Pusat Bertambah"),
         a(F, "Catat Faktur Pembelian", FIN_FAKTUR_BELI, { module: O, href: "/operasional/po" }),
         a(F, "Bayar PO / Pelunasan", "/finance/pembelian/pembayaran-pembelian"),
@@ -182,7 +182,7 @@ export const operasionalGuideNav: ModuleGuideNav = {
       "Inventori & Stok Cabang",
       "Inventori & Stok",
       "/operasional/inventori",
-      "Saldo stok per cabang — base coat, hardener, thinner. Mutasi dari transaksi, distribusi, opname.",
+      "Saldo stok per cabang · base coat, hardener, thinner. Mutasi dari transaksi, distribusi, opname.",
       [
         a(O, "Buka Inventori & Stok", "/operasional/inventori"),
         a(O, "Filter Cabang & Kategori"),
@@ -209,7 +209,7 @@ export const operasionalGuideNav: ModuleGuideNav = {
       "Laporan Pemakaian Base",
       "Laporan Pemakaian Base",
       "/operasional/laporan-pemakaian",
-      "Rekap pemakaian base coat per cabang/periode — analisis efisiensi mixing.",
+      "Rekap pemakaian base coat per cabang/periode · analisis efisiensi mixing.",
       [
         a(O, "Generate Laporan Pemakaian", "/operasional/laporan-pemakaian"),
         a(O, "Filter Cabang & Periode"),
@@ -222,7 +222,7 @@ export const operasionalGuideNav: ModuleGuideNav = {
       "Monitoring Operasional",
       "Monitoring",
       "/operasional/monitoring",
-      "Dashboard KPI — transaksi harian, stok alert, OPB pending.",
+      "Dashboard KPI · transaksi harian, stok alert, OPB pending.",
       [
         a(O, "Buka Monitoring", "/operasional/monitoring"),
         a(O, "Review KPI & Alert"),
@@ -234,7 +234,7 @@ export const operasionalGuideNav: ModuleGuideNav = {
       "Master Cabang",
       "Master Cabang",
       "/operasional/cabang",
-      "Data bengkel mitra — nama, alamat, PIC, status aktif.",
+      "Data bengkel mitra · nama, alamat, PIC, status aktif.",
       [a(O, "Kelola Data Cabang"), a(O, "Set PIC & Kontak"), a(O, "Aktif / Nonaktif Cabang")],
     ),
     produk: g(
@@ -242,7 +242,7 @@ export const operasionalGuideNav: ModuleGuideNav = {
       "Master Produk",
       "Master Produk",
       "/operasional/produk",
-      "Master cat & material — kode, satuan, kategori. Sync ke Finance Barang & Jasa.",
+      "Master cat & material · kode, satuan, kategori. Sync ke Finance Barang & Jasa.",
       [
         a(O, "Kelola Master Produk", "/operasional/produk"),
         a(F, "Review Barang & Jasa", "/finance/persediaan/barang-jasa"),

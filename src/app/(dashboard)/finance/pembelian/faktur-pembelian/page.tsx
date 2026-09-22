@@ -51,14 +51,14 @@ export default function FakturPembelianPage() {
     const jurnalId = postWithJurnal("faktur-beli", posted, { jurnalList, addJurnal });
     update(id, { status: "Posted", jurnalId });
     replaceAll(ensureHutangFromFakturBeli(hutangItems, posted));
-    toast(`Faktur ${id} di-posting — jurnal ${jurnalId}`, "success");
+    toast(`Faktur ${id} di-posting · jurnal ${jurnalId}`, "success");
   }
 
   return (
     <div>
       <PageHeader
         title="Faktur Pembelian"
-        desc="Invoice dari pabrik/vendor — generate dari PO selesai + GR"
+        desc="Invoice dari pabrik/vendor · generate dari PO selesai + GR"
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: "Pembelian" },
@@ -97,7 +97,7 @@ export default function FakturPembelianPage() {
                 <select value={poId} onChange={(e) => setPoId(e.target.value)} className={`${fieldClass} bg-white`}>
                   {eligiblePo.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.id} — {p.supplier} ({p.gr})
+                      {p.id} · {p.supplier} ({p.gr})
                     </option>
                   ))}
                 </select>

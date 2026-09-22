@@ -44,7 +44,7 @@ export default function LaporanPemakaianPage() {
     <div>
       <PageHeader
         title="Laporan Pemakaian Base"
-        desc="Grid side-by-side TGL 1–15 | 16–31 per gram — referensi DOA Cabang Bogor hal. 2"
+        desc="Grid side-by-side TGL 1–15 | 16–31 per gram · referensi DOA Cabang Bogor hal. 2"
         breadcrumb={[
           { label: "Operasional", href: "/operasional" },
           { label: "Laporan Pemakaian Base" },

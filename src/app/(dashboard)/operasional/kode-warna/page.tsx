@@ -26,7 +26,7 @@ export default function KodeWarnaPage() {
       toast("Kode dan nama warna wajib diisi", "error");
       return;
     }
-    setItems((prev) => [...prev, { kode: kode.trim(), nama: nama.trim(), kategori, formula: formula || "—" }]);
+    setItems((prev) => [...prev, { kode: kode.trim(), nama: nama.trim(), kategori, formula: formula || "-" }]);
     setShowForm(false);
     setKode("");
     setNama("");

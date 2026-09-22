@@ -28,12 +28,12 @@ export default function LemburDetailPage() {
   const canApprove = row.status === "Menunggu TTD";
 
   function handleApprove() {
-    update(row.id, { status: "Selesai", approver: "Supervisor Cabang", catatanApprover: "Lembur valid — ada bukti foto & GPS" });
+    update(row.id, { status: "Selesai", approver: "Supervisor Cabang", catatanApprover: "Lembur valid · ada bukti foto & GPS" });
     toast("Pengajuan lembur disetujui", "success");
   }
 
   function handleReject() {
-    update(row.id, { status: "Ditolak", approver: "Supervisor Cabang", catatanApprover: "Ditolak — durasi tidak sesuai kebijakan" });
+    update(row.id, { status: "Ditolak", approver: "Supervisor Cabang", catatanApprover: "Ditolak · durasi tidak sesuai kebijakan" });
     toast("Pengajuan lembur ditolak", "error");
   }
 
@@ -60,7 +60,7 @@ export default function LemburDetailPage() {
           <div className="flex justify-between"><span className="text-slds-text-weak">Karyawan</span><span className="font-semibold">{row.nama}</span></div>
           <div className="flex justify-between"><span className="text-slds-text-weak">Cabang</span><span>{row.cabang}</span></div>
           <div className="flex justify-between"><span className="text-slds-text-weak">Tanggal</span><span>{row.tanggal}</span></div>
-          <div className="flex justify-between"><span className="text-slds-text-weak">Jam</span><span>{row.jamMulai} — {row.jamSelesai} ({row.jam} jam)</span></div>
+          <div className="flex justify-between"><span className="text-slds-text-weak">Jam</span><span>{row.jamMulai} · {row.jamSelesai} ({row.jam} jam)</span></div>
           <div className="flex justify-between items-start gap-2">
             <span className="text-slds-text-weak shrink-0">GPS</span>
             <span className="text-right inline-flex items-start gap-1"><MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5" />{row.gps}</span>
@@ -74,7 +74,7 @@ export default function LemburDetailPage() {
           {row.approver && (
             <div className="pt-2 border-t border-slds-border">
               <p className="text-[11px] text-slds-text-weak uppercase font-semibold mb-1">Approver</p>
-              <p>{row.approver}{row.catatanApprover ? ` — ${row.catatanApprover}` : ""}</p>
+              <p>{row.approver}{row.catatanApprover ? ` · ${row.catatanApprover}` : ""}</p>
             </div>
           )}
           {canApprove && (

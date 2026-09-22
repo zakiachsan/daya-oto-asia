@@ -10,7 +10,7 @@ import { formatIDR } from "@/lib/mock-data";
 
 function renderCell(row: Record<string, unknown>, col: MockColumnDef) {
   const raw = row[col.key];
-  if (raw == null || raw === "") return "—";
+  if (raw == null || raw === "") return "-";
   switch (col.format) {
     case "idr":
       return formatIDR(Number(raw));
@@ -57,7 +57,7 @@ export function FinanceMockPreviewPage({ pathKey }: { pathKey: string }) {
     <div>
       <PageHeader
         title={meta.title}
-        desc={`${meta.desc ?? meta.title} — UI preview (mock data)`}
+        desc={`${meta.desc ?? meta.title} · UI preview (mock data)`}
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: meta.section },

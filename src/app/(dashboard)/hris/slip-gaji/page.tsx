@@ -29,7 +29,7 @@ export default function SlipGajiPage() {
     <div>
       <PageHeader
         title="Slip Gaji"
-        desc="Batch payroll — klik nama karyawan untuk breakdown lengkap"
+        desc="Batch payroll · klik nama karyawan untuk breakdown lengkap"
         breadcrumb={[{ label: "HRIS", href: "/hris" }, { label: "Slip Gaji" }]}
         actions={
           <button
@@ -45,7 +45,7 @@ export default function SlipGajiPage() {
       />
 
       {showConfirm && (
-        <ActionFormPanel title={`Finalize Slip Gaji — ${MONTHS[month]} 2026`} onClose={() => setShowConfirm(false)} onSave={handleFinalize} saveLabel="Ya, Finalize">
+        <ActionFormPanel title={`Finalize Slip Gaji · ${MONTHS[month]} 2026`} onClose={() => setShowConfirm(false)} onSave={handleFinalize} saveLabel="Ya, Finalize">
           <p className="text-[13px] text-slds-text">Perhitungan: gaji pokok + tunjangan + lembur (PP 35/2021) − potongan telat/alpha − PPh21.</p>
           <p className="text-[12px] text-slds-text-weak mt-2">{items.length} karyawan · Total {formatIDR(items.reduce((s, r) => s + r.bersih, 0))}</p>
         </ActionFormPanel>

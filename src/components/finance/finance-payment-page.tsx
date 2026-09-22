@@ -18,7 +18,7 @@ import {
   useJurnalList,
 } from "@/lib/preview-store";
 import type { FakturJualRow } from "@/lib/faktur-utils";
-import type { FakturBeliRow } from "@/lib/faktur-beli-utils";
+import { dedupeFakturBeliById, type FakturBeliRow } from "@/lib/faktur-beli-utils";
 import { jurnalSlug } from "@/lib/jurnal-utils";
 import {
   applyPaymentToHutang,
@@ -61,7 +61,7 @@ export function FinancePaymentPage({ mode }: { mode: PaymentMode }) {
     [fakturJual],
   );
   const postedBeli = useMemo(
-    () => fakturBeli.filter((f) => f.status === "Posted"),
+    () => dedupeFakturBeliById(fakturBeli).filter((f) => f.status === "Posted"),
     [fakturBeli],
   );
 
@@ -189,7 +189,7 @@ export function FinancePaymentPage({ mode }: { mode: PaymentMode }) {
     setKeterangan("");
     setFakturId("");
     setJumlah(0);
-    toast(`${paymentId} tercatat — jurnal ${jurnalId} di-post`, "success");
+    toast(`${paymentId} tercatat · jurnal ${jurnalId} di-post`, "success");
   }
 
   return (
@@ -198,8 +198,8 @@ export function FinancePaymentPage({ mode }: { mode: PaymentMode }) {
         title={title}
         desc={
           isPenerimaan
-            ? "Pelunasan piutang dari faktur penjualan — auto jurnal Dr Kas/Bank, Cr Piutang"
-            : "Pelunasan hutang ke vendor — auto jurnal Dr Hutang, Cr Kas/Bank"
+            ? "Pelunasan piutang dari faktur penjualan · auto jurnal Dr Kas/Bank, Cr Piutang"
+            : "Pelunasan hutang ke vendor · auto jurnal Dr Hutang, Cr Kas/Bank"
         }
         breadcrumb={[
           { label: "Finance", href: "/finance" },
@@ -233,7 +233,7 @@ export function FinancePaymentPage({ mode }: { mode: PaymentMode }) {
                 onChange={(e) => handleFakturChange(e.target.value)}
                 className={`${fieldClass} bg-white`}
               >
-                <option value="">— Pilih faktur —</option>
+                <option value="">- Pilih faktur -</option>
                 {(isPenerimaan ? unpaidJual : unpaidBeli).map((f) => (
                   <option key={f.id} value={f.id}>
                     {f.id} · {isPenerimaan ? (f as FakturJualRow).pelanggan : (f as FakturBeliRow).vendor} · sisa{" "}
@@ -271,7 +271,7 @@ export function FinancePaymentPage({ mode }: { mode: PaymentMode }) {
               <input
                 value={keterangan}
                 onChange={(e) => setKeterangan(e.target.value)}
-                placeholder="Opsional — catatan pembayaran"
+                placeholder="Opsional · catatan pembayaran"
                 className={fieldClass}
               />
             </div>

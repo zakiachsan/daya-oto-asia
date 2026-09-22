@@ -11,7 +11,7 @@ export default function RasioKeuanganPage() {
     <div>
       <PageHeader
         title="Rasio Keuangan"
-        desc="Analisis kesehatan keuangan — UI preview (mock data)"
+        desc="Analisis kesehatan keuangan · UI preview (mock data)"
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: "Laporan Keuangan" },

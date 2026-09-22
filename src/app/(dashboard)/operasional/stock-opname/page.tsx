@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/ui/stat-card";
 import { DataTable } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { TOLERANSI_GRAM, isDalamToleransi } from "@/lib/stock-opname-utils";
+import { TOLERANSI_GRAM, isOpnameRowDalamToleransi } from "@/lib/stock-opname-utils";
 import { useStockOpname } from "@/lib/preview-store";
 import { useToast } from "@/components/ui/toast";
 
@@ -35,25 +35,34 @@ export default function StockOpnamePage() {
 
   function approveAll() {
     bulkUpdate((prev) =>
-      prev.map((r) => (isDalamToleransi(r.selisih) ? { ...r, status: "Selesai", supervisor: "Pak Ahmad" } : r)),
+      prev.map((r) =>
+        r.status === "Menunggu Review" && isOpnameRowDalamToleransi(r)
+          ? { ...r, status: "Selesai", supervisor: "Pak Ahmad" }
+          : r,
+      ),
     );
     toast("Opname dalam toleransi di-approve", "success");
   }
 
   function flagLarge() {
     bulkUpdate((prev) =>
-      prev.map((r) => (!isDalamToleransi(r.selisih) ? { ...r, status: "Perlu Review" } : r)),
+      prev.map((r) =>
+        r.status === "Menunggu Review" && !isOpnameRowDalamToleransi(r)
+          ? { ...r, status: "Perlu Review", catatan: "Selisih melebihi toleransi · investigasi tinter" }
+          : r,
+      ),
     );
     toast("Selisih besar di-flag untuk investigasi", "info");
   }
 
-  const dalamToleransi = items.filter((r) => isDalamToleransi(r.selisih)).length;
+  const menungguReview = items.filter((r) => r.status === "Menunggu Review").length;
+  const dalamToleransi = items.filter((r) => isOpnameRowDalamToleransi(r)).length;
 
   return (
     <div>
       <PageHeader
         title="Stock Opname"
-        desc={`Supervisor rekonsiliasi timbang tinter — klik no. opname untuk detail · toleransi ±${TOLERANSI_GRAM}g`}
+        desc={`Supervisor rekonsiliasi timbang tinter · klik no. opname untuk detail · toleransi ±${TOLERANSI_GRAM}g`}
         breadcrumb={[{ label: "Operasional", href: "/operasional" }, { label: "Stock Opname" }]}
         actions={
           <div className="flex items-center gap-2 text-[12px] text-slds-text-weak bg-slds-bg px-3 py-2 rounded-md">
@@ -64,9 +73,9 @@ export default function StockOpnamePage() {
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-        <StatCard label="Opname Minggu Ini" value={String(items.length)} sub="Dari 4 cabang" icon={Scale} color="blue" />
-        <StatCard label="Dalam Toleransi" value={String(dalamToleransi)} sub={`Selisih ≤ ${TOLERANSI_GRAM} gram`} icon={Scale} color="green" />
-        <StatCard label="Perlu Review" value={String(items.length - dalamToleransi)} sub="Selisih &gt; toleransi" icon={AlertTriangle} color="red" />
+        <StatCard label="Menunggu Review" value={String(menungguReview)} sub="Baru dari tinter mobile" icon={Scale} color="blue" />
+        <StatCard label="Dalam Toleransi" value={String(dalamToleransi)} sub={`Kaleng cocok · gram ±${TOLERANSI_GRAM}g`} icon={Scale} color="green" />
+        <StatCard label="Perlu Review" value={String(items.filter((r) => r.status === "Perlu Review").length)} sub="Selisih / kaleng tidak cocok" icon={AlertTriangle} color="red" />
       </div>
 
       <div className="mb-4 flex gap-2 flex-wrap">
@@ -85,7 +94,7 @@ export default function StockOpnamePage() {
           ))}
         </select>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-3 py-2 border border-slds-border rounded-md text-[13px] bg-white focus:border-brand focus:outline-none">
-          {["Semua Status", "Selesai", "Perlu Review"].map((o) => (
+          {["Semua Status", "Menunggu Review", "Selesai", "Perlu Review"].map((o) => (
             <option key={o} value={o}>{o}</option>
           ))}
         </select>
@@ -106,11 +115,24 @@ export default function StockOpnamePage() {
           { key: "cabang", label: "Cabang" },
           { key: "produk", label: "Produk" },
           {
+            key: "kaleng",
+            label: "Kaleng",
+            render: (r) => {
+              if (r.kalengFisik == null) return <span className="text-slds-text-weak">-</span>;
+              const sk = r.selisihKaleng ?? 0;
+              return (
+                <span className={sk === 0 ? "text-green-600 font-semibold" : "text-red-600 font-bold"}>
+                  {r.kalengFisik} {sk !== 0 ? `(${sk > 0 ? "+" : ""}${sk})` : ""}
+                </span>
+              );
+            },
+          },
+          {
             key: "selisih",
-            label: "Selisih",
+            label: "Selisih Gram",
             render: (r) => {
               const s = Number(r.selisih);
-              const ok = isDalamToleransi(s);
+              const ok = isOpnameRowDalamToleransi(r);
               return (
                 <span className={ok ? "text-green-600 font-semibold" : "text-red-600 font-bold"}>
                   {s > 0 ? `+${s}` : s} gr

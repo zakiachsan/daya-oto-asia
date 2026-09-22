@@ -9,7 +9,7 @@ export default function PerubahanEquitasPage() {
     <div>
       <PageHeader
         title="Perubahan Ekuitas"
-        desc="Laporan perubahan modal & laba ditahan — UI preview (mock data)"
+        desc="Laporan perubahan modal & laba ditahan · UI preview (mock data)"
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: "Laporan Keuangan" },
@@ -39,8 +39,8 @@ export default function PerubahanEquitasPage() {
               <tr key={r.komponen} className="border-b border-slds-border last:border-0">
                 <td className="px-4 py-2 font-semibold">{r.komponen}</td>
                 <td className="px-4 py-2 text-right">{formatIDR(r.saldoAwal)}</td>
-                <td className="px-4 py-2 text-right text-green-600">{r.penambahan > 0 ? formatIDR(r.penambahan) : "—"}</td>
-                <td className="px-4 py-2 text-right text-red-600">{r.pengurangan > 0 ? formatIDR(r.pengurangan) : "—"}</td>
+                <td className="px-4 py-2 text-right text-green-600">{r.penambahan > 0 ? formatIDR(r.penambahan) : "-"}</td>
+                <td className="px-4 py-2 text-right text-red-600">{r.pengurangan > 0 ? formatIDR(r.pengurangan) : "-"}</td>
                 <td className="px-4 py-2 text-right font-semibold">{formatIDR(r.saldoAkhir)}</td>
               </tr>
             ))}
@@ -49,8 +49,8 @@ export default function PerubahanEquitasPage() {
             <tr className="font-bold bg-slds-bg">
               <td className="px-4 py-3">Total Ekuitas</td>
               <td className="px-4 py-3 text-right">{formatIDR(totalAwal)}</td>
-              <td className="px-4 py-3 text-right">—</td>
-              <td className="px-4 py-3 text-right">—</td>
+              <td className="px-4 py-3 text-right">-</td>
+              <td className="px-4 py-3 text-right">-</td>
               <td className="px-4 py-3 text-right text-brand">{formatIDR(totalAkhir)}</td>
             </tr>
           </tfoot>

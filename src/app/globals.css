@@ -49,7 +49,7 @@ button:disabled {
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: #d1d1d1; border-radius: 3px; }
 
-/* Formulir cetak DOA Bogor — preview on-screen + print popup */
+/* Formulir cetak DOA Bogor · preview on-screen + print popup */
 .doc {
   font-family: "Times New Roman", Times, Georgia, serif;
   color: #000;
@@ -76,7 +76,7 @@ table.doc-table th { font-weight: bold; background: #f5f5f5; }
 .doc .tarif-baris { display: flex; justify-content: space-between; padding-left: 8px; font-size: 8.5pt; }
 .doc .footer-alamat { font-size: 8pt; text-align: center; margin-top: 8px; line-height: 1.3; }
 
-/* Nota DOA Cabang Bogor — clone layout PDF hal. 1 */
+/* Nota DOA Cabang Bogor · clone layout PDF hal. 1 */
 .nota-bogor {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10pt;
@@ -226,7 +226,7 @@ table.doc-table th { font-weight: bold; background: #f5f5f5; }
   letter-spacing: 0.05em;
 }
 
-/* Form OPB SAP Astra — ONE TIME MATERIAL per transaksi */
+/* Form OPB SAP Astra · ONE TIME MATERIAL per transaksi */
 .sap-opb {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10pt;
@@ -419,7 +419,7 @@ table.doc-table th { font-weight: bold; background: #f5f5f5; }
   letter-spacing: 0.05em;
 }
 
-/* Nota penjualan terisi — referensi scan nota penjualan.pdf */
+/* Nota penjualan terisi · referensi scan nota penjualan.pdf */
 .nota-penjualan {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10pt;
@@ -550,7 +550,7 @@ table.doc-table th { font-weight: bold; background: #f5f5f5; }
   letter-spacing: 0.05em;
 }
 
-/* Rekap admin lampiran invoice — referensi scan rekap admin PDF */
+/* Rekap admin lampiran invoice · referensi scan rekap admin PDF */
 .rekap-invoice {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 9pt;
@@ -639,7 +639,7 @@ table.doc-table th { font-weight: bold; background: #f5f5f5; }
   color: #444746;
 }
 
-/* Laporan pemakaian base — DOA Bogor hal. 2, side-by-side TGL 1–15 | 16–31 */
+/* Laporan pemakaian base · DOA Bogor hal. 2, side-by-side TGL 1–15 | 16–31 */
 .laporan-pemakaian {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 8pt;

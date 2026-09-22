@@ -13,7 +13,7 @@ export default function KinerjaPage() {
     <div>
       <PageHeader
         title="Kinerja Tinter"
-        desc="Scan kinerja tinter — klik nama untuk durasi mixing & pemakaian bahan"
+        desc="Scan kinerja tinter · klik nama untuk durasi mixing & pemakaian bahan"
         breadcrumb={[{ label: "HRIS", href: "/hris" }, { label: "Kinerja Tinter" }]}
       />
 

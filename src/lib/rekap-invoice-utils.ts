@@ -1,7 +1,7 @@
 import type { OpbRow, TransaksiRow } from "./mock-data";
 import { formatRpJumlah } from "./nota-bogor-tarif";
 
-/** PPN 11% — dari perbandingan kolom scan referensi */
+/** PPN 11% · dari perbandingan kolom scan referensi */
 export const REKAP_PPN_RATE = 0.11;
 
 const BULAN_SINGKAT = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
@@ -35,7 +35,7 @@ export function calcTotalWithPpn(dpp: number) {
   return Math.round(dpp * (1 + REKAP_PPN_RATE));
 }
 
-/** No. SAP 10 digit — pola scan 5502529599 */
+/** No. SAP 10 digit · pola scan 5502529599 */
 export function rekapSapNoFromTrx(trx: Pick<TransaksiRow, "id">) {
   const tail = trx.id.replace(/\D/g, "").slice(-5).padStart(5, "0");
   return `55025${tail}`;
@@ -49,13 +49,13 @@ export function formatPlatRekap(plat: string) {
   return plat.replace(/\s+/g, "").toUpperCase();
 }
 
-/** Header pelanggan Astra — referensi scan Sunter, disesuaikan per cabang OPB */
+/** Header pelanggan Astra · referensi scan Sunter, disesuaikan per cabang OPB */
 export function astraPelangganRekap(cabang: string) {
   const lower = cabang.toLowerCase();
-  if (lower.includes("surabaya")) return "PT. ASTRA DAIHATSU INTERNATIONAL — SURABAYA";
-  if (lower.includes("malang")) return "PT. ASTRA DAIHATSU INTERNATIONAL — MALANG";
-  if (lower.includes("jember")) return "PT. ASTRA DAIHATSU INTERNATIONAL — JEMBER";
-  if (lower.includes("kediri")) return "PT. ASTRA DAIHATSU INTERNATIONAL — KEDIRI";
+  if (lower.includes("surabaya")) return "PT. ASTRA DAIHATSU INTERNATIONAL · SURABAYA";
+  if (lower.includes("malang")) return "PT. ASTRA DAIHATSU INTERNATIONAL · MALANG";
+  if (lower.includes("jember")) return "PT. ASTRA DAIHATSU INTERNATIONAL · JEMBER";
+  if (lower.includes("kediri")) return "PT. ASTRA DAIHATSU INTERNATIONAL · KEDIRI";
   return "PT. ASTRA DAIHATSU INTERNATIONAL SUNTER";
 }
 
@@ -79,7 +79,7 @@ const SYNTH_PLAT = [
   "L1234ABC", "L3456DEF", "N5678XY", "P9012JK", "B1823KLM",
 ];
 
-/** Baris rekap — transaksi real + synthetic pad sampai jumlahTrx OPB */
+/** Baris rekap · transaksi real + synthetic pad sampai jumlahTrx OPB */
 export function buildRekapInvoiceLines(opb: OpbRow, transaksi: TransaksiRow[]): RekapInvoiceLine[] {
   const real = transaksi
     .filter((t) => t.status === "Selesai" && cabangMatches(opb.cabang, t.cabang))

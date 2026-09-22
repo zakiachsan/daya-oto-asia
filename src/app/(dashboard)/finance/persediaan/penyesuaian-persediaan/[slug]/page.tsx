@@ -35,7 +35,7 @@ export default function PenyesuaianStokDetailPage() {
     const posted = { ...row, status: "Posted" as const };
     const jurnalId = postWithJurnal("penyesuaian-stok", posted, { jurnalList, addJurnal });
     update(row.id, { status: "Posted", jurnalId });
-    toast(`Penyesuaian ${row.id} di-posting — jurnal ${jurnalId}`, "success");
+    toast(`Penyesuaian ${row.id} di-posting · jurnal ${jurnalId}`, "success");
   }
 
   return (
@@ -113,7 +113,7 @@ export default function PenyesuaianStokDetailPage() {
 
           <div className="mt-4 p-3 bg-slds-bg rounded-md text-[12px]">
             <p className="font-semibold text-slds-text mb-1">Auto-jurnal (preview)</p>
-            <p className="text-slds-text-weak">Dr Beban Penyesuaian Stok / Cr Persediaan Bahan Cat — {formatIDR(row.nilai)}</p>
+            <p className="text-slds-text-weak">Dr Beban Penyesuaian Stok / Cr Persediaan Bahan Cat · {formatIDR(row.nilai)}</p>
           </div>
         </div>
       </div>

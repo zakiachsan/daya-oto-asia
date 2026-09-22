@@ -102,7 +102,7 @@ export default function POPage() {
     <div>
       <PageHeader
         title="PO & Penerimaan"
-        desc="Purchase Order ke pabrik — klik no. PO untuk detail item & goods received"
+        desc="Purchase Order ke pabrik · klik no. PO untuk detail item & goods received"
         breadcrumb={[{ label: "Operasional", href: "/operasional" }, { label: "PO & Penerimaan" }]}
         actions={
           <button type="button" data-no-toast onClick={() => setShowForm(!showForm)} className="inline-flex items-center gap-1.5 px-3 py-2 bg-brand text-white rounded-md text-[13px] font-semibold hover:bg-brand-dark">
@@ -145,7 +145,7 @@ export default function POPage() {
                   <td className="px-3 py-2">
                     <select value={line.kode} onChange={(e) => updateLine(i, { kode: e.target.value })} className="w-full px-2 py-1.5 border border-slds-border rounded-md text-[13px] bg-white">
                       {MOCK_PRODUK.slice(0, 20).map((p) => (
-                        <option key={p.kode} value={p.kode}>{p.kode} — {p.nama.slice(0, 30)}</option>
+                        <option key={p.kode} value={p.kode}>{p.kode} · {p.nama.slice(0, 30)}</option>
                       ))}
                     </select>
                   </td>
@@ -179,7 +179,7 @@ export default function POPage() {
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari no. PO, supplier..." className="w-full pl-9 pr-3 py-2 border border-slds-border rounded-md text-[13px] focus:border-brand focus:outline-none" />
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-3 py-2 border border-slds-border rounded-md text-[13px] bg-white">
-          {["Semua Status", "Draft", "Menunggu TTD", "Selesai"].map((o) => (
+          {["Semua Status", "Draft", "Menunggu TTD", "Partial", "Selesai"].map((o) => (
             <option key={o} value={o}>{o}</option>
           ))}
         </select>
@@ -203,7 +203,7 @@ export default function POPage() {
           {
             key: "gr",
             label: "GR",
-            render: (r) => (r.gr ? <span className="font-mono text-green-700 text-[12px]">{String(r.gr)}</span> : <span className="text-slds-text-weak">—</span>),
+            render: (r) => (r.gr ? <span className="font-mono text-green-700 text-[12px]">{String(r.gr)}</span> : <span className="text-slds-text-weak">-</span>),
           },
           {
             key: "finance",

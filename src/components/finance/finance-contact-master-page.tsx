@@ -28,7 +28,7 @@ const CONFIG: Record<
   pelanggan: {
     title: "Pelanggan",
     section: "Penjualan",
-    desc: "Master bengkel mitra — terhubung piutang & faktur penjualan",
+    desc: "Master bengkel mitra · terhubung piutang & faktur penjualan",
     saldoLabel: "Piutang",
     saldoKey: "piutang",
     mirrorHref: "/operasional/cabang",
@@ -37,7 +37,7 @@ const CONFIG: Record<
   pemasok: {
     title: "Pemasok",
     section: "Pembelian",
-    desc: "Master vendor pabrik cat — terhubung hutang & faktur pembelian",
+    desc: "Master vendor pabrik cat · terhubung hutang & faktur pembelian",
     saldoLabel: "Hutang",
     saldoKey: "hutang",
   },
@@ -284,7 +284,7 @@ export function FinanceContactMasterPage({ mode }: { mode: MasterMode }) {
               label: "Syarat Bayar",
               render: (r) => {
                 const s = findSyaratBayar(syaratList, r.syaratBayarId);
-                return s ? syaratBayarLabel(s) : "—";
+                return s ? syaratBayarLabel(s) : "-";
               },
             },
             { key: "kontak", label: "Kontak" },
@@ -330,7 +330,7 @@ export function FinanceContactMasterPage({ mode }: { mode: MasterMode }) {
               label: "Syarat Bayar",
               render: (r) => {
                 const s = findSyaratBayar(syaratList, r.syaratBayarId);
-                return s ? syaratBayarLabel(s) : "—";
+                return s ? syaratBayarLabel(s) : "-";
               },
             },
             { key: "kontak", label: "Kontak" },

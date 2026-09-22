@@ -47,7 +47,7 @@ export default function AppLemburPage() {
     });
     setShowForm(false);
     setFotoTaken(false);
-    toast("Pengajuan lembur terkirim — menunggu approval", "success");
+    toast("Pengajuan lembur terkirim · menunggu approval", "success");
   }
 
   return (
@@ -87,7 +87,7 @@ export default function AppLemburPage() {
             <Camera className="h-4 w-4" /> {fotoTaken ? "Foto Tersimpan ✓" : "Ambil Foto Bukti"}
           </button>
           <div className="flex items-center gap-1 text-[11px] text-green-700 bg-green-50 rounded-lg p-2">
-            <MapPin className="h-3.5 w-3.5" /> GPS: Auto 2000 Surabaya — dalam radius
+            <MapPin className="h-3.5 w-3.5" /> GPS: Auto 2000 Surabaya · dalam radius
           </div>
           <button type="button" data-no-toast onClick={handleSubmit} className="w-full py-3 bg-brand text-white rounded-xl font-bold text-[14px]">
             Kirim Pengajuan

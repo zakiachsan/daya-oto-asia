@@ -9,7 +9,7 @@ export default function NeracaPage() {
     <div>
       <PageHeader
         title="Neraca"
-        desc="Laporan posisi keuangan — UI preview (mock data)"
+        desc="Laporan posisi keuangan · UI preview (mock data)"
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: "Laporan Keuangan" },

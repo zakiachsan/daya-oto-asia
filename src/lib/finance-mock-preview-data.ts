@@ -122,7 +122,7 @@ export const FINANCE_MOCK_PREVIEWS: Record<string, MockPreviewTable> = {
       { key: "saldo", label: "Saldo", format: "idr", className: "text-right" },
     ],
     rows: [
-      { tanggal: "2026-09-01", referensi: "—", keterangan: "Saldo awal", debit: 0, kredit: 0, saldo: 350000000 },
+      { tanggal: "2026-09-01", referensi: "-", keterangan: "Saldo awal", debit: 0, kredit: 0, saldo: 350000000 },
       { tanggal: "2026-09-06", referensi: "TRM/011", keterangan: "Pelunasan piutang Jember", debit: 8200000, kredit: 0, saldo: 358200000 },
       { tanggal: "2026-09-07", referensi: "TRF/001", keterangan: "Setor kas", debit: 50000000, kredit: 0, saldo: 408200000 },
       { tanggal: "2026-09-08", referensi: "TRM/012", keterangan: "OPB Cakrawala", debit: 5800000, kredit: 0, saldo: 414000000 },
@@ -184,7 +184,7 @@ export const FINANCE_MOCK_PREVIEWS: Record<string, MockPreviewTable> = {
     ],
     rows: [
       { id: "UMJ/2026/09/001", tanggal: "2026-09-03", pelanggan: "Auto 2000 Surabaya", jumlah: 10000000, alokasi: "INV-2026-0088", status: "Sebagian" },
-      { id: "UMJ/2026/09/002", tanggal: "2026-09-09", pelanggan: "Cakrawala Malang", jumlah: 5000000, alokasi: "—", status: "Belum Alokasi" },
+      { id: "UMJ/2026/09/002", tanggal: "2026-09-09", pelanggan: "Cakrawala Malang", jumlah: 5000000, alokasi: "-", status: "Belum Alokasi" },
     ],
   },
   "persediaan/penerimaan-barang": {
@@ -488,8 +488,8 @@ export const FINANCE_MOCK_PREVIEWS: Record<string, MockPreviewTable> = {
     ],
     rows: [
       { periode: "Agustus 2026", karyawan: "Rudi Hartono", cabang: "Malang", bersih: 5000000, jurnal: "JU/2026/08/045", status: "Posted" },
-      { periode: "Agustus 2026", karyawan: "Andi Wijaya", cabang: "Surabaya", bersih: 5170000, jurnal: "—", status: "Draft" },
-      { periode: "Agustus 2026", karyawan: "Eko Prasetyo", cabang: "Jember", bersih: 5085000, jurnal: "—", status: "Draft" },
+      { periode: "Agustus 2026", karyawan: "Andi Wijaya", cabang: "Surabaya", bersih: 5170000, jurnal: "-", status: "Draft" },
+      { periode: "Agustus 2026", karyawan: "Eko Prasetyo", cabang: "Jember", bersih: 5085000, jurnal: "-", status: "Draft" },
     ],
   },
   "perusahaan/karyawan": {

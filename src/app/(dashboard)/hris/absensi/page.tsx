@@ -9,7 +9,7 @@ import { useIzinList } from "@/lib/preview-store";
 
 const MOCK_ABSENSI = [
   { nama: "Andi Wijaya", cabang: "Surabaya", tanggal: "2026-09-10", checkIn: "07:58", checkOut: "17:05", telat: 0, status: "Aktif" },
-  { nama: "Rudi Hartono", cabang: "Malang", tanggal: "2026-09-10", checkIn: "08:12", checkOut: "—", telat: 1, status: "Draft" },
+  { nama: "Rudi Hartono", cabang: "Malang", tanggal: "2026-09-10", checkIn: "08:12", checkOut: "-", telat: 1, status: "Draft" },
   { nama: "Eko Prasetyo", cabang: "Jember", tanggal: "2026-09-10", checkIn: "07:55", checkOut: "17:00", telat: 0, status: "Aktif" },
 ];
 
@@ -30,7 +30,7 @@ export default function AbsensiPage() {
     <div>
       <PageHeader
         title="Absensi"
-        desc="Rekap kehadiran karyawan — port pt-gis (UI preview, mock data)"
+        desc="Rekap kehadiran karyawan · port pt-gis (UI preview, mock data)"
         breadcrumb={[{ label: "HRIS", href: "/hris" }, { label: "Absensi" }]}
       />
 
@@ -57,7 +57,7 @@ export default function AbsensiPage() {
             { key: "tanggal", label: "Tanggal" },
             { key: "checkIn", label: "Check In" },
             { key: "checkOut", label: "Check Out" },
-            { key: "telat", label: "Telat", render: (r) => (Number(r.telat) > 0 ? <span className="text-amber-600 font-bold">{String(r.telat)}x</span> : "—") },
+            { key: "telat", label: "Telat", render: (r) => (Number(r.telat) > 0 ? <span className="text-amber-600 font-bold">{String(r.telat)}x</span> : "-") },
             { key: "status", label: "Status", render: (r) => <StatusBadge status={String(r.status)} /> },
           ]}
           data={MOCK_ABSENSI}
@@ -107,7 +107,7 @@ export default function AbsensiPage() {
             pendingIzin.map((i) => (
               <Link key={i.id} href={`/hris/izin/${i.id}`} className="bg-white border border-slds-border rounded-lg p-3 flex items-center justify-between gap-3 hover:border-brand/40">
                 <div>
-                  <p className="text-[13px] font-bold">{i.nama} — {i.tipe}</p>
+                  <p className="text-[13px] font-bold">{i.nama} · {i.tipe}</p>
                   <p className="text-[11px] text-slds-text-weak">{i.mulai} · {i.alasan}</p>
                 </div>
                 <span className="text-[12px] font-semibold text-brand shrink-0">Review →</span>

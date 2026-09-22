@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * One-time local bootstrap — uploads setup-server.sh and runs it on VPS.
+ * One-time local bootstrap · uploads setup-server.sh and runs it on VPS.
  * Usage: VPS_PASS='...' node deploy/remote-bootstrap.mjs
  */
 import { readFileSync } from "fs";

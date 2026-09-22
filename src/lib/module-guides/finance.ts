@@ -8,7 +8,7 @@ const H = "hris" as GuideModuleId;
 export const financeGuideNav: ModuleGuideNav = {
   moduleId: "finance",
   title: "Panduan Finance",
-  subtitle: "Klik menu di kiri — alur kerja ditampilkan dari atas ke bawah.",
+  subtitle: "Klik menu di kiri · alur kerja ditampilkan dari atas ke bawah.",
   sections: [
     { key: "dashboard", label: "Dashboard", items: [{ id: "dashboard", label: "Dashboard" }] },
     {
@@ -137,7 +137,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Akun Perkiraan",
       "Akun Perkiraan",
       "/finance/buku-besar/akun-perkiraan",
-      "Chart of accounts — tambah/edit akun tersimpan ke API, dasar semua jurnal dan laporan.",
+      "Chart of accounts · tambah/edit akun tersimpan ke API, dasar semua jurnal dan laporan.",
       [a(F, "Lihat Daftar Akun"), a(F, "Tambah / Edit Akun (simpan ke API)"), a(F, "Review Saldo Akun", "/finance/buku-besar/histori-akun")]
     ),
     anggaran: g(
@@ -145,7 +145,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Anggaran",
       "Anggaran",
       "/finance/buku-besar/anggaran",
-      "Rencana anggaran per akun/periode — master data CONFIG.",
+      "Rencana anggaran per akun/periode · master data CONFIG.",
       [a(F, "Buat Anggaran"), a(F, "Review Realisasi vs Anggaran"), a(F, "Bandingkan Laba Rugi", "/finance/laporan/laba-rugi")]
     ),
     "pencatatan-beban": g(
@@ -153,7 +153,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Pencatatan Beban",
       "Pencatatan Beban",
       "/finance/buku-besar/pencatatan-beban",
-      "Catat beban — jurnal hutang dibuat saat simpan; bayar kas/bank di langkah terpisah.",
+      "Catat beban · jurnal hutang dibuat saat simpan; bayar kas/bank di langkah terpisah.",
       [a(F, "Buat Pencatatan Beban"), a(F, "Simpan & Buat Jurnal"), a(F, "Bayar Beban (Kas/Bank)")]
     ),
     "jurnal-umum": g(
@@ -161,7 +161,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Jurnal Umum",
       "Jurnal Umum",
       "/finance/buku-besar/jurnal-umum",
-      "Entri jurnal manual — langsung status Posted saat disimpan.",
+      "Entri jurnal manual · langsung status Posted saat disimpan.",
       [
         a(F, "Buat Jurnal Baru"),
         a(F, "Input Baris Debit/Kredit"),
@@ -174,7 +174,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Histori Akun",
       "Histori Akun",
       "/finance/buku-besar/histori-akun",
-      "Mutasi per akun — audit trail transaksi.",
+      "Mutasi per akun · audit trail transaksi.",
       [a(F, "Pilih Akun"), a(F, "Filter Periode"), a(F, "Review Mutasi")]
     ),
     "log-aktivitas-jurnal": g(
@@ -182,7 +182,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Log Aktifitas Jurnal",
       "Log Aktifitas Jurnal",
       "/finance/buku-besar/log-aktivitas-jurnal",
-      "Audit trail perubahan jurnal — siapa ubah/apa.",
+      "Audit trail perubahan jurnal · siapa ubah/apa.",
       [a(F, "Filter Periode"), a(F, "Cari Nomor Jurnal"), a(F, "Review Aktivitas")]
     ),
     pembayaran: g(
@@ -190,7 +190,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Pembayaran Kas/Bank",
       "Pembayaran",
       "/finance/kas-bank/pembayaran",
-      "Catat pengeluaran kas — hutang supplier, beban, dll.",
+      "Catat pengeluaran kas · hutang supplier, beban, dll.",
       [
         a(F, "Buat Pembayaran"),
         a(F, "Pilih Akun Kas/Bank"),
@@ -203,7 +203,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Penerimaan Kas/Bank",
       "Penerimaan",
       "/finance/kas-bank/penerimaan",
-      "Catat penerimaan kas — piutang pelanggan dan pendapatan lain.",
+      "Catat penerimaan kas · piutang pelanggan dan pendapatan lain.",
       [
         a(F, "Buat Penerimaan"),
         a(F, "Pilih Akun Kas/Bank"),
@@ -250,7 +250,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Faktur Penjualan (OPB → Faktur → Piutang)",
       "Faktur Penjualan",
       "/finance/penjualan/faktur-penjualan",
-      "Buat faktur dari OPB yang sudah ditagihkan — post jurnal piutang & pendapatan otomatis.",
+      "Buat faktur dari OPB yang sudah ditagihkan · post jurnal piutang & pendapatan otomatis.",
       [
         a(O, "OPB Status Ditagihkan", "/operasional/opb", { module: F, href: "/finance/penjualan/faktur-penjualan" }),
         a(F, "Buat Faktur Penjualan dari OPB"),
@@ -264,7 +264,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Penerimaan Penjualan",
       "Penerimaan Penjualan",
       "/finance/penjualan/penerimaan-penjualan",
-      "Catat pelunasan faktur — update piutang & saldo kas.",
+      "Catat pelunasan faktur · update piutang & saldo kas.",
       [
         a(F, "Buat Penerimaan"),
         a(F, "Pilih Faktur Open/Partial"),
@@ -288,7 +288,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Master Pelanggan",
       "Pelanggan",
       "/finance/penjualan/pelanggan",
-      "Data pelanggan/cabang bengkel — dipakai di faktur penjualan & OPB.",
+      "Data pelanggan/cabang bengkel · dipakai di faktur penjualan & OPB.",
       [
         a(F, "Kelola Data Pelanggan", "/finance/penjualan/pelanggan"),
         a(O, "Cabang Terkait di Master Cabang", "/operasional/cabang"),
@@ -301,7 +301,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Uang Muka Penjualan",
       "Uang Muka Penjualan",
       "/finance/penjualan/uang-muka-penjualan",
-      "Monitor DP pelanggan — catat via Kas Penerimaan (keterangan: uang muka/DP).",
+      "Monitor DP pelanggan · catat via Kas Penerimaan (keterangan: uang muka/DP).",
       [a(F, "Catat di Kas Penerimaan", "/finance/kas-bank/penerimaan"), a(F, "Review Daftar DP")]
     ),
 
@@ -316,7 +316,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Pesanan Pembelian (PO)",
       "Pesanan Pembelian",
       "/finance/pembelian/pesanan-pembelian",
-      "Monitor PO Operasional — urutan: DP (opsional) → terima barang → faktur → pelunasan.",
+      "Monitor PO Operasional · urutan: DP (opsional) → terima barang → faktur → pelunasan.",
       [
         a(O, "Buat PO & Goods Received", "/operasional/po", { module: F, href: "/finance/pembelian/pesanan-pembelian" }),
         a(F, "Review PO"),
@@ -330,7 +330,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Penerimaan Barang Pembelian",
       "Penerimaan Barang",
       "/finance/pembelian/penerimaan-barang",
-      "Mirror penerimaan Operasional — setelah GR lanjut faktur & pelunasan.",
+      "Mirror penerimaan Operasional · setelah GR lanjut faktur & pelunasan.",
       [
         a(O, "Goods Received di Operasional", "/operasional/po", { module: F, href: "/finance/pembelian/penerimaan-barang" }),
         a(F, "Review GR"),
@@ -342,7 +342,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Faktur Pembelian",
       "Faktur Pembelian",
       "/finance/pembelian/faktur-pembelian",
-      "Catat faktur supplier — wajib setelah penerimaan barang sebelum pelunasan penuh.",
+      "Catat faktur supplier · wajib setelah penerimaan barang sebelum pelunasan penuh.",
       [
         a(F, "Catat Faktur dari PO"),
         a(F, "Review PPN & Total"),
@@ -354,7 +354,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Uang Muka Pembelian",
       "Uang Muka Pembelian",
       "/finance/pembelian/uang-muka-pembelian",
-      "Catat DP ke supplier — bisa juga dari menu Pembayaran Pembelian.",
+      "Catat DP ke supplier · bisa juga dari menu Pembayaran Pembelian.",
       [a(F, "Catat Uang Muka (DP)"), a(F, "Review Saldo DP PO")]
     ),
     "pembayaran-pembelian": g(
@@ -376,7 +376,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Master Pemasok",
       "Pemasok",
       "/finance/pembelian/pemasok",
-      "Data supplier/pabrik cat — dipakai di PO & faktur pembelian.",
+      "Data supplier/pabrik cat · dipakai di PO & faktur pembelian.",
       [
         a(F, "Kelola Data Pemasok", "/finance/pembelian/pemasok"),
         a(O, "Buat PO ke Pemasok", "/operasional/po"),
@@ -390,7 +390,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Penerimaan Barang (Persediaan)",
       "Penerimaan Barang",
       "/finance/persediaan/penerimaan-barang",
-      "Mirror penerimaan barang masuk gudang pusat — review dari sisi Finance.",
+      "Mirror penerimaan barang masuk gudang pusat · review dari sisi Finance.",
       [
         a(O, "Goods Received di Operasional", "/operasional/po"),
         a(F, "Review Penerimaan Barang", "/finance/persediaan/penerimaan-barang"),
@@ -403,7 +403,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Penyesuaian Persediaan",
       "Penyesuaian Persediaan",
       "/finance/persediaan/penyesuaian-persediaan",
-      "Koreksi stok setelah stock opname cabang — posting jurnal persediaan.",
+      "Koreksi stok setelah stock opname cabang · posting jurnal persediaan.",
       [
         a(O, "Stock Opname Approved", "/operasional/stock-opname"),
         a(F, "Buat Penyesuaian Persediaan"),
@@ -418,7 +418,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Barang & Jasa",
       "Barang & Jasa",
       "/finance/persediaan/barang-jasa",
-      "Master item persediaan — mirror data produk Operasional.",
+      "Master item persediaan · mirror data produk Operasional.",
       [
         a(O, "Kelola Master Produk", "/operasional/produk"),
         a(F, "Review Master Barang & Jasa", "/finance/persediaan/barang-jasa"),
@@ -433,7 +433,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Barang Per Gudang",
       "Barang Per Gudang",
       "/finance/persediaan/barang-per-gudang",
-      "Stok per gudang — data live dari API stock.",
+      "Stok per gudang · data live dari API stock.",
       [a(F, "Filter Gudang"), a(F, "Review Qty per Lokasi")]
     ),
     "barang-stok-minimum": g(
@@ -441,7 +441,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Barang Stok Minimum",
       "Barang Stok Minimum",
       "/finance/persediaan/barang-stok-minimum",
-      "Produk di bawah minimum stok — trigger ajuan stok di Operasional.",
+      "Produk di bawah minimum stok · trigger ajuan stok di Operasional.",
       [
         a(F, "Review Alert Minimum", "/finance/persediaan/barang-stok-minimum"),
         a(O, "Proses Ajuan Stok Cabang", "/operasional/ajuan-stok"),
@@ -476,7 +476,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Laporan Hutang Piutang",
       "Laporan Hutang Piutang",
       "/finance/laporan/hutang-piutang",
-      "Outstanding AR/AP — aging piutang dan hutang.",
+      "Outstanding AR/AP · aging piutang dan hutang.",
       [a(F, "Review Piutang"), a(F, "Review Hutang"), a(F, "Filter Aging")]
     ),
     "laporan-penjualan": g(
@@ -484,7 +484,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Laporan Penjualan",
       "Laporan Penjualan",
       "/finance/laporan/laporan-penjualan",
-      "Rekap penjualan per periode — invoice & penerimaan.",
+      "Rekap penjualan per periode · invoice & penerimaan.",
       [a(F, "Pilih Periode"), a(F, "Generate Laporan"), a(F, "Export")]
     ),
     "laporan-pembelian": g(
@@ -492,7 +492,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Laporan Pembelian",
       "Laporan Pembelian",
       "/finance/laporan/laporan-pembelian",
-      "Rekap pembelian per periode — PO, faktur, pembayaran.",
+      "Rekap pembelian per periode · PO, faktur, pembayaran.",
       [a(F, "Pilih Periode"), a(F, "Generate Laporan"), a(F, "Export")]
     ),
     "laba-ditahan": g(
@@ -500,7 +500,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Laba Ditahan",
       "Laba Ditahan",
       "/finance/laporan/laba-ditahan",
-      "Pergerakan laba ditahan per periode — dari jurnal penutup & operasional.",
+      "Pergerakan laba ditahan per periode · dari jurnal penutup & operasional.",
       [a(F, "Pilih Periode"), a(F, "Generate Laporan"), a(F, "Review Jurnal Penutup", "/finance/perusahaan/proses-akhir-bulan")]
     ),
     "rasio-keuangan": g(
@@ -508,7 +508,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Rasio Keuangan",
       "Rasio Keuangan",
       "/finance/laporan/rasio-keuangan",
-      "Likuiditas, leverage, profitabilitas — data live financial-reports.",
+      "Likuiditas, leverage, profitabilitas · data live financial-reports.",
       [a(F, "Pilih Periode"), a(F, "Generate Rasio")]
     ),
     "perubahan-equitas": g(
@@ -548,7 +548,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Perubahan Aset Tetap",
       "Perubahan Aset Tetap",
       "/finance/aset-tetap/perubahan-aset-tetap",
-      "Histori perubahan field aset (nilai, umur, akun) — tercatat di master-data.",
+      "Histori perubahan field aset (nilai, umur, akun) · tercatat di master-data.",
       [a(F, "Catat Perubahan Field"), a(F, "Review Histori per Aset")]
     ),
     "disposisi-aset": g(
@@ -556,7 +556,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Disposisi Aset Tetap",
       "Disposisi Aset Tetap",
       "/finance/aset-tetap/disposisi-aset-tetap",
-      "Daftar aset berstatus Disposed — proses dispose dari tab Daftar di Aset Tetap.",
+      "Daftar aset berstatus Disposed · proses dispose dari tab Daftar di Aset Tetap.",
       [a(F, "Dispose dari Aset Tetap", "/finance/aset-tetap/aset-tetap"), a(F, "Review Jurnal AD/"), a(F, "Review Gain/Loss")]
     ),
     "pindah-aset": g(
@@ -580,7 +580,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Syarat Pembayaran",
       "Syarat Pembayaran",
       "/finance/perusahaan/syarat-pembayaran",
-      "Master terms (Net 30, COD, dll.) — dipakai di faktur.",
+      "Master terms (Net 30, COD, dll.) · dipakai di faktur.",
       [a(F, "Tambah Syarat"), a(F, "Set Default"), a(F, "Nonaktifkan Syarat")]
     ),
 
@@ -590,7 +590,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Gaji & Tunjangan (HRIS → Finance)",
       "Gaji & Tunjangan",
       "/finance/perusahaan/gaji-tunjangan",
-      "Posting payroll dari HRIS — jurnal beban gaji & utang gaji.",
+      "Posting payroll dari HRIS · jurnal beban gaji & utang gaji.",
       [
         a(H, "Finalisasi Slip Gaji", "/hris/slip-gaji"),
         a(F, "Catat Batch Payroll"),
@@ -611,7 +611,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Transaksi Berulang",
       "Transaksi Berulang",
       "/finance/perusahaan/transaksi-berulang",
-      "Template transaksi berkala — jalankan manual per baris atau bulk jatuh tempo (RB/ jurnal). Scheduler otomatis belum tersedia.",
+      "Template transaksi berkala · jalankan manual per baris atau bulk jatuh tempo (RB/ jurnal). Scheduler otomatis belum tersedia.",
       [a(F, "Buat Template"), a(F, "Jalankan per Baris"), a(F, "Jalankan Jatuh Tempo")]
     ),
     "proses-akhir-bulan": g(
@@ -619,7 +619,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Proses Akhir Bulan",
       "Proses Akhir Bulan",
       "/finance/perusahaan/proses-akhir-bulan",
-      "Checklist review + tutup periode — buat jurnal penutup CL/ ke Laba Ditahan. Periode tertutup memblokir posting baru.",
+      "Checklist review + tutup periode · buat jurnal penutup CL/ ke Laba Ditahan. Periode tertutup memblokir posting baru.",
       [a(F, "Review Checklist"), a(F, "Simpan Checklist"), a(F, "Tutup Periode & Buat Jurnal")]
     ),
     kontak: g(
@@ -643,7 +643,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Kalender",
       "Kalender",
       "/finance/perusahaan/kalender",
-      "Jatuh tempo piutang/hutang, payroll, transaksi berulang, PO, WO & opname — legend dari data live.",
+      "Jatuh tempo piutang/hutang, payroll, transaksi berulang, PO, WO & opname · legend dari data live.",
       [a(F, "Lihat Event Bulan Ini"), a(F, "Review Kategori Aktif di Sidebar")]
     ),
     "log-aktivitas": g(
@@ -659,7 +659,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Daftar Laporan",
       "Daftar Laporan",
       "/finance/daftar-laporan",
-      "Katalog laporan Accurate-style — filter periode & export.",
+      "Katalog laporan Accurate-style · filter periode & export.",
       [a(F, "Pilih Kategori Laporan"), a(F, "Atur Filter Periode"), a(F, "Generate & Export")]
     ),
     perpajakan: g(

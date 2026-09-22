@@ -9,7 +9,7 @@ export default function PerpajakanPage() {
     <div>
       <PageHeader
         title="Perpajakan"
-        desc="PPN keluaran, PPN masukan, dan rekapitulasi SPT — UI preview (mock data)"
+        desc="PPN keluaran, PPN masukan, dan rekapitulasi SPT · UI preview (mock data)"
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: "Laporan Keuangan" },

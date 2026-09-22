@@ -60,13 +60,13 @@ export function buildPenyesuaianFromOpname(opname: StockOpnameRow, seq: number):
   };
 }
 
-export function buildFakturBeliFromPo(po: PoDetail, seq: number): FakturBeliRow {
+export function buildFakturBeliFromPo(po: PoDetail, _seq: number, totalOverride?: number): FakturBeliRow {
   return {
-    id: `PINV-2026-${String(36 + seq).padStart(3, "0")}`,
+    id: po.id.replace(/^PO-/, "PINV-"),
     tanggal: new Date().toISOString().slice(0, 10),
     vendor: po.supplier,
     po: po.id,
-    total: po.total,
+    total: totalOverride ?? po.receivedTotal ?? po.total,
     status: "Draft",
   };
 }

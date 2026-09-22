@@ -1,4 +1,4 @@
-/** Struktur baris nota penjualan — referensi scan `nota penjualan.pdf` */
+/** Struktur baris nota penjualan · referensi scan `nota penjualan.pdf` */
 
 export type NotaPenjualanBaris = {
   id: string;
@@ -13,7 +13,7 @@ export type NotaPenjualanGrup = {
   baris: NotaPenjualanBaris[];
 };
 
-/** Form terisi tinter — berbeda dari nota pemakaian (pre-print tarif penuh) */
+/** Form terisi tinter · berbeda dari nota pemakaian (pre-print tarif penuh) */
 export const NOTA_PENJUALAN_GRUP: NotaPenjualanGrup[] = [
   {
     judul: "BASE COAT",

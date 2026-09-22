@@ -35,11 +35,11 @@ export default function KlaimDetailPage() {
 
   function handleVerify() {
     if (matches.length === 0) {
-      toast("Tidak ada transaksi cocok — klaim perlu ditolak atau investigasi", "error");
+      toast("Tidak ada transaksi cocok · klaim perlu ditolak atau investigasi", "error");
       return;
     }
     updateStatus(row.id, "Valid", `Cocok ${matches.map((m) => m.id).join(", ")}`);
-    toast(`Klaim ${row.id} valid — ditemukan ${matches.length} transaksi`, "success");
+    toast(`Klaim ${row.id} valid · ditemukan ${matches.length} transaksi`, "success");
     router.push("/operasional/verifikasi-klaim");
   }
 
@@ -130,7 +130,7 @@ export default function KlaimDetailPage() {
               <p className="text-[12px] font-bold text-slds-text">Keputusan Supervisor</p>
               <div className="flex gap-2 flex-wrap">
                 <button type="button" data-no-toast onClick={handleVerify} className="inline-flex items-center gap-1 px-4 py-2 bg-green-600 text-white rounded-md text-[13px] font-semibold">
-                  <Check className="h-4 w-4" /> Valid — Klaim Benar
+                  <Check className="h-4 w-4" /> Valid · Klaim Benar
                 </button>
               </div>
               <div className="flex gap-2">

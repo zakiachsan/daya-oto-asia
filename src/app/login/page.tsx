@@ -52,7 +52,7 @@ export default function LoginPage() {
             </button>
           </form>
           <p className="text-[11px] text-slds-text-weak text-center mt-4">
-            UI Preview — klik Masuk untuk lanjut (tanpa backend)
+            UI Preview · klik Masuk untuk lanjut (tanpa backend)
           </p>
         </div>
       </div>

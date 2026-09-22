@@ -50,14 +50,14 @@ export function KasVoucherPage({ mode }: { mode: KasMode }) {
 
     setFormOpen(false);
     setKeterangan("");
-    toast(`Voucher ${newRow.id} tercatat — jurnal ${jurnalId}`, "success");
+    toast(`Voucher ${newRow.id} tercatat · jurnal ${jurnalId}`, "success");
   }
 
   return (
     <div>
       <PageHeader
         title={title}
-        desc={isIn ? "Penerimaan kas/bank — auto jurnal Dr Kas/Bank, Cr Pendapatan" : "Pembayaran kas/bank — auto jurnal Dr Beban, Cr Kas/Bank"}
+        desc={isIn ? "Penerimaan kas/bank · auto jurnal Dr Kas/Bank, Cr Pendapatan" : "Pembayaran kas/bank · auto jurnal Dr Beban, Cr Kas/Bank"}
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: "Kas & Bank" },
@@ -136,7 +136,7 @@ export function KasVoucherPage({ mode }: { mode: KasMode }) {
                   {String(r.jurnalId)}
                 </Link>
               ) : (
-                "—"
+                "-"
               ),
           },
         ]}

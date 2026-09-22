@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { Scale, Package } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
-import { useBukaKaleng } from "@/lib/preview-store";
+import { useBukaKaleng, useInventoriStok } from "@/lib/preview-store";
 import { MOCK_PRODUK } from "@/lib/mock-data";
+import { MOBILE_USER } from "@/lib/mobile-app-utils";
 
 export default function BukaKalengPage() {
   const { toast } = useToast();
   const { items, add } = useBukaKaleng();
+  const { bukaKaleng } = useInventoriStok();
   const [produk, setProduk] = useState(MOCK_PRODUK[0].kode);
   const [beratKosong, setBeratKosong] = useState(120);
   const [beratIsi, setBeratIsi] = useState(1120);
@@ -22,15 +24,16 @@ export default function BukaKalengPage() {
     const p = MOCK_PRODUK.find((x) => x.kode === produk);
     add({
       id: `BK-${Date.now()}`,
-      produk: p ? `${p.kode} — ${p.nama}` : produk,
+      produk: p ? `${p.kode} · ${p.nama}` : produk,
       beratKosong,
       beratIsi,
       netGram,
-      tinter: "Andi Wijaya",
+      tinter: MOBILE_USER,
       cabang: "Surabaya",
       tanggal: new Date().toISOString().slice(0, 10),
     });
-    toast(`${netGram} gram masuk stok cabang`, "success");
+    bukaKaleng({ kodeProduk: produk, cabang: "Surabaya", netGram, oleh: MOBILE_USER });
+    toast(`${netGram} gr masuk stok · 1 kaleng utuh berkurang`, "success");
     setBeratKosong(120);
     setBeratIsi(1120);
   }
@@ -38,7 +41,7 @@ export default function BukaKalengPage() {
   return (
     <div className="space-y-4">
       <p className="text-[13px] text-slds-text-weak">
-        Buka kaleng baru — timbang kosong & isi. Netto masuk stok gram cabang.
+        Buka kaleng baru · timbang kosong & isi. Netto masuk stok gram cabang.
       </p>
 
       <div className="bg-white rounded-xl p-4 border border-slds-border space-y-3">
@@ -46,7 +49,7 @@ export default function BukaKalengPage() {
           <label className="text-[11px] font-semibold text-slds-text-weak uppercase">Produk (Kaleng)</label>
           <select value={produk} onChange={(e) => setProduk(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-slds-border rounded-lg text-[14px] bg-white">
             {MOCK_PRODUK.filter((p) => p.satuan === "gram").map((p) => (
-              <option key={p.kode} value={p.kode}>{p.kode} — {p.nama}</option>
+              <option key={p.kode} value={p.kode}>{p.kode} · {p.nama}</option>
             ))}
           </select>
         </div>

@@ -18,7 +18,7 @@ export default function VerifikasiKlaimPage() {
     <div>
       <PageHeader
         title="Verifikasi Klaim Warna"
-        desc="Supervisor verifikasi klaim bengkel — klik no. klaim untuk detail & keputusan"
+        desc="Supervisor verifikasi klaim bengkel · klik no. klaim untuk detail & keputusan"
         breadcrumb={[
           { label: "Operasional", href: "/operasional" },
           { label: "Verifikasi Klaim Warna" },
@@ -57,7 +57,7 @@ export default function VerifikasiKlaimPage() {
               if (klaim.status !== "Menunggu Verifikasi") {
                 return (
                   <span className="text-[11px] text-slds-text-weak max-w-[160px] block truncate" title={klaim.catatan}>
-                    {klaim.catatan ?? "—"}
+                    {klaim.catatan ?? "-"}
                   </span>
                 );
               }

@@ -37,7 +37,7 @@ export const INITIAL_HUTANG_PIUTANG: HutangPiutangDetail[] = [
     tipe: "Piutang",
     total: 5800000,
     sisa: 0,
-    jatuhTempo: "—",
+    jatuhTempo: "-",
     status: "Selesai",
     refFaktur: "INV-2026-0087",
     lines: [

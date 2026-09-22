@@ -40,7 +40,7 @@ export default function AppIzinPage() {
     setMulai("");
     setSelesai("");
     setAlasan("");
-    toast("Pengajuan izin terkirim — menunggu approval", "success");
+    toast("Pengajuan izin terkirim · menunggu approval", "success");
   }
 
   return (
@@ -94,7 +94,7 @@ export default function AppIzinPage() {
             <Calendar className="h-5 w-5 text-brand shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-bold text-slds-text">{r.tipe}</p>
-              <p className="text-[11px] text-slds-text-weak truncate">{r.mulai} — {r.selesai}</p>
+              <p className="text-[11px] text-slds-text-weak truncate">{r.mulai} · {r.selesai}</p>
             </div>
             <StatusBadge status={r.status} />
             <ChevronRight className="h-4 w-4 text-slds-text-weak shrink-0" />

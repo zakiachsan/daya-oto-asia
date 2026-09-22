@@ -16,7 +16,7 @@ function r(title: string, desc: string, icon: ReportIcon = "doc"): ReportItem {
   return { title, desc, icon };
 }
 
-/** Katalog laporan Accurate-style — subset relevan DOA */
+/** Katalog laporan Accurate-style · subset relevan DOA */
 export const REPORT_CATEGORIES: ReportCategory[] = [
   {
     key: "keuangan",

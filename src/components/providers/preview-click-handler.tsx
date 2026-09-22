@@ -21,7 +21,7 @@ function shouldSkipButton(btn: HTMLButtonElement) {
   return false;
 }
 
-/** Global handler for UI preview — shows toast feedback on button clicks. */
+/** Global handler for UI preview · shows toast feedback on button clicks. */
 export function PreviewClickHandler() {
   const { toast } = useToast();
 
@@ -48,7 +48,7 @@ export function PreviewClickHandler() {
       const lower = label.toLowerCase();
       if (lower === "batal" || lower === "kembali") return;
 
-      toast(`"${label}" — berhasil (preview UI)`, "info");
+      toast(`"${label}" · berhasil (preview UI)`, "info");
     };
 
     document.addEventListener("click", handler, true);

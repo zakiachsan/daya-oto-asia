@@ -3,8 +3,8 @@ import { AppProviders } from "@/components/providers/app-providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Daya Oto Asia — Sistem Cat Body Repair",
-  description: "Sistem Manajemen Cat Body Repair Terpadu — PT Daya Oto Asia",
+  title: "Daya Oto Asia · Sistem Cat Body Repair",
+  description: "Sistem Manajemen Cat Body Repair Terpadu · PT Daya Oto Asia",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

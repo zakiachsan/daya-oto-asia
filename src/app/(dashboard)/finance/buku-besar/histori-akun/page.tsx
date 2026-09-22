@@ -11,7 +11,7 @@ export default function HistoriAkunPage() {
     <div>
       <PageHeader
         title="Histori Akun"
-        desc="Buku besar per akun — UI preview (mock data)"
+        desc="Buku besar per akun · UI preview (mock data)"
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: "Buku Besar" },
@@ -20,7 +20,7 @@ export default function HistoriAkunPage() {
         actions={
           <select className="px-3 py-2 border border-slds-border rounded-md text-[13px] bg-white min-w-[220px]" defaultValue="110301">
             {MOCK_COA.map((a) => (
-              <option key={a.kode} value={a.kode}>{a.kode} — {a.nama}</option>
+              <option key={a.kode} value={a.kode}>{a.kode} · {a.nama}</option>
             ))}
           </select>
         }
@@ -29,7 +29,7 @@ export default function HistoriAkunPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
         <div className="bg-white border border-slds-border rounded-lg p-4">
           <p className="text-[11px] font-semibold uppercase text-slds-text-weak">Akun</p>
-          <p className="text-[13px] font-bold mt-1">{akun.kode} — {akun.nama}</p>
+          <p className="text-[13px] font-bold mt-1">{akun.kode} · {akun.nama}</p>
         </div>
         <div className="bg-white border border-slds-border rounded-lg p-4">
           <p className="text-[11px] font-semibold uppercase text-slds-text-weak">Saldo Awal</p>
@@ -63,8 +63,8 @@ export default function HistoriAkunPage() {
                   </Link>
                 </td>
                 <td className="px-4 py-2 text-slds-text-weak">{r.keterangan}</td>
-                <td className="px-4 py-2 text-right">{r.debit > 0 ? formatIDR(r.debit) : "—"}</td>
-                <td className="px-4 py-2 text-right">{r.credit > 0 ? formatIDR(r.credit) : "—"}</td>
+                <td className="px-4 py-2 text-right">{r.debit > 0 ? formatIDR(r.debit) : "-"}</td>
+                <td className="px-4 py-2 text-right">{r.credit > 0 ? formatIDR(r.credit) : "-"}</td>
                 <td className="px-4 py-2 text-right font-semibold">{formatIDR(r.saldo)}</td>
               </tr>
             ))}

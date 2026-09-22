@@ -10,7 +10,7 @@ export default function FinanceDashboard() {
     <div className="space-y-5">
       <PageHeader
         title="Dashboard Finance"
-        desc="Dashboard keuangan — menu Accurate-style (UI preview)"
+        desc="Dashboard keuangan · menu Accurate-style (UI preview)"
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">

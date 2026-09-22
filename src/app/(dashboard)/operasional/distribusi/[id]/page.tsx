@@ -6,7 +6,7 @@ import { ArrowLeft, Truck, Check } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatWaktu } from "@/lib/mock-data";
-import { useDistribusiList } from "@/lib/preview-store";
+import { useDistribusiList, useInventoriStok } from "@/lib/preview-store";
 import { useToast } from "@/components/ui/toast";
 
 export default function DistribusiDetailPage() {
@@ -14,6 +14,7 @@ export default function DistribusiDetailPage() {
   const id = String(params.id);
   const { toast } = useToast();
   const { items, update } = useDistribusiList();
+  const { addManual } = useInventoriStok();
   const found = items.find((r) => r.id === id);
 
   if (!found) {
@@ -33,7 +34,17 @@ export default function DistribusiDetailPage() {
       waktuTerima: new Date().toISOString(),
       driver: row.driver ?? "Kurir Cabang",
     });
-    toast(`${row.id} ditandai selesai diterima cabang`, "success");
+    for (const line of row.lines) {
+      addManual({
+        kodeProduk: line.kode,
+        cabang: row.ke,
+        kaleng: line.qty,
+        gram: 0,
+        keterangan: `Distribusi ${row.id} dari ${row.dari}`,
+        oleh: "Admin Gudang",
+      });
+    }
+    toast(`${row.id} diterima · stok ${row.ke} +${row.items} kaleng`, "success");
   }
 
   const timeline = [
@@ -67,8 +78,9 @@ export default function DistribusiDetailPage() {
           <div className="flex justify-between"><span className="text-slds-text-weak">Dari</span><span className="font-semibold">{row.dari}</span></div>
           <div className="flex justify-between"><span className="text-slds-text-weak">Ke Cabang</span><span className="font-semibold">{row.ke}</span></div>
           <div className="flex justify-between"><span className="text-slds-text-weak">Tanggal</span><span>{row.tanggal}</span></div>
-          <div className="flex justify-between"><span className="text-slds-text-weak">Driver</span><span>{row.driver ?? "—"}</span></div>
-          <div className="flex justify-between"><span className="text-slds-text-weak">Total Items</span><span>{row.items} kaleng/produk</span></div>
+          <div className="flex justify-between"><span className="text-slds-text-weak">Driver</span><span>{row.driver ?? "-"}</span></div>
+          <div className="flex justify-between"><span className="text-slds-text-weak">Jenis Produk</span><span>{row.lines.length} item</span></div>
+          <div className="flex justify-between"><span className="text-slds-text-weak">Total Qty</span><span>{row.items} kaleng</span></div>
           {row.status !== "Selesai" && (
             <button type="button" data-no-toast onClick={handleTerima} className="w-full mt-3 inline-flex items-center justify-center gap-1 px-3 py-2 bg-brand text-white rounded-md text-[12px] font-semibold">
               <Check className="h-3.5 w-3.5" /> Konfirmasi Diterima Cabang

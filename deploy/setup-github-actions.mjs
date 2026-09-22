@@ -183,7 +183,7 @@ async function main() {
     const secretsOk = await setGitHubSecrets(privateKey);
     console.log("\n✅ VPS production deployed.");
     if (secretsOk) {
-      console.log("✅ GitHub Actions secrets configured — push to main/staging will auto-deploy.");
+      console.log("✅ GitHub Actions secrets configured · push to main/staging will auto-deploy.");
     } else {
       console.log("⏳ Set secrets manually, then push to main to trigger auto-deploy.");
     }

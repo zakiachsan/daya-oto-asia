@@ -26,7 +26,7 @@ export default function DaftarLaporanPage() {
     <div className="space-y-4">
       <PageHeader
         title="Daftar Laporan"
-        desc="Katalog laporan keuangan Accurate-style — generate & export menyusul"
+        desc="Katalog laporan keuangan Accurate-style · generate & export menyusul"
         breadcrumb={[{ label: "Finance", href: "/finance" }, { label: "Daftar Laporan" }]}
         actions={
           <div className="relative">

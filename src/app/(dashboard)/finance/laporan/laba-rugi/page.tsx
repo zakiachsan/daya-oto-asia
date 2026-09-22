@@ -8,7 +8,7 @@ export default function LabaRugiPage() {
     <div>
       <PageHeader
         title="Laba Rugi"
-        desc="Laporan laba rugi — UI preview (mock data)"
+        desc="Laporan laba rugi · UI preview (mock data)"
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: "Laporan Keuangan" },

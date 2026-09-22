@@ -37,7 +37,7 @@ export const MODULES: ModuleDef[] = [
     },
     menus: [
       { href: "/operasional", label: "Dashboard" },
-      { href: "/operasional/transaksi", label: "Transaksi Warna", section: "Operasional" },
+      { href: "/operasional/transaksi", label: "Transaksi", section: "Operasional" },
       { href: "/operasional/opb", label: "OPB & Tagihan" },
       { href: "/operasional/rekonsiliasi", label: "Rekonsiliasi" },
       { href: "/operasional/verifikasi-klaim", label: "Verifikasi Klaim Warna" },
@@ -83,7 +83,7 @@ export const MODULES: ModuleDef[] = [
   {
     id: "finance",
     label: "Finance",
-    desc: "Pembukuan Accurate-style — buku besar, kas/bank, penjualan, pembelian, laporan",
+    desc: "Pembukuan Accurate-style · buku besar, kas/bank, penjualan, pembelian, laporan",
     icon: Calculator,
     color: {
       bg: "bg-amber-50",
@@ -167,13 +167,15 @@ export const MOBILE_MODULE: ModuleDef = {
   firstMenu: "/app",
   menus: [
     { href: "/app", label: "Beranda" },
-    { href: "/app/transaksi", label: "Transaksi Warna" },
+    { href: "/app/transaksi", label: "Transaksi" },
     { href: "/app/transaksi/baru", label: "Buat Transaksi" },
     { href: "/app/absensi", label: "Absensi" },
+    { href: "/app/stok", label: "Stok Cabang" },
     { href: "/app/stock-opname", label: "Stock Opname" },
     { href: "/app/buka-kaleng", label: "Buka Kaleng" },
     { href: "/app/ajukan-stok", label: "Ajukan Stok" },
     { href: "/app/slip-gaji", label: "Slip Gaji" },
+    { href: "/app/kasbon", label: "Kasbon" },
     { href: "/app/profil", label: "Profil" },
   ],
 };

@@ -1,4 +1,4 @@
-/** Tarif & struktur tabel nota DOA Cabang Bogor — hal. 1 PDF referensi */
+/** Tarif & struktur tabel nota DOA Cabang Bogor · hal. 1 PDF referensi */
 
 export type NotaTarifItem = {
   label: string;

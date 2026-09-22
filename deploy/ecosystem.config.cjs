@@ -1,4 +1,4 @@
-/** PM2 — production :3300, staging :3301 */
+/** PM2 · production :3300, staging :3301 */
 module.exports = {
   apps: [
     {

@@ -34,7 +34,7 @@ export default function COAPage() {
     <div>
       <PageHeader
         title="Akun Perkiraan"
-        desc="Chart of Accounts — hierarki akun sesuai standar PSAK (port erp-scw-distribution)"
+        desc="Chart of Accounts · hierarki akun sesuai standar PSAK (port erp-scw-distribution)"
         breadcrumb={[{ label: "Finance", href: "/finance" }, { label: "Akun Perkiraan" }]}
         actions={
           <button type="button"

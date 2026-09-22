@@ -54,7 +54,7 @@ function KlaimWarnaContent() {
     setShowForm(false);
     setPlatNomor("");
     setCatatan("");
-    toast("Klaim warna terkirim — menunggu verifikasi supervisor", "success");
+    toast("Klaim warna terkirim · menunggu verifikasi supervisor", "success");
   }
 
   return (
@@ -92,7 +92,7 @@ function KlaimWarnaContent() {
             >
               {MOCK_KODE_WARNA.map((k) => (
                 <option key={k.kode} value={k.kode}>
-                  {k.kode} — {k.nama}
+                  {k.kode} · {k.nama}
                 </option>
               ))}
             </select>

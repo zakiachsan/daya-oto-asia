@@ -95,7 +95,7 @@ export function applyPaymentToHutang(
     ...hp,
     sisa,
     status: sisa === 0 ? "Selesai" : hp.status,
-    jatuhTempo: sisa === 0 ? "—" : hp.jatuhTempo,
+    jatuhTempo: sisa === 0 ? "-" : hp.jatuhTempo,
     lines: [...hp.lines, line],
   };
 }

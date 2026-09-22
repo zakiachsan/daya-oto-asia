@@ -31,7 +31,7 @@ export default function RekonsiliasiPage() {
     <div>
       <PageHeader
         title="Rekonsiliasi OPB"
-        desc="Cocokkan OPB, nota tercetak, dan pemakaian stok — deteksi leakage"
+        desc="Cocokkan OPB, nota tercetak, dan pemakaian stok · deteksi leakage"
         breadcrumb={[{ label: "Operasional", href: "/operasional" }, { label: "Rekonsiliasi" }]}
         actions={
           <button
@@ -106,7 +106,7 @@ export default function RekonsiliasiPage() {
               render: (r) => {
                 const row = r as OpbRow;
                 if (row.sap) return <span className="font-mono text-[12px]">{row.sap}</span>;
-                if (row.status !== "Rekonsiliasi") return <span className="text-slds-text-weak">—</span>;
+                if (row.status !== "Rekonsiliasi") return <span className="text-slds-text-weak">-</span>;
                 return (
                   <div className="flex items-center gap-1">
                     <input
@@ -137,7 +137,7 @@ export default function RekonsiliasiPage() {
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <p className="text-[13px] font-bold text-red-800">Stok habis tapi OPB tidak terbentuk</p>
             <p className="text-[12px] text-red-700 mt-1">
-              Prima Jember — 3 transaksi stok terpakai (TRX-0135, 0136, 0137) belum masuk OPB Agustus.
+              Prima Jember · 3 transaksi stok terpakai (TRX-0135, 0136, 0137) belum masuk OPB Agustus.
               Kemungkinan: admin cabang belum forward ke HO.
             </p>
             <button
@@ -152,7 +152,7 @@ export default function RekonsiliasiPage() {
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
             <p className="text-[13px] font-bold text-amber-800">Nota cetak &gt; OPB</p>
             <p className="text-[12px] text-amber-700 mt-1">
-              Auto 2000 Surabaya — 45 nota tercetak vs 47 OPB. Selisih 2 kemungkinan transaksi penambahan bahan belum di-lock.
+              Auto 2000 Surabaya · 45 nota tercetak vs 47 OPB. Selisih 2 kemungkinan transaksi penambahan bahan belum di-lock.
             </p>
           </div>
         </div>

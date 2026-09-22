@@ -25,7 +25,7 @@ export default function HRAnalyticsPage() {
     <div>
       <PageHeader
         title="HR Analytics"
-        desc="KPI kehadiran, izin, lembur — port pt-gis dengan recharts"
+        desc="KPI kehadiran, izin, lembur · port pt-gis dengan recharts"
         breadcrumb={[{ label: "HRIS", href: "/hris" }, { label: "HR Analytics" }]}
       />
 

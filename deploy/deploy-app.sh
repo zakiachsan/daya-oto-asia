@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploy single environment — usage: ./deploy-app.sh production|staging
+# Deploy single environment · usage: ./deploy-app.sh production|staging
 set -euo pipefail
 
 ENV="${1:-production}"

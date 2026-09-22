@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   MOCK_TRANSAKSI,
   MOCK_OPB,
@@ -14,17 +14,37 @@ import {
   type KlaimWarnaRow,
 } from "./mock-data";
 import type { FakturJualRow } from "./faktur-utils";
-import type { FakturBeliRow } from "./faktur-beli-utils";
+import { dedupeFakturBeliById, type FakturBeliRow } from "./faktur-beli-utils";
 import type { FinancePaymentRow } from "./finance-payment-utils";
 import { MOCK_JURNAL_DETAILS, type JurnalDetail } from "./jurnal-utils";
 import { INITIAL_STOCK_OPNAME, type StockOpnameRow } from "./stock-opname-utils";
+import {
+  buildDraftFromInventori,
+  opnameSessionKey,
+  type StockOpnameDraftSession,
+} from "./stock-opname-mobile-utils";
 import { INITIAL_PO, type PoDetail } from "./po-utils";
+import {
+  INITIAL_INVENTORI,
+  mergeInventoriRows,
+  type InventoriStokAdjust,
+  type InventoriStokRow,
+} from "./inventori-utils";
 import { INITIAL_DISTRIBUSI, type DistribusiDetail } from "./distribusi-utils";
 import { INITIAL_AJUAN_STOK, type AjuanStokDetail } from "./ajuan-stok-utils";
 import { INITIAL_PENYESUAIAN, type PenyesuaianDetail } from "./penyesuaian-stok-utils";
 import { INITIAL_HUTANG_PIUTANG, type HutangPiutangDetail } from "./hutang-piutang-utils";
+import { INITIAL_KASBON, type KasbonRow } from "./kasbon-utils";
+import { INITIAL_KLAIM_NOTA, type KlaimNotaRow } from "./klaim-nota-utils";
 import { INITIAL_IZIN, type IzinDetail } from "./izin-utils";
 import { INITIAL_LEMBUR, type LemburDetail } from "./lembur-utils";
+import {
+  buildInitialAbsensiRiwayat,
+  todayIso,
+  type AbsensiRiwayatRow,
+  type AbsensiStatus,
+} from "./absensi-utils";
+import type { SavedFormulaRow } from "./saved-formula-utils";
 import {
   INITIAL_PELANGGAN,
   INITIAL_PEMASOK,
@@ -55,12 +75,16 @@ const BUKA_KEY = "daya-oto-buka-kaleng";
 const OPB_KEY = "daya-oto-opb";
 const ASSIGN_KEY = "daya-oto-assignment";
 const KLAIM_KEY = "daya-oto-klaim-warna";
+const KLAIM_NOTA_KEY = "daya-oto-klaim-nota";
 const CETAK_NOTA_KEY = "daya-oto-cetak-nota-log";
 const FAKTUR_KEY = "daya-oto-faktur-jual";
 const JURNAL_KEY = "daya-oto-jurnal-extra";
 const OPNAME_KEY = "daya-oto-stock-opname";
+const OPNAME_DRAFT_KEY = "daya-oto-stock-opname-draft";
 const PO_KEY = "daya-oto-po";
 const DIST_KEY = "daya-oto-distribusi";
+const INVENTORI_ADJ_KEY = "daya-oto-inventori-adj";
+const KASBON_KEY = "daya-oto-kasbon";
 const PENYESUAIAN_KEY = "daya-oto-penyesuaian-stok";
 const HUTANG_KEY = "daya-oto-hutang-piutang";
 const FAKTUR_BELI_KEY = "daya-oto-faktur-beli";
@@ -68,6 +92,9 @@ const PAYMENT_KEY = "daya-oto-finance-payments";
 const KAS_BANK_KEY = "daya-oto-kas-bank";
 const IZIN_KEY = "daya-oto-izin";
 const LEMBUR_KEY = "daya-oto-lembur";
+const ABSENSI_RIWAYAT_KEY = "daya-oto-absensi-riwayat";
+const SAVED_FORMULA_KEY = "daya-oto-saved-formulas";
+const EXTRA_KODE_WARNA_KEY = "daya-oto-extra-kode-warna";
 const DEMO_CHECKLIST_KEY = "daya-oto-demo-checklist";
 const SYARAT_BAYAR_KEY = "daya-oto-syarat-pembayaran";
 const PELANGGAN_KEY = "daya-oto-pelanggan";
@@ -117,15 +144,35 @@ export function useTransaksiList() {
 
   const add = useCallback((row: TransaksiRow) => {
     setExtra((prev) => {
-      const next = [row, ...prev];
+      const next = [row, ...prev.filter((r) => r.id !== row.id)];
       write(TRX_KEY, next);
       return next;
     });
   }, []);
 
-  const all = ready ? [...extra, ...MOCK_TRANSAKSI] : MOCK_TRANSAKSI;
+  const update = useCallback((id: string, patch: Partial<TransaksiRow>) => {
+    setExtra((prev) => {
+      const idx = prev.findIndex((r) => r.id === id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...patch };
+        write(TRX_KEY, next);
+        return next;
+      }
+      const mock = MOCK_TRANSAKSI.find((r) => r.id === id);
+      if (!mock) return prev;
+      const next = [{ ...mock, ...patch }, ...prev];
+      write(TRX_KEY, next);
+      return next;
+    });
+  }, []);
 
-  return { all, add, ready };
+  const extraIds = new Set(extra.map((r) => r.id));
+  const all = ready
+    ? [...extra, ...MOCK_TRANSAKSI.filter((m) => !extraIds.has(m.id))]
+    : MOCK_TRANSAKSI;
+
+  return { all, add, update, ready };
 }
 
 export function useAjuanStok() {
@@ -280,6 +327,179 @@ export function useKlaimWarna() {
   }, []);
 
   return { items, updateStatus, add };
+}
+
+export function useKlaimNota() {
+  const [items, setItems] = useState<KlaimNotaRow[]>(INITIAL_KLAIM_NOTA);
+
+  useEffect(() => {
+    setItems(read<KlaimNotaRow>(KLAIM_NOTA_KEY, INITIAL_KLAIM_NOTA));
+  }, []);
+
+  const add = useCallback((row: KlaimNotaRow) => {
+    setItems((prev) => {
+      const next = [row, ...prev];
+      write(KLAIM_NOTA_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const updateStatus = useCallback(
+    (id: string, status: KlaimNotaRow["status"], catatan?: string) => {
+      setItems((prev) => {
+        const next = prev.map((r) =>
+          r.id === id ? { ...r, status, ...(catatan !== undefined ? { catatan } : {}) } : r,
+        );
+        write(KLAIM_NOTA_KEY, next);
+        return next;
+      });
+    },
+    [],
+  );
+
+  return { items, add, updateStatus };
+}
+
+export function useKasbon() {
+  const [items, setItems] = useState<KasbonRow[]>(INITIAL_KASBON);
+
+  useEffect(() => {
+    setItems(read<KasbonRow>(KASBON_KEY, INITIAL_KASBON));
+  }, []);
+
+  const add = useCallback((row: KasbonRow) => {
+    setItems((prev) => {
+      const next = [row, ...prev];
+      write(KASBON_KEY, next);
+      return next;
+    });
+  }, []);
+
+  return { items, add };
+}
+
+function freshAbsensiRiwayatSeed() {
+  return buildInitialAbsensiRiwayat();
+}
+
+export function resetAbsensiRiwayatData() {
+  const fresh = freshAbsensiRiwayatSeed();
+  if (typeof window !== "undefined") {
+    write(ABSENSI_RIWAYAT_KEY, fresh);
+  }
+  return fresh;
+}
+
+export function useAbsensiRiwayat() {
+  const [items, setItems] = useState<AbsensiRiwayatRow[]>(freshAbsensiRiwayatSeed);
+
+  useEffect(() => {
+    setItems(read<AbsensiRiwayatRow>(ABSENSI_RIWAYAT_KEY, freshAbsensiRiwayatSeed()));
+  }, []);
+
+  const recordCheckIn = useCallback(
+    (params: { checkIn: string; status: AbsensiStatus; keteranganLuar?: string }) => {
+      const tanggal = todayIso();
+      setItems((prev) => {
+        const idx = prev.findIndex((r) => r.tanggal === tanggal);
+        const row: AbsensiRiwayatRow = {
+          id: idx >= 0 ? prev[idx].id : `abs-${Date.now()}`,
+          tanggal,
+          checkIn: params.checkIn,
+          checkOut: idx >= 0 ? prev[idx].checkOut : null,
+          status: params.status,
+          keteranganLuar: params.keteranganLuar,
+        };
+        const next = idx >= 0 ? prev.map((r, i) => (i === idx ? row : r)) : [row, ...prev];
+        write(ABSENSI_RIWAYAT_KEY, next);
+        return next;
+      });
+    },
+    [],
+  );
+
+  const recordCheckOut = useCallback((checkOut: string) => {
+    const tanggal = todayIso();
+    setItems((prev) => {
+      const idx = prev.findIndex((r) => r.tanggal === tanggal);
+      if (idx < 0) return prev;
+      const next = prev.map((r, i) => (i === idx ? { ...r, checkOut } : r));
+      write(ABSENSI_RIWAYAT_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const reset = useCallback(() => {
+    const fresh = resetAbsensiRiwayatData();
+    setItems(fresh);
+    return fresh;
+  }, []);
+
+  return { items, recordCheckIn, recordCheckOut, reset };
+}
+
+export type ExtraKodeWarnaRow = { kode: string; nama: string };
+
+export function useExtraKodeWarna() {
+  const [items, setItems] = useState<ExtraKodeWarnaRow[]>([]);
+
+  useEffect(() => {
+    setItems(read<ExtraKodeWarnaRow>(EXTRA_KODE_WARNA_KEY, []));
+  }, []);
+
+  const add = useCallback((row: ExtraKodeWarnaRow) => {
+    setItems((prev) => {
+      if (prev.some((p) => p.kode === row.kode)) return prev;
+      const next = [...prev, row];
+      write(EXTRA_KODE_WARNA_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const merge = useCallback((rows: ExtraKodeWarnaRow[]) => {
+    setItems((prev) => {
+      const next = [...prev];
+      rows.forEach((row) => {
+        if (!next.some((p) => p.kode === row.kode)) next.push(row);
+      });
+      write(EXTRA_KODE_WARNA_KEY, next);
+      return next;
+    });
+  }, []);
+
+  return { items, add, merge };
+}
+
+export function useSavedFormulas(tinter?: string) {
+  const [items, setItems] = useState<SavedFormulaRow[]>([]);
+
+  useEffect(() => {
+    setItems(read<SavedFormulaRow>(SAVED_FORMULA_KEY, []));
+  }, []);
+
+  const mine = useMemo(
+    () => (tinter ? items.filter((f) => f.tinter === tinter) : items),
+    [items, tinter],
+  );
+
+  const save = useCallback((row: SavedFormulaRow) => {
+    setItems((prev) => {
+      const idx = prev.findIndex((p) => p.id === row.id);
+      const next = idx >= 0 ? prev.map((p, i) => (i === idx ? row : p)) : [row, ...prev];
+      write(SAVED_FORMULA_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const remove = useCallback((id: string) => {
+    setItems((prev) => {
+      const next = prev.filter((p) => p.id !== id);
+      write(SAVED_FORMULA_KEY, next);
+      return next;
+    });
+  }, []);
+
+  return { items: mine, all: items, save, remove };
 }
 
 export function slugify(name: string) {
@@ -447,6 +667,15 @@ export function useStockOpname() {
     });
   }, []);
 
+  const addMany = useCallback((rows: StockOpnameRow[]) => {
+    if (rows.length === 0) return;
+    setItems((prev) => {
+      const next = [...rows, ...prev];
+      write(OPNAME_KEY, next);
+      return next;
+    });
+  }, []);
+
   const bulkUpdate = useCallback((updater: (rows: StockOpnameRow[]) => StockOpnameRow[]) => {
     setItems((prev) => {
       const next = updater(prev);
@@ -455,7 +684,64 @@ export function useStockOpname() {
     });
   }, []);
 
-  return { items, updateStatus, bulkUpdate };
+  return { items, updateStatus, addMany, bulkUpdate };
+}
+
+export function useStockOpnameDraft(cabang: string, tinter: string) {
+  const sessionKey = opnameSessionKey(cabang, tinter);
+  const [sessions, setSessions] = useState<Record<string, StockOpnameDraftSession>>({});
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const empty: Record<string, StockOpnameDraftSession> = {};
+    setSessions(readObj(OPNAME_DRAFT_KEY, empty));
+    setReady(true);
+  }, []);
+
+  const session = sessions[sessionKey] ?? { cabang, tinter, items: {} };
+  const drafts = session.items;
+
+  const saveItem = useCallback(
+    (item: InventoriStokRow, kalengFisik: number, gramFisik: number) => {
+      const draft = buildDraftFromInventori(item, kalengFisik, gramFisik);
+      setSessions((prev) => {
+        const current = prev[sessionKey] ?? { cabang, tinter, items: {} };
+        const next = {
+          ...prev,
+          [sessionKey]: { cabang, tinter, items: { ...current.items, [item.id]: draft } },
+        };
+        writeObj(OPNAME_DRAFT_KEY, next);
+        return next;
+      });
+      return draft;
+    },
+    [cabang, tinter, sessionKey],
+  );
+
+  const removeItem = useCallback(
+    (inventoriId: string) => {
+      setSessions((prev) => {
+        const current = prev[sessionKey] ?? { cabang, tinter, items: {} };
+        const { [inventoriId]: _, ...rest } = current.items;
+        const next = { ...prev, [sessionKey]: { cabang, tinter, items: rest } };
+        writeObj(OPNAME_DRAFT_KEY, next);
+        return next;
+      });
+    },
+    [cabang, tinter, sessionKey],
+  );
+
+  const clearSession = useCallback(() => {
+    setSessions((prev) => {
+      const next = { ...prev, [sessionKey]: { cabang, tinter, items: {} } };
+      writeObj(OPNAME_DRAFT_KEY, next);
+      return next;
+    });
+  }, [cabang, tinter, sessionKey]);
+
+  const draftCount = Object.keys(drafts).length;
+
+  return { ready, drafts, draftCount, saveItem, removeItem, clearSession };
 }
 
 export function usePoList() {
@@ -508,6 +794,70 @@ export function useDistribusiList() {
   }, []);
 
   return { items, add, update };
+}
+
+export function useInventoriStok() {
+  const [adjustments, setAdjustments] = useState<InventoriStokAdjust[]>([]);
+
+  useEffect(() => {
+    setAdjustments(read<InventoriStokAdjust>(INVENTORI_ADJ_KEY, []));
+  }, []);
+
+  const rows: InventoriStokRow[] = mergeInventoriRows(INITIAL_INVENTORI, adjustments);
+
+  const adjust = useCallback((entry: Omit<InventoriStokAdjust, "id" | "tanggal"> & { tanggal?: string }) => {
+    const row: InventoriStokAdjust = {
+      id: `ADJ-${Date.now()}`,
+      tanggal: entry.tanggal ?? new Date().toISOString().slice(0, 10),
+      kodeProduk: entry.kodeProduk,
+      cabang: entry.cabang,
+      kalengDelta: entry.kalengDelta,
+      gramDelta: entry.gramDelta,
+      keterangan: entry.keterangan,
+      oleh: entry.oleh,
+    };
+    setAdjustments((prev) => {
+      const next = [row, ...prev];
+      write(INVENTORI_ADJ_KEY, next);
+      return next;
+    });
+    return row;
+  }, []);
+
+  const addManual = useCallback(
+    (input: {
+      kodeProduk: string;
+      cabang: string;
+      kaleng: number;
+      gram: number;
+      keterangan: string;
+      oleh: string;
+    }) =>
+      adjust({
+        kodeProduk: input.kodeProduk,
+        cabang: input.cabang,
+        kalengDelta: input.kaleng,
+        gramDelta: input.gram,
+        keterangan: input.keterangan,
+        oleh: input.oleh,
+      }),
+    [adjust],
+  );
+
+  const bukaKaleng = useCallback(
+    (input: { kodeProduk: string; cabang: string; netGram: number; oleh: string }) =>
+      adjust({
+        kodeProduk: input.kodeProduk,
+        cabang: input.cabang,
+        kalengDelta: -1,
+        gramDelta: input.netGram,
+        keterangan: "Buka kaleng · netto masuk stok gram",
+        oleh: input.oleh,
+      }),
+    [adjust],
+  );
+
+  return { rows, adjustments, adjust, addManual, bukaKaleng };
 }
 
 export function usePenyesuaianStok() {
@@ -575,7 +925,9 @@ export function useFakturBeli() {
   const [items, setItems] = useState<FakturBeliRow[]>(INITIAL_FAKTUR_BELI);
 
   useEffect(() => {
-    setItems(read(FAKTUR_BELI_KEY, INITIAL_FAKTUR_BELI));
+    const loaded = dedupeFakturBeliById(read(FAKTUR_BELI_KEY, INITIAL_FAKTUR_BELI));
+    setItems(loaded);
+    write(FAKTUR_BELI_KEY, loaded);
   }, []);
 
   const updateStatus = useCallback((id: string, status: FakturBeliRow["status"]) => {
@@ -596,7 +948,7 @@ export function useFakturBeli() {
 
   const add = useCallback((row: FakturBeliRow) => {
     setItems((prev) => {
-      const next = [row, ...prev];
+      const next = [row, ...prev.filter((r) => r.id !== row.id)];
       write(FAKTUR_BELI_KEY, next);
       return next;
     });

@@ -97,7 +97,7 @@ export function SyaratPembayaranPage() {
     <div>
       <PageHeader
         title="Syarat Pembayaran"
-        desc="Master syarat bayar — Net 30, COD, dll. Dipakai di pelanggan & pemasok"
+        desc="Master syarat bayar · Net 30, COD, dll. Dipakai di pelanggan & pemasok"
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: "Perusahaan" },
@@ -177,7 +177,7 @@ export function SyaratPembayaranPage() {
           {
             key: "keterangan",
             label: "Keterangan",
-            render: (r) => r.keterangan ?? "—",
+            render: (r) => r.keterangan ?? "-",
           },
           {
             key: "aktif",

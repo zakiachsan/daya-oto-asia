@@ -169,7 +169,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               </span>
             )}
           </div>
-          <span className="text-[11px] text-slds-text-weak hidden sm:block">UI Preview — Mock Data</span>
+          <span className="text-[11px] text-slds-text-weak hidden sm:block">UI Preview · Mock Data</span>
         </header>
         <main
           className={

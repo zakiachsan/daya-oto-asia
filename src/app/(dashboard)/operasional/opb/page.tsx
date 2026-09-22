@@ -67,7 +67,7 @@ export default function OPBPage() {
     };
     add(newOPB);
     setShowForm(false);
-    toast(`OPB ${newOPB.id} digenerate — ${jumlahTrx} trx, ${formatIDR(total)}`, "success");
+    toast(`OPB ${newOPB.id} digenerate · ${jumlahTrx} trx, ${formatIDR(total)}`, "success");
   }
 
   const counts = {
@@ -81,7 +81,7 @@ export default function OPBPage() {
     <div>
       <PageHeader
         title="OPB & Tagihan"
-        desc="Order Pembelian Barang — klik no. OPB untuk detail, pipeline & dokumen"
+        desc="Order Pembelian Barang · klik no. OPB untuk detail, pipeline & dokumen"
         breadcrumb={[{ label: "Operasional", href: "/operasional" }, { label: "OPB & Tagihan" }]}
         actions={
           <button

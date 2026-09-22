@@ -9,7 +9,7 @@ export default function LabaDitahanPage() {
     <div>
       <PageHeader
         title="Laba Ditahan"
-        desc="Mutasi saldo laba ditahan — UI preview (mock data)"
+        desc="Mutasi saldo laba ditahan · UI preview (mock data)"
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: "Laporan Keuangan" },

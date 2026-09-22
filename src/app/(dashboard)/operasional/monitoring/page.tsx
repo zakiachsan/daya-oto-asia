@@ -33,7 +33,7 @@ export default function MonitoringPage() {
           <h3 className="text-[13px] font-bold text-slds-text mb-3 flex items-center gap-2">
             <GitBranch className="h-4 w-4 text-brand" /> Alur Stok End-to-End
           </h3>
-          <p className="text-[12px] text-slds-text-weak mb-4">Contoh kasus Silver Metallic Surabaya — klik setiap langkah untuk drill-down</p>
+          <p className="text-[12px] text-slds-text-weak mb-4">Contoh kasus Silver Metallic Surabaya · klik setiap langkah untuk drill-down</p>
           <StokChainVisual steps={DEMO_STOK_CHAIN} />
         </div>
 
@@ -46,7 +46,7 @@ export default function MonitoringPage() {
               { cabang: "Jember", warna: "Pearl White", count: 12 },
             ].map((r) => (
               <div key={r.cabang} className="flex justify-between py-2 border-b border-slds-border last:border-0 text-[13px]">
-                <span><strong>{r.cabang}</strong> — {r.warna}</span>
+                <span><strong>{r.cabang}</strong> · {r.warna}</span>
                 <span className="font-bold text-brand">{r.count}x</span>
               </div>
             ))}
@@ -59,7 +59,7 @@ export default function MonitoringPage() {
               { cabang: "Jember", item: "Pearl White", note: "Habis, ajuan pending approval", href: "/operasional/ajuan-stok/AJ-002" },
             ].map((r) => (
               <Link key={r.cabang + r.item} href={r.href} className="block py-2 border-b border-slds-border last:border-0 hover:bg-slds-bg/50 -mx-2 px-2 rounded">
-                <p className="text-[13px] font-bold text-slds-text">{r.cabang} — {r.item}</p>
+                <p className="text-[13px] font-bold text-slds-text">{r.cabang} · {r.item}</p>
                 <p className="text-[11px] text-amber-700">{r.note}</p>
               </Link>
             ))}

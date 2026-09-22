@@ -41,13 +41,13 @@ export default function AjuanStokDetailPage() {
   function handleApprove() {
     const refPo = `PO-2026-${String(40 + items.length).padStart(3, "0")}`;
     updateStatus(row.id, "Disetujui");
-    update(row.id, { catatanApprover: "Disetujui — stok cabang kritis", refPo });
-    toast(`Ajuan disetujui — ${refPo} bisa diproses`, "success");
+    update(row.id, { catatanApprover: "Disetujui · stok cabang kritis", refPo });
+    toast(`Ajuan disetujui · ${refPo} bisa diproses`, "success");
   }
 
   function handleReject() {
     updateStatus(row.id, "Ditolak");
-    update(row.id, { catatanApprover: "Ditolak — stok pusat terbatas, tunggu distribusi minggu depan" });
+    update(row.id, { catatanApprover: "Ditolak · stok pusat terbatas, tunggu distribusi minggu depan" });
     toast("Ajuan stok ditolak", "error");
   }
 

@@ -8,7 +8,9 @@ import { DataTable } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { useTransaksiList } from "@/lib/preview-store";
 
-const STATUS_OPTIONS = ["Semua Status", "Draft", "Menunggu TTD", "Selesai"];
+import { TRANSAKSI_STATUS_FILTER } from "@/lib/transaksi-status-utils";
+
+const STATUS_OPTIONS = [...TRANSAKSI_STATUS_FILTER];
 const CABANG_OPTIONS = ["Semua Cabang", "Surabaya", "Malang", "Jember", "Kediri"];
 
 export default function TransaksiPage() {
@@ -16,10 +18,12 @@ export default function TransaksiPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("Semua Status");
   const [cabang, setCabang] = useState("Semua Cabang");
+  const [tanggal, setTanggal] = useState("");
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return all.filter((t) => {
+      if (tanggal && t.tanggal !== tanggal) return false;
       if (status !== "Semua Status" && t.status !== status) return false;
       if (cabang !== "Semua Cabang" && !t.cabang.includes(cabang)) return false;
       if (!q) return true;
@@ -32,14 +36,14 @@ export default function TransaksiPage() {
         t.platNomor.toLowerCase().includes(q)
       );
     });
-  }, [all, search, status, cabang]);
+  }, [all, search, status, cabang, tanggal]);
 
   return (
     <div>
       <PageHeader
-        title="Transaksi Warna"
-        desc="Monitoring transaksi pencampuran warna — klik baris untuk detail lengkap"
-        breadcrumb={[{ label: "Operasional", href: "/operasional" }, { label: "Transaksi Warna" }]}
+        title="Transaksi"
+        desc="Monitoring transaksi tinter · klik baris untuk detail lengkap"
+        breadcrumb={[{ label: "Operasional", href: "/operasional" }, { label: "Transaksi" }]}
       />
 
       <div className="mb-4 flex gap-2 flex-wrap">
@@ -61,6 +65,12 @@ export default function TransaksiPage() {
             <option key={o} value={o}>{o}</option>
           ))}
         </select>
+        <input
+          type="date"
+          value={tanggal}
+          onChange={(e) => setTanggal(e.target.value)}
+          className="px-3 py-2 border border-slds-border rounded-md text-[13px] focus:border-brand focus:outline-none bg-white"
+        />
         <select
           value={cabang}
           onChange={(e) => setCabang(e.target.value)}

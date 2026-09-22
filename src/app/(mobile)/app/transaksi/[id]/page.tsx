@@ -20,8 +20,9 @@ export default function TransaksiDetailPage() {
   const trx = all.find((t) => t.id === id);
   const auditLogs = byTrxId(id);
 
-  const [printed, setPrinted] = useState(trx?.status === "Selesai" || !!trx?.waktuCetakNota);
-  const [signed, setSigned] = useState(trx?.status === "Selesai" || !!trx?.waktuTTD);
+  const doneStatuses = ["Selesai", "Menunggu OPB", "OPB Terbit", "Proses Invoice", "TTD GH", "Cetak Nota"];
+  const [printed, setPrinted] = useState(doneStatuses.includes(trx?.status ?? "") || !!trx?.waktuCetakNota);
+  const [signed, setSigned] = useState(["Selesai", "Menunggu OPB", "OPB Terbit", "Proses Invoice", "TTD GH"].includes(trx?.status ?? "") || !!trx?.waktuTTD);
   const [showNota, setShowNota] = useState(!!trx?.waktuCetakNota);
 
   if (!trx) {
@@ -33,7 +34,7 @@ export default function TransaksiDetailPage() {
     );
   }
 
-  const canTambahBahan = trx.status === "Menunggu TTD" || trx.status === "Draft";
+  const canTambahBahan = trx.status === "Draft" || trx.status === "Cetak Nota";
 
   return (
     <div className="space-y-4">
@@ -59,7 +60,16 @@ export default function TransaksiDetailPage() {
         </div>
       </div>
 
-      {canTambahBahan && (
+      {trx.status === "Draft" && (
+        <Link
+          href={`/app/transaksi/baru?draft=${encodeURIComponent(trx.id)}`}
+          className="flex items-center justify-center gap-2 w-full py-3.5 bg-brand text-white rounded-xl font-bold text-[14px]"
+        >
+          Lanjutkan Draft
+        </Link>
+      )}
+
+      {canTambahBahan && trx.status !== "Draft" && (
         <Link
           href={`/app/transaksi/baru?parent=${encodeURIComponent(trx.id)}&mobil=${encodeURIComponent(trx.mobil)}&warna=${encodeURIComponent(trx.warna)}`}
           className="flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-brand text-brand rounded-xl font-semibold text-[14px]"
@@ -90,7 +100,10 @@ export default function TransaksiDetailPage() {
         <div className="flex justify-between"><span className="text-slds-text-weak">Mulai</span><span>{formatWaktu(trx.waktuMulai)}</span></div>
         <div className="flex justify-between"><span className="text-slds-text-weak">Selesai Mixing</span><span>{formatWaktu(trx.waktuSelesaiMixing)}</span></div>
         <div className="flex justify-between"><span className="text-slds-text-weak">Cetak Nota</span><span>{formatWaktu(trx.waktuCetakNota)}</span></div>
-        <div className="flex justify-between"><span className="text-slds-text-weak">TTD DocuMatrix</span><span>{formatWaktu(trx.waktuTTD)}</span></div>
+        <div className="flex justify-between"><span className="text-slds-text-weak">TTD GH</span><span>{formatWaktu(trx.waktuTTD)}</span></div>
+        {trx.receiptId && (
+          <div className="flex justify-between"><span className="text-slds-text-weak">Receipt ID</span><span className="font-mono text-[11px]">{trx.receiptId}</span></div>
+        )}
       </div>
 
       {(showNota || trx.waktuCetakNota || trx.status === "Menunggu TTD") && (
@@ -122,7 +135,7 @@ export default function TransaksiDetailPage() {
             <Printer className="h-4 w-4" /> {printed ? "Cetak Ulang Nota" : "Cetak Nota Penjualan"}
           </button>
           <button type="button" data-no-toast onClick={() => { setSigned(true); toast("Tanda tangan DocuMatrix berhasil", "success"); }} disabled={!printed || signed} className="w-full py-3 border-2 border-brand text-brand rounded-xl font-bold text-[14px] flex items-center justify-center gap-2 disabled:opacity-50">
-            <PenLine className="h-4 w-4" /> {signed ? "Sudah Ditandatangani" : "DocuMatrix — TTD Kepala Bengkel"}
+            <PenLine className="h-4 w-4" /> {signed ? "Sudah Ditandatangani" : "DocuMatrix · TTD Kepala Bengkel"}
           </button>
         </div>
       )}

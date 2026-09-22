@@ -28,7 +28,7 @@ export default function KinerjaDetailPage() {
     <div>
       <PageHeader
         title={nama}
-        desc="Detail kinerja tinter — transaksi & durasi mixing per pekerjaan"
+        desc="Detail kinerja tinter · transaksi & durasi mixing per pekerjaan"
         breadcrumb={[
           { label: "HRIS", href: "/hris" },
           { label: "Kinerja Tinter", href: "/hris/kinerja" },
@@ -42,8 +42,8 @@ export default function KinerjaDetailPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
         <StatCard label="Transaksi Bulan Ini" value={String(kinerja?.trxBulan ?? trx.length)} icon={Paintbrush} color="orange" />
-        <StatCard label="Avg Durasi Mixing" value={avgDurasi ? formatDurasi(avgDurasi) : kinerja?.avgDurasi ?? "—"} icon={Clock} color="blue" />
-        <StatCard label="Pemakaian Bahan" value={kinerja?.pemakaianBahan ?? "—"} icon={Package} color="green" />
+        <StatCard label="Avg Durasi Mixing" value={avgDurasi ? formatDurasi(avgDurasi) : kinerja?.avgDurasi ?? "-"} icon={Clock} color="blue" />
+        <StatCard label="Pemakaian Bahan" value={kinerja?.pemakaianBahan ?? "-"} icon={Package} color="green" />
       </div>
 
       <DataTable

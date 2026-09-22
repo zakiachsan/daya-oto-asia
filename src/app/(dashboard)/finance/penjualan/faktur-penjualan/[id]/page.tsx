@@ -42,7 +42,7 @@ export default function FakturPenjualanDetailPage() {
     const jurnalId = postWithJurnal("faktur-jual", posted, { jurnalList, addJurnal });
     update(row.id, { status: "Posted", jurnalId });
     replaceAll(ensurePiutangFromFaktur(hutangItems, posted));
-    toast(`Faktur ${row.id} di-posting — jurnal ${jurnalId}`, "success");
+    toast(`Faktur ${row.id} di-posting · jurnal ${jurnalId}`, "success");
   }
 
   function handlePrint() {
@@ -114,7 +114,7 @@ export default function FakturPenjualanDetailPage() {
             </div>
             <div className="flex justify-between py-1.5 border-b border-slds-border">
               <span className="text-slds-text-weak">Rekap admin dilampirkan</span>
-              <span>{opb ? "✓ Siap" : "—"}</span>
+              <span>{opb ? "✓ Siap" : "-"}</span>
             </div>
             <div className="flex justify-between py-1.5 border-b border-slds-border">
               <span className="text-slds-text-weak">Posting ke AR</span>
@@ -136,7 +136,7 @@ export default function FakturPenjualanDetailPage() {
 
       {opb && (
         <div className="overflow-x-auto">
-          <h3 className="text-[13px] font-bold text-slds-text mb-2">Lampiran — Rekap Order Pembelian Bahan</h3>
+          <h3 className="text-[13px] font-bold text-slds-text mb-2">Lampiran · Rekap Order Pembelian Bahan</h3>
           <RekapInvoicePreview opb={opb} transaksi={transaksi} invoiceId={row.id} />
         </div>
       )}

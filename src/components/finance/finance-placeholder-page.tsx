@@ -9,7 +9,7 @@ export function FinancePlaceholderPage({ title, section, desc, features, mirrorH
     <div>
       <PageHeader
         title={title}
-        desc={desc ?? `Modul ${section} — struktur Accurate (UI preview)`}
+        desc={desc ?? `Modul ${section} · struktur Accurate (UI preview)`}
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: section },

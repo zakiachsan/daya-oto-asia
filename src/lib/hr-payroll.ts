@@ -1,4 +1,4 @@
-/** Ported from pt-gis — payroll calc for tinter workforce */
+/** Ported from pt-gis · payroll calc for tinter workforce */
 
 export const LEMBUR_HOURS_DIVISOR = 173;
 export const LEMBUR_MULTIPLIER = 1.5;

@@ -52,7 +52,7 @@ export function TransferBankPage() {
 
     setFormOpen(false);
     setKeterangan("");
-    toast(`Transfer ${newRow.id} tercatat — jurnal ${jurnalId}`, "success");
+    toast(`Transfer ${newRow.id} tercatat · jurnal ${jurnalId}`, "success");
   }
 
   const totalTransfer = items.reduce((s, r) => s + r.jumlah, 0);
@@ -61,7 +61,7 @@ export function TransferBankPage() {
     <div>
       <PageHeader
         title="Transfer Bank"
-        desc="Transfer antar rekening kas/bank — auto jurnal Dr tujuan / Cr sumber"
+        desc="Transfer antar rekening kas/bank · auto jurnal Dr tujuan / Cr sumber"
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: "Kas & Bank" },
@@ -143,7 +143,7 @@ export function TransferBankPage() {
                   {String(r.jurnalId)}
                 </Link>
               ) : (
-                "—"
+                "-"
               ),
           },
         ]}

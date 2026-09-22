@@ -27,7 +27,7 @@ function DoaLogo() {
 }
 
 /**
- * Rekap admin lampiran invoice — referensi scan `rekap admin untuk lampiran invoice.pdf`.
+ * Rekap admin lampiran invoice · referensi scan `rekap admin untuk lampiran invoice.pdf`.
  * Tabel: No · Tanggal · No. Polisi · No. SAP · Total Harga · Total Harga + PPN
  */
 export function RekapInvoicePreview({ opb, transaksi, invoiceId, className = "" }: RekapInvoicePreviewProps) {
@@ -81,7 +81,7 @@ export function RekapInvoicePreview({ opb, transaksi, invoiceId, className = "" 
       </table>
 
       <p className="rekap-invoice-note">
-        Dokumen rekap admin dilampirkan pada faktur penjualan — verifikasi finance HO sebelum posting AR.
+        Dokumen rekap admin dilampirkan pada faktur penjualan · verifikasi finance HO sebelum posting AR.
         {opb.sap ? ` No. SAP OPB: ${opb.sap}.` : ""}
       </p>
     </div>

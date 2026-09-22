@@ -64,7 +64,7 @@ export default function AppSlipGajiPage() {
 
       {month === DEMO_CURRENT_MONTH && slip.status === "Draft" && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-[12px] text-amber-800">
-          Slip {MONTHS[month]} masih draft — menunggu HR finalize batch payroll.
+          Slip {MONTHS[month]} masih draft · menunggu HR finalize batch payroll.
         </div>
       )}
 
@@ -125,7 +125,7 @@ export default function AppSlipGajiPage() {
         )}
       </div>
 
-      {/* Template cetak — off-screen, dipakai printSlipGajiPreview() */}
+      {/* Template cetak · off-screen, dipakai printSlipGajiPreview() */}
       <div className="sr-only">
         <SlipGajiPreview slip={slip} />
       </div>

@@ -47,7 +47,7 @@ export default function OpbDetailPage() {
       toast(`${row.id} dikirim ke Admin Cabang untuk TTD`, "success");
     } else if (row.status === "Menunggu TTD") {
       updateStatus(row.id, "Rekonsiliasi");
-      toast(`${row.id} diforward ke HO — masuk rekonsiliasi`, "success");
+      toast(`${row.id} diforward ke HO · masuk rekonsiliasi`, "success");
     }
   }
 
@@ -57,7 +57,7 @@ export default function OpbDetailPage() {
       return;
     }
     setSap(row.id, sapInput.trim());
-    toast(`SAP ${sapInput.trim()} tersimpan — OPB ditagihkan`, "success");
+    toast(`SAP ${sapInput.trim()} tersimpan · OPB ditagihkan`, "success");
   }
 
   return (

@@ -27,7 +27,7 @@ export function FinanceJurnalRecent() {
         {
           key: "sourceType",
           label: "Sumber",
-          render: (r) => (r.sourceType ? JURNAL_SOURCE_LABELS[r.sourceType] : "—"),
+          render: (r) => (r.sourceType ? JURNAL_SOURCE_LABELS[r.sourceType] : "-"),
         },
         { key: "keterangan", label: "Keterangan" },
         { key: "debit", label: "Debit", render: (r) => formatIDR(Number(r.debit)), className: "text-right" },

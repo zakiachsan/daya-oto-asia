@@ -23,7 +23,7 @@ export const INITIAL_AJUAN_STOK: AjuanStokDetail[] = [
     tanggal: "2026-09-10",
     status: "Menunggu",
     stokSaatIni: "2 kaleng",
-    alasan: "Stok kritis — permintaan mixing meningkat pekan ini",
+    alasan: "Stok kritis · permintaan mixing meningkat pekan ini",
   },
   {
     id: "AJ-002",

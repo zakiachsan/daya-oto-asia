@@ -16,7 +16,7 @@ export const a = (
   also?: FlowAction["also"],
 ): FlowAction => (also ? { module, label, href, also } : href ? { module, label, href } : { module, label });
 
-/** Panduan singkat — buka halaman + langkah standar */
+/** Panduan singkat · buka halaman + langkah standar */
 export function simpleGuide(
   id: string,
   menuLabel: string,

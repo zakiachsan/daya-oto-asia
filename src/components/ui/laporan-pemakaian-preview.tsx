@@ -103,7 +103,7 @@ function DayBlock({
 }
 
 /**
- * Laporan pemakaian base — referensi DOA Cabang Bogor hal. 2.
+ * Laporan pemakaian base · referensi DOA Cabang Bogor hal. 2.
  * Dua grid side-by-side: TGL 1–15 | TGL 16–31.
  */
 export function LaporanPemakaianPreview({ bengkel, tinter, bulan, rows, className = "" }: LaporanPemakaianPreviewProps) {

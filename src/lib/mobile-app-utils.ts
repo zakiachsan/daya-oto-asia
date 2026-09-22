@@ -2,10 +2,10 @@
 
 import { useMemo } from "react";
 import { MOCK_KINERJA, formatDurasi } from "./mock-data";
-import { useIzinList, useLemburList, useTransaksiList } from "./preview-store";
+import { useIzinList, useKasbon, useLemburList, useTransaksiList } from "./preview-store";
+import { MOBILE_CABANG, MOBILE_USER } from "./mobile-app-constants";
 
-export const MOBILE_USER = "Andi Wijaya";
-export const MOBILE_CABANG = "Auto 2000 Surabaya";
+export { MOBILE_CABANG, MOBILE_USER };
 
 export function isPendingHrStatus(status: string) {
   return status === "Menunggu TTD" || status === "Draft";
@@ -14,18 +14,22 @@ export function isPendingHrStatus(status: string) {
 export function useMobileHrPending() {
   const { items: izin } = useIzinList();
   const { items: lembur } = useLemburList();
+  const { items: kasbon } = useKasbon();
 
   return useMemo(() => {
     const izinItems = izin.filter((i) => i.nama === MOBILE_USER && isPendingHrStatus(i.status));
     const lemburItems = lembur.filter((l) => l.nama === MOBILE_USER && isPendingHrStatus(l.status));
+    const kasbonItems = kasbon.filter((k) => k.nama === MOBILE_USER && k.status === "Menunggu TTD");
     return {
       izinPending: izinItems.length,
       lemburPending: lemburItems.length,
-      totalPending: izinItems.length + lemburItems.length,
+      kasbonPending: kasbonItems.length,
+      totalPending: izinItems.length + lemburItems.length + kasbonItems.length,
       izinItems,
       lemburItems,
+      kasbonItems,
     };
-  }, [izin, lembur]);
+  }, [izin, lembur, kasbon]);
 }
 
 export function useMobileKinerjaRingkas() {
@@ -43,9 +47,9 @@ export function useMobileKinerjaRingkas() {
 
     return {
       trxBulan: trxBulan.length > 0 ? trxBulan.length : (mock?.trxBulan ?? 0),
-      avgDurasi: avgMenit != null ? formatDurasi(avgMenit) : (mock?.avgDurasi ?? "—"),
-      kehadiran: mock?.kehadiran ?? "—",
-      pemakaianBahan: mock?.pemakaianBahan ?? "—",
+      avgDurasi: avgMenit != null ? formatDurasi(avgMenit) : (mock?.avgDurasi ?? "-"),
+      kehadiran: mock?.kehadiran ?? "-",
+      pemakaianBahan: mock?.pemakaianBahan ?? "-",
     };
   }, [all, bulan, mock]);
 }

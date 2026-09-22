@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { ArrowLeft, Scale, Check, AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { TOLERANSI_GRAM, isDalamToleransi } from "@/lib/stock-opname-utils";
+import { TOLERANSI_GRAM, isOpnameRowDalamToleransi } from "@/lib/stock-opname-utils";
 import { usePenyesuaianStok, useStockOpname } from "@/lib/preview-store";
 import { penyesuaianForOpname } from "@/lib/ops-finance-bridge";
 import { penyesuaianSlug } from "@/lib/penyesuaian-stok-utils";
@@ -30,17 +30,17 @@ export default function StockOpnameDetailPage() {
   }
 
   const row = found;
-  const ok = isDalamToleransi(row.selisih);
+  const ok = isOpnameRowDalamToleransi(row);
   const existingAdj = penyesuaianForOpname(row.id, penyesuaian);
   const needsAdj = row.selisih !== 0 && !existingAdj;
 
   function handleApprove() {
-    updateStatus(row.id, "Selesai", { supervisor: "Pak Ahmad", catatan: "Disetujui supervisor â dalam toleransi" });
+    updateStatus(row.id, "Selesai", { supervisor: "Pak Ahmad", catatan: "Disetujui supervisor · dalam toleransi" });
     toast("Opname di-approve", "success");
   }
 
   function handleFlag() {
-    updateStatus(row.id, "Perlu Review", { catatan: "Selisih melebihi toleransi â investigasi tinter" });
+    updateStatus(row.id, "Perlu Review", { catatan: "Selisih melebihi toleransi · investigasi tinter" });
     toast("Opname di-flag untuk review", "info");
   }
 
@@ -66,25 +66,69 @@ export default function StockOpnameDetailPage() {
           <h3 className="text-[13px] font-bold text-slds-text mb-3 flex items-center gap-2">
             <Scale className="h-4 w-4" /> Hasil Timbang
           </h3>
-          <div className="grid grid-cols-3 gap-3 mb-4">
-            <div className="bg-slds-bg rounded-lg p-3 text-center">
-              <p className="text-[10px] uppercase text-slds-text-weak font-semibold">Stok Sistem</p>
-              <p className="text-2xl font-bold text-slds-text mt-1">{row.sistem} gr</p>
+          {row.kalengFisik != null ? (
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="bg-slds-bg rounded-lg p-3">
+                <p className="text-[10px] uppercase text-slds-text-weak font-semibold mb-2">Kaleng</p>
+                <div className="flex justify-between text-[13px]">
+                  <span className="text-slds-text-weak">Sistem</span>
+                  <span className="font-bold">{row.kalengSistem ?? "-"}</span>
+                </div>
+                <div className="flex justify-between text-[13px] mt-1">
+                  <span className="text-slds-text-weak">Fisik</span>
+                  <span className="font-bold">{row.kalengFisik}</span>
+                </div>
+                <div className="flex justify-between text-[13px] mt-1 pt-1 border-t border-slds-border">
+                  <span className="text-slds-text-weak">Selisih</span>
+                  <span className={`font-bold ${(row.selisihKaleng ?? 0) === 0 ? "text-green-700" : "text-red-700"}`}>
+                    {(row.selisihKaleng ?? 0) === 0 ? "Cocok" : `${row.selisihKaleng! > 0 ? "+" : ""}${row.selisihKaleng} kaleng`}
+                  </span>
+                </div>
+              </div>
+              <div className="bg-blue-50 rounded-lg p-3">
+                <p className="text-[10px] uppercase text-blue-700 font-semibold mb-2">Gram terbuka</p>
+                <div className="flex justify-between text-[13px]">
+                  <span className="text-slds-text-weak">Sistem</span>
+                  <span className="font-bold">{row.gramSistem ?? row.sistem} gr</span>
+                </div>
+                <div className="flex justify-between text-[13px] mt-1">
+                  <span className="text-slds-text-weak">Fisik</span>
+                  <span className="font-bold">{row.gramFisik ?? row.fisik} gr</span>
+                </div>
+                <div className="flex justify-between text-[13px] mt-1 pt-1 border-t border-blue-200">
+                  <span className="text-slds-text-weak">Selisih</span>
+                  <span className={`font-bold ${Math.abs(row.selisih) <= TOLERANSI_GRAM ? "text-green-700" : "text-red-700"}`}>
+                    {row.selisih > 0 ? `+${row.selisih}` : row.selisih} gr
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="bg-blue-50 rounded-lg p-3 text-center">
-              <p className="text-[10px] uppercase text-blue-700 font-semibold">Timbang Fisik</p>
-              <p className="text-2xl font-bold text-blue-900 mt-1">{row.fisik} gr</p>
+          ) : (
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="bg-slds-bg rounded-lg p-3 text-center">
+                <p className="text-[10px] uppercase text-slds-text-weak font-semibold">Stok Sistem</p>
+                <p className="text-2xl font-bold text-slds-text mt-1">{row.sistem} gr</p>
+              </div>
+              <div className="bg-blue-50 rounded-lg p-3 text-center">
+                <p className="text-[10px] uppercase text-blue-700 font-semibold">Timbang Fisik</p>
+                <p className="text-2xl font-bold text-blue-900 mt-1">{row.fisik} gr</p>
+              </div>
+              <div className={`rounded-lg p-3 text-center ${ok ? "bg-green-50" : "bg-red-50"}`}>
+                <p className={`text-[10px] uppercase font-semibold ${ok ? "text-green-700" : "text-red-700"}`}>Selisih</p>
+                <p className={`text-2xl font-bold mt-1 ${ok ? "text-green-900" : "text-red-900"}`}>
+                  {row.selisih > 0 ? `+${row.selisih}` : row.selisih} gr
+                </p>
+              </div>
             </div>
-            <div className={`rounded-lg p-3 text-center ${ok ? "bg-green-50" : "bg-red-50"}`}>
-              <p className={`text-[10px] uppercase font-semibold ${ok ? "text-green-700" : "text-red-700"}`}>Selisih</p>
-              <p className={`text-2xl font-bold mt-1 ${ok ? "text-green-900" : "text-red-900"}`}>
-                {row.selisih > 0 ? `+${row.selisih}` : row.selisih} gr
-              </p>
-            </div>
-          </div>
+          )}
           <p className={`text-[12px] font-semibold ${ok ? "text-green-700" : "text-red-700"}`}>
-            {ok ? `â Dalam toleransi Â±${TOLERANSI_GRAM} gram` : `â- Melebihi toleransi Â±${TOLERANSI_GRAM} gram`}
+            {ok
+              ? `✓ Dalam toleransi · kaleng cocok · gram ±${TOLERANSI_GRAM}g`
+              : `✗ Melebihi toleransi · cek kaleng & gram`}
           </p>
+          {row.batchId && (
+            <p className="text-[11px] text-slds-text-weak mt-2 font-mono">Batch: {row.batchId}</p>
+          )}
         </div>
 
         <div className="bg-white border border-slds-border rounded-lg p-4 space-y-2 text-[13px]">
@@ -102,10 +146,10 @@ export default function StockOpnameDetailPage() {
         </div>
       </div>
 
-      {row.status !== "Selesai" && (
+      {row.status === "Menunggu Review" && (
         <div className="bg-white border border-slds-border rounded-lg p-4">
           <p className="text-[13px] font-bold text-slds-text mb-2">Aksi Supervisor (Pak Ahmad)</p>
-          <p className="text-[12px] text-slds-text-weak mb-3">Tinter hanya input timbang. Approval dilakukan supervisor.</p>
+          <p className="text-[12px] text-slds-text-weak mb-3">Dikirim dari mobile tinter · approve jika kaleng & gram dalam toleransi.</p>
           <div className="flex gap-2 flex-wrap">
             {ok && (
               <button type="button" data-no-toast onClick={handleApprove} className="inline-flex items-center gap-1 px-4 py-2 bg-brand text-white rounded-md text-[12px] font-semibold">
@@ -125,7 +169,7 @@ export default function StockOpnameDetailPage() {
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
           <p className="text-[13px] font-bold text-amber-900 mb-1">Selisih perlu penyesuaian persediaan</p>
           <p className="text-[12px] text-amber-800 mb-3">
-            Selisih {row.selisih}gr terdeteksi — buat penyesuaian di Finance untuk koreksi stok & jurnal.
+            Selisih {row.selisih}gr terdeteksi · buat penyesuaian di Finance untuk koreksi stok & jurnal.
           </p>
           <Link
             href={`/finance/persediaan/penyesuaian-persediaan?opname=${encodeURIComponent(row.id)}`}

@@ -1,6 +1,22 @@
 import { MOCK_PO, MOCK_PRODUK } from "./mock-data";
 
-export type PoLine = { kode: string; nama: string; qty: number; harga: number };
+export type PoLine = {
+  kode: string;
+  nama: string;
+  qty: number;
+  harga: number;
+  /** Qty diterima saat goods receipt (partial OK) */
+  qtyReceived?: number;
+};
+
+export type PoReturLine = {
+  kode: string;
+  nama: string;
+  qty: number;
+  alasan: string;
+};
+
+export type PoReceiveStatus = "pending" | "partial" | "complete";
 
 export type PoDetail = {
   id: string;
@@ -12,7 +28,30 @@ export type PoDetail = {
   gr: string;
   catatan?: string;
   lines: PoLine[];
+  returs?: PoReturLine[];
+  receiveStatus?: PoReceiveStatus;
+  /** Total nilai barang yang benar-benar diterima (basis faktur) */
+  receivedTotal?: number;
 };
+
+export function calcReceivedTotal(lines: PoLine[]) {
+  return lines.reduce((s, l) => s + (l.qtyReceived ?? 0) * l.harga, 0);
+}
+
+export function deriveReceiveStatus(lines: PoLine[]): PoReceiveStatus {
+  const received = lines.filter((l) => (l.qtyReceived ?? 0) > 0);
+  if (received.length === 0) return "pending";
+  const allFull = lines.every((l) => (l.qtyReceived ?? 0) >= l.qty);
+  return allFull ? "complete" : "partial";
+}
+
+export const PO_RETUR_ALASAN = [
+  "Tumpah dalam pengiriman",
+  "Kaleng penyok / rusak",
+  "Qty kurang dari PO",
+  "Kadaluarsa / produk reject",
+  "Lain-lain",
+] as const;
 
 function line(kode: string, qty: number, harga: number): PoLine {
   const p = MOCK_PRODUK.find((x) => x.kode === kode);
@@ -56,4 +95,9 @@ export const HARGA_EST: Record<string, number> = {
   "AXT-101": 380000,
 };
 
-export const PO_SUPPLIERS = ["PT Axalta Indonesia", "PT Nippon Paint"];
+export const PO_SUPPLIERS = [
+  "PT Axalta Indonesia",
+  "PT Nippon Paint",
+  "Distributor Axalta Manado",
+  "Distributor Axalta Surabaya",
+];

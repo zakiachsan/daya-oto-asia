@@ -23,7 +23,7 @@ export default function KategoriHargaPage() {
       toast("Nama kategori wajib diisi", "error");
       return;
     }
-    setItems((prev) => [...prev, { kategori: kategori.trim(), harga, satuan: "liter", contoh: contoh || "—" }]);
+    setItems((prev) => [...prev, { kategori: kategori.trim(), harga, satuan: "liter", contoh: contoh || "-" }]);
     setShowForm(false);
     setKategori("");
     setHarga(250000);
@@ -35,7 +35,7 @@ export default function KategoriHargaPage() {
     <div>
       <PageHeader
         title="Kategori Harga"
-        desc="Tarif referensi DOA Cabang Bogor — per liter, per kategori warna (bukan per kode warna)."
+        desc="Tarif referensi DOA Cabang Bogor · per liter, per kategori warna (bukan per kode warna)."
         breadcrumb={[{ label: "Operasional", href: "/operasional" }, { label: "Kategori Harga" }]}
         actions={
           <button

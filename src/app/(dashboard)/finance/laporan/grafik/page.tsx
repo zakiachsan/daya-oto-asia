@@ -22,7 +22,7 @@ export default function GrafikPage() {
     <div>
       <PageHeader
         title="Grafik Keuangan"
-        desc="Visualisasi tren penjualan & beban — UI preview (mock data, jutaan Rp)"
+        desc="Visualisasi tren penjualan & beban · UI preview (mock data, jutaan Rp)"
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: "Laporan Keuangan" },

@@ -1,4 +1,4 @@
-/** Resep mixing per kode warna — base volume 50G (referensi YATU) */
+/** Resep mixing per kode warna · base volume 50G (referensi YATU) */
 export type FormulaDef = {
   kodeWarna: string;
   nama: string;

@@ -91,7 +91,7 @@ def main() -> None:
             }
         )
 
-    header = """/** Auto-generated from List Produk AXT.xlsx — 76 produk Axalta */
+    header = """/** Auto-generated from List Produk AXT.xlsx · 76 produk Axalta */
 export type AxtProduk = {
   kode: string;
   nama: string;

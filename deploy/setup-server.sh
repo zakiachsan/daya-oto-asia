@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One-time VPS bootstrap — Ubuntu 22.04+
+# One-time VPS bootstrap · Ubuntu 22.04+
 set -euo pipefail
 
 REPO="${REPO:-https://github.com/zakiachsan/daya-oto-asia.git}"

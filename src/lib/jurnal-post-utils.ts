@@ -6,7 +6,7 @@ export type JurnalPostContext = {
   addJurnal: (j: JurnalDetail) => void;
 };
 
-/** Post a source document to jurnal — returns the new jurnal ID. */
+/** Post a source document to jurnal · returns the new jurnal ID. */
 export function postWithJurnal(
   type: JurnalSourceType,
   source: unknown,

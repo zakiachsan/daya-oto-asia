@@ -34,7 +34,7 @@ export default function MobileLemburDetailPage() {
           <div>
             <p className="font-mono text-[12px] text-slds-text-weak">{row.id}</p>
             <p className="text-[15px] font-bold text-slds-text">{row.tanggal}</p>
-            <p className="text-[12px] text-slds-text-weak">{row.jamMulai} — {row.jamSelesai} · {row.jam} jam</p>
+            <p className="text-[12px] text-slds-text-weak">{row.jamMulai} · {row.jamSelesai} · {row.jam} jam</p>
           </div>
           <StatusBadge status={row.status} />
         </div>

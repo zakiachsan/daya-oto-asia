@@ -53,7 +53,7 @@ export function uniqueTinters(transaksi: TransaksiRow[]) {
   return ["Semua Tinter", ...Array.from(new Set(transaksi.map((t) => t.tinter))).sort()];
 }
 
-/** Baris grid — kolom = tanggal, referensi DOA Bogor hal. 2 */
+/** Baris grid · kolom = tanggal, referensi DOA Bogor hal. 2 */
 export type LaporanGridRow = {
   no: number;
   namaBarang: string;

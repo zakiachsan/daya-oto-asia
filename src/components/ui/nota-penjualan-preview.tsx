@@ -55,7 +55,7 @@ function UnderlineField({ label, value }: { label: string; value: string }) {
 }
 
 /**
- * Nota penjualan terisi — referensi scan `nota penjualan.pdf`.
+ * Nota penjualan terisi · referensi scan `nota penjualan.pdf`.
  * Berbeda dari nota pemakaian (pre-print tarif DOA Bogor hal. 1).
  */
 export function NotaPenjualanPreview({ trx, className = "" }: NotaPenjualanPreviewProps) {

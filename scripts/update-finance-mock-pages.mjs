@@ -31,4 +31,4 @@ for (const pagePath of walk(financeRoot)) {
   console.log("Updated:", rel);
 }
 
-console.log(`Done — ${updated} pages updated`);
+console.log(`Done · ${updated} pages updated`);

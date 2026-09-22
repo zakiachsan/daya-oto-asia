@@ -69,7 +69,7 @@ function pemakaianMlForLine(totalGram: number, harga: number, jumlahRp: number) 
 }
 
 /**
- * Baris terisi untuk nota penjualan — base coat dari kategori transaksi.
+ * Baris terisi untuk nota penjualan · base coat dari kategori transaksi.
  * Untuk demo job besar (total > base), tambah clear coat + surfacer seperti scan referensi.
  */
 export function buildNotaPenjualanLines(trx: Pick<TransaksiRow, "kategori" | "bahan" | "total">): NotaPenjualanLineFill[] {

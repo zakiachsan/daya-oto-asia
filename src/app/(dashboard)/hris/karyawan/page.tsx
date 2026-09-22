@@ -34,7 +34,7 @@ export default function KaryawanPage() {
     <div>
       <PageHeader
         title="Karyawan"
-        desc="Data karyawan / manpower — self-service via App Tinter"
+        desc="Data karyawan / manpower · self-service via App Tinter"
         breadcrumb={[{ label: "HRIS", href: "/hris" }, { label: "Karyawan" }]}
         actions={
           <button

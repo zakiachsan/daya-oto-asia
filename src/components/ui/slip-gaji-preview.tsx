@@ -9,13 +9,13 @@ type SlipGajiPreviewProps = {
   className?: string;
 };
 
-/** Slip gaji karyawan — layout cetak selaras HRIS detail */
+/** Slip gaji karyawan · layout cetak selaras HRIS detail */
 export function SlipGajiPreview({ slip, className = "" }: SlipGajiPreviewProps) {
   return (
     <div className={`slip-gaji-doc ${className}`} id="slip-gaji-preview">
       <div className="slip-gaji-header">
         <p className="slip-gaji-company">PT. DAYA OTO ASIA</p>
-        <p className="slip-gaji-title">SLIP GAJI — {slip.bulan}</p>
+        <p className="slip-gaji-title">SLIP GAJI · {slip.bulan}</p>
         <p className="slip-gaji-meta">{slip.nama} · {slip.cabangFull}</p>
       </div>
 
@@ -52,7 +52,7 @@ export function SlipGajiPreview({ slip, className = "" }: SlipGajiPreviewProps) 
         </tbody>
       </table>
 
-      <p className="slip-gaji-footer">Dokumen generated preview — {slip.status}</p>
+      <p className="slip-gaji-footer">Dokumen generated preview · {slip.status}</p>
     </div>
   );
 }

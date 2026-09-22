@@ -8,7 +8,7 @@ export default function ArusKasPage() {
     <div>
       <PageHeader
         title="Arus Kas"
-        desc="Laporan arus kas operasional — UI preview (mock data)"
+        desc="Laporan arus kas operasional · UI preview (mock data)"
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: "Laporan Keuangan" },

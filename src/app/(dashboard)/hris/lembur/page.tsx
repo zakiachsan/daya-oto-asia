@@ -27,7 +27,7 @@ export default function LemburPage() {
     <div>
       <PageHeader
         title="Lembur"
-        desc="Approval lembur dengan bukti foto + GPS — klik no. untuk detail"
+        desc="Approval lembur dengan bukti foto + GPS · klik no. untuk detail"
         breadcrumb={[{ label: "HRIS", href: "/hris" }, { label: "Lembur" }]}
       />
 

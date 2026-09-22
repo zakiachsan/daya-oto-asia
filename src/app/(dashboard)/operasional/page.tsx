@@ -4,7 +4,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/ui/stat-card";
 import { DataTable } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { MOCK_TRANSAKSI, MOCK_CABANG, MOCK_STOK, formatIDR } from "@/lib/mock-data";
+import { InventoriAlertTable } from "@/components/operasional/inventori-alert-table";
+import { MOCK_TRANSAKSI, MOCK_CABANG, formatIDR } from "@/lib/mock-data";
 
 export default function OperasionalDashboard() {
   return (
@@ -39,19 +40,7 @@ export default function OperasionalDashboard() {
         </div>
 
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-bold text-slds-text">Stok Perlu Perhatian</h2>
-            <Link href="/operasional/inventori" className="text-[12px] text-brand font-semibold">Lihat semua</Link>
-          </div>
-          <DataTable
-            columns={[
-              { key: "produk", label: "Produk" },
-              { key: "cabang", label: "Cabang" },
-              { key: "qty", label: "Qty", render: (r) => `${r.qty} ${r.satuan}` },
-              { key: "status", label: "Status", render: (r) => <StatusBadge status={String(r.status)} /> },
-            ]}
-            data={MOCK_STOK.filter((s) => s.status !== "Aman")}
-          />
+          <InventoriAlertTable />
         </div>
       </div>
 

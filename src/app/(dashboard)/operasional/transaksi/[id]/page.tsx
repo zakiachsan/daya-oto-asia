@@ -5,22 +5,26 @@ import { useParams } from "next/navigation";
 import { ArrowLeft, Clock, Car, Paintbrush, Printer, PenLine, FileText, Plus } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { formatIDR, formatWaktu, formatDurasi } from "@/lib/mock-data";
+import { formatIDR, formatWaktu, formatDurasi, type TransaksiRow } from "@/lib/mock-data";
 import { NotaPreview, printNotaPreview } from "@/components/ui/nota-preview";
 import { NotaPenjualanPreview, printNotaPenjualanPreview } from "@/components/ui/nota-penjualan-preview";
 import { SapOpbPreview, printSapOpbPreview } from "@/components/ui/sap-opb-preview";
 import { useNotaPrint, useTransaksiList } from "@/lib/preview-store";
 import { CetakNotaAudit } from "@/components/ui/cetak-nota-audit";
 import { useToast } from "@/components/ui/toast";
+import { canActorUpdateStatus, nextTransaksiStatus, normalizeTransaksiStatus } from "@/lib/transaksi-status-utils";
+import { useState } from "react";
 
 export default function TransaksiDetailPage() {
   const params = useParams();
   const id = String(params.id);
   const { toast } = useToast();
-  const { all } = useTransaksiList();
+  const { all, update } = useTransaksiList();
   const { recordPrint, byTrxId } = useNotaPrint();
   const trx = all.find((t) => t.id === id);
   const auditLogs = byTrxId(id);
+  const [opbInput, setOpbInput] = useState("");
+  const trxStatus = trx ? normalizeTransaksiStatus(trx.status) : "Draft";
 
   if (!trx) {
     return (
@@ -31,17 +35,31 @@ export default function TransaksiDetailPage() {
     );
   }
 
-  const totalGram = trx.bahan.reduce((s, b) => s + b.gram, 0);
-  const canTambahBahan = trx.status === "Menunggu TTD" || trx.status === "Draft";
+  const row = trx;
+  const totalGram = row.bahan.reduce((s, b) => s + b.gram, 0);
+  const canTambahBahan = trxStatus === "Draft" || trxStatus === "Cetak Nota";
 
   const timeline = [
     { label: "Mulai Transaksi", waktu: trx.waktuMulai, icon: Paintbrush, done: true },
     { label: "Selesai Mixing", waktu: trx.waktuSelesaiMixing, icon: Clock, done: !!trx.waktuSelesaiMixing },
     { label: "Cetak Nota", waktu: trx.waktuCetakNota, icon: Printer, done: !!trx.waktuCetakNota },
-    { label: "TTD DocuMatrix", waktu: trx.waktuTTD, icon: PenLine, done: !!trx.waktuTTD },
+    { label: "TTD GH", waktu: trx.waktuTTD, icon: PenLine, done: !!trx.waktuTTD },
+    { label: "Menunggu OPB", waktu: trxStatus !== "Draft" && trxStatus !== "Cetak Nota" && trxStatus !== "TTD GH" ? trx.waktuTTD : null, icon: FileText, done: ["Menunggu OPB", "OPB Terbit", "Proses Invoice", "Selesai"].includes(trxStatus) },
+    { label: "OPB Terbit", waktu: trx.opbId ? trx.waktuCetakNota : null, icon: FileText, done: ["OPB Terbit", "Proses Invoice", "Selesai"].includes(trxStatus) },
   ];
 
   const penambahan = all.filter((t) => t.parentId === trx.id);
+
+  function advanceAdminStatus() {
+    const next = nextTransaksiStatus(trxStatus, "admin");
+    if (!next) return;
+    const patch: Partial<TransaksiRow> = { status: next };
+    if (next === "OPB Terbit" && opbInput.trim()) {
+      patch.opbId = opbInput.trim();
+    }
+    update(row.id, patch);
+    toast(`Status → ${next}`, "success");
+  }
 
   return (
     <div>
@@ -50,7 +68,7 @@ export default function TransaksiDetailPage() {
         desc={`${trx.id} · ${trx.tanggal}${trx.parentId ? ` · Penambahan dari ${trx.parentId}` : ""}`}
         breadcrumb={[
           { label: "Operasional", href: "/operasional" },
-          { label: "Transaksi Warna", href: "/operasional/transaksi" },
+          { label: "Transaksi", href: "/operasional/transaksi" },
           { label: trx.id },
         ]}
         actions={
@@ -98,9 +116,42 @@ export default function TransaksiDetailPage() {
         <ArrowLeft className="h-4 w-4" /> Kembali ke daftar
       </Link>
 
+      {(trxStatus === "Menunggu OPB" || canActorUpdateStatus(trxStatus, "admin")) && (
+        <div className="mb-4 bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-3">
+          <h3 className="text-[13px] font-bold text-amber-900">Admin / Supervisor · OPB & Status</h3>
+          {trxStatus === "Menunggu OPB" && (
+            <div className="flex gap-2 flex-wrap items-end">
+              <label className="flex-1 min-w-[200px]">
+                <span className="text-[11px] font-semibold text-slds-text-weak uppercase">Nomor OPB (input manual)</span>
+                <input
+                  value={opbInput}
+                  onChange={(e) => setOpbInput(e.target.value)}
+                  placeholder="OPB-2026-xxxx"
+                  className="w-full mt-1 px-3 py-2 border border-slds-border rounded-md text-[13px]"
+                />
+              </label>
+            </div>
+          )}
+          {canActorUpdateStatus(trxStatus, "admin") && (
+            <button
+              type="button"
+              data-no-toast
+              onClick={advanceAdminStatus}
+              disabled={trxStatus === "Menunggu OPB" && !opbInput.trim() && !trx.opbId}
+              className="px-4 py-2 bg-brand text-white rounded-md text-[12px] font-semibold disabled:opacity-50"
+            >
+              {trxStatus === "Menunggu OPB" ? "Terbitkan OPB" : trxStatus === "OPB Terbit" ? "Proses Invoice" : "Tandai Selesai"}
+            </button>
+          )}
+          {trx.receiptId && (
+            <p className="text-[11px] text-slds-text-weak">Receipt ID: <span className="font-mono font-bold">{trx.receiptId}</span></p>
+          )}
+        </div>
+      )}
+
       {canTambahBahan && (
         <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between gap-3">
-          <p className="text-[12px] text-blue-800">Transaksi belum di-lock — bisa tambah bahan ke mobil yang sama</p>
+          <p className="text-[12px] text-blue-800">Transaksi belum di-lock · bisa tambah bahan ke mobil yang sama</p>
           <Link
             href={`/app/transaksi/baru?parent=${encodeURIComponent(trx.id)}&mobil=${encodeURIComponent(trx.mobil)}&warna=${encodeURIComponent(trx.warna)}`}
             className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 bg-brand text-white rounded-md text-[12px] font-semibold"
@@ -164,7 +215,7 @@ export default function TransaksiDetailPage() {
           <h3 className="text-[13px] font-bold text-slds-text mb-2">Penambahan Bahan Terkait</h3>
           {penambahan.map((p) => (
             <Link key={p.id} href={`/operasional/transaksi/${p.id}`} className="flex justify-between py-2 border-b border-slds-border last:border-0 text-[13px] hover:text-brand">
-              <span>{p.id} — {p.warna}</span>
+              <span>{p.id} · {p.warna}</span>
               <span className="font-semibold">{formatDurasi(p.durasiMixingMenit)}</span>
             </Link>
           ))}

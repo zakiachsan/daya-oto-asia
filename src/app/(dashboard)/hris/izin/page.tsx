@@ -27,7 +27,7 @@ export default function IzinPage() {
     <div>
       <PageHeader
         title="Izin & Cuti"
-        desc="Approval pengajuan izin/cuti — klik no. pengajuan untuk detail & aksi"
+        desc="Approval pengajuan izin/cuti · klik no. pengajuan untuk detail & aksi"
         breadcrumb={[{ label: "HRIS", href: "/hris" }, { label: "Izin & Cuti" }]}
       />
 
@@ -70,7 +70,7 @@ export default function IzinPage() {
           },
           { key: "nama", label: "Karyawan" },
           { key: "tipe", label: "Tipe" },
-          { key: "mulai", label: "Periode", render: (r) => `${r.mulai} — ${r.selesai}` },
+          { key: "mulai", label: "Periode", render: (r) => `${r.mulai} · ${r.selesai}` },
           { key: "status", label: "Status", render: (r) => <StatusBadge status={String(r.status)} /> },
         ]}
         data={filtered}

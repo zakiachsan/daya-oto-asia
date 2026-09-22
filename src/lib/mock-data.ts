@@ -1,4 +1,6 @@
 import { AXT_PRODUK } from "./axt-products";
+import type { TransaksiDraftWizard } from "./transaksi-draft-utils";
+import type { ProdukKategoriId, TransaksiStatus } from "./transaksi-status-utils";
 
 export const MOCK_USER = {
   name: "Budi Santoso",
@@ -15,21 +17,35 @@ export const MOCK_CABANG = [
 
 export type TransaksiBahan = { kode: string; nama: string; gram: number };
 
+export type TransaksiLayer = {
+  layer: number;
+  label: string;
+  bahan: TransaksiBahan[];
+};
+
 export type TransaksiRow = {
   id: string;
+  /** Sama dengan id · ditampilkan sebagai Receipt ID di nota */
+  receiptId?: string;
   tanggal: string;
   cabang: string;
   warna: string;
   kodeWarna: string;
   kategori: string;
   tinter: string;
-  status: string;
+  status: TransaksiStatus | string;
   total: number;
   mobil: string;
   platNomor: string;
+  /** Kategori pekerjaan selain basecoat (dempul, primer, dll.) */
+  produkKategori?: ProdukKategoriId;
+  /** Multi-layer basecoat (1–3 layer) */
+  layers?: TransaksiLayer[];
+  /** Foto sample plat wajib sebelum cetak nota */
+  fotoSample?: boolean;
   /** Waktu tinter mulai transaksi (tap di app) */
   waktuMulai: string;
-  /** Waktu selesai mixing — dipakai hitung durasi kinerja */
+  /** Waktu selesai mixing · dipakai hitung durasi kinerja */
   waktuSelesaiMixing: string | null;
   durasiMixingMenit: number | null;
   waktuCetakNota: string | null;
@@ -45,6 +61,7 @@ export type TransaksiRow = {
   noVendor?: string;
   mixingVolume?: number;
   recipeId?: string;
+  draftWizard?: TransaksiDraftWizard;
 };
 
 export const MOCK_TRANSAKSI: TransaksiRow[] = [
@@ -57,6 +74,8 @@ export const MOCK_TRANSAKSI: TransaksiRow[] = [
     kategori: "Silver",
     tinter: "Andi Wijaya",
     status: "Selesai",
+    receiptId: "TRX-2026-0142",
+    fotoSample: true,
     total: 210000,
     mobil: "Toyota Avanza 2024",
     platNomor: "L 1234 ABC",
@@ -86,7 +105,9 @@ export const MOCK_TRANSAKSI: TransaksiRow[] = [
     kodeWarna: "3R1",
     kategori: "Red",
     tinter: "Rudi Hartono",
-    status: "Menunggu TTD",
+    status: "Cetak Nota",
+    receiptId: "TRX-2026-0141",
+    fotoSample: true,
     total: 210000,
     mobil: "Honda Brio 2022",
     platNomor: "N 5678 XY",
@@ -115,6 +136,7 @@ export const MOCK_TRANSAKSI: TransaksiRow[] = [
     kategori: "Pearl",
     tinter: "Eko Prasetyo",
     status: "Draft",
+    receiptId: "TRX-2026-0140",
     total: 230000,
     mobil: "Mitsubishi Xpander 2023",
     platNomor: "P 9012 JK",
@@ -141,7 +163,9 @@ export const MOCK_TRANSAKSI: TransaksiRow[] = [
     kodeWarna: "SP9",
     kategori: "Special",
     tinter: "Andi Wijaya",
-    status: "Selesai",
+    status: "Menunggu OPB",
+    receiptId: "TRX-2026-0139",
+    fotoSample: true,
     total: 210000,
     mobil: "Toyota Fortuner 2021",
     platNomor: "L 3456 DEF",
@@ -163,12 +187,12 @@ export const MOCK_TRANSAKSI: TransaksiRow[] = [
 ];
 
 export function formatWaktu(iso: string | null) {
-  if (!iso) return "—";
+  if (!iso) return "-";
   return new Date(iso).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
 }
 
 export function formatDurasi(menit: number | null) {
-  if (menit == null) return "—";
+  if (menit == null) return "-";
   if (menit < 60) return `${menit} menit`;
   const jam = Math.floor(menit / 60);
   const sisa = menit % 60;
@@ -282,9 +306,9 @@ export const MOCK_PRODUK = AXT_PRODUK.map((p) => ({
   status: p.status,
 }));
 
-/** Tarif referensi DOA Cabang Bogor — per liter */
+/** Tarif referensi DOA Cabang Bogor · per liter */
 export const MOCK_KATEGORI_HARGA = [
-  { kategori: "Standard", harga: 190000, satuan: "liter", contoh: "1K Solid — hitam, putih, biru" },
+  { kategori: "Standard", harga: 190000, satuan: "liter", contoh: "1K Solid · hitam, putih, biru" },
   { kategori: "Red", harga: 210000, satuan: "liter", contoh: "Merah solid" },
   { kategori: "Yellow", harga: 210000, satuan: "liter", contoh: "Kuning solid" },
   { kategori: "Special", harga: 210000, satuan: "liter", contoh: "Special effect, hitam special" },
@@ -365,7 +389,7 @@ export const MOCK_FAKTUR_BELI = [
 
 export const MOCK_HUTANG_PIUTANG = [
   { pihak: "Auto 2000 Surabaya", tipe: "Piutang", total: 12500000, jatuhTempo: "2026-09-30", status: "Draft" },
-  { pihak: "Cakrawala Malang", tipe: "Piutang", total: 0, jatuhTempo: "—", status: "Selesai" },
+  { pihak: "Cakrawala Malang", tipe: "Piutang", total: 0, jatuhTempo: "-", status: "Selesai" },
   { pihak: "PT Axalta Indonesia", tipe: "Hutang", total: 8500000, jatuhTempo: "2026-09-20", status: "Posted" },
 ];
 

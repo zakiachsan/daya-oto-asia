@@ -35,7 +35,7 @@ export default function AjuanStokPage() {
     <div>
       <PageHeader
         title="Ajuan Stok"
-        desc="Approval permintaan stok dari tinter — klik no. ajuan untuk detail & aksi"
+        desc="Approval permintaan stok dari tinter · klik no. ajuan untuk detail & aksi"
         breadcrumb={[{ label: "Operasional", href: "/operasional" }, { label: "Ajuan Stok" }]}
       />
 

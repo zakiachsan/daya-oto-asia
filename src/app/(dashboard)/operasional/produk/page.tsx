@@ -42,7 +42,7 @@ export default function ProdukPage() {
     <div>
       <PageHeader
         title="Master Produk"
-        desc="76 produk Axalta (AXT) — import dari List Produk AXT.xlsx. Satuan gram setelah kaleng dibuka."
+        desc="76 produk Axalta (AXT) · import dari List Produk AXT.xlsx. Satuan gram setelah kaleng dibuka."
         breadcrumb={[{ label: "Operasional", href: "/operasional" }, { label: "Master Produk" }]}
         actions={
           <button

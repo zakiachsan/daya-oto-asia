@@ -1,4 +1,4 @@
-/** Auto-generated from List Produk AXT.xlsx — 76 produk Axalta */
+/** Auto-generated from List Produk AXT.xlsx · 76 produk Axalta */
 export type AxtProduk = {
   kode: string;
   nama: string;

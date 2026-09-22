@@ -28,12 +28,12 @@ export default function IzinDetailPage() {
   const canApprove = row.status === "Menunggu TTD" || row.status === "Draft";
 
   function handleApprove() {
-    update(row.id, { status: "Selesai", approver: "HR Admin", catatanApprover: "Disetujui — cuti/izin valid" });
+    update(row.id, { status: "Selesai", approver: "HR Admin", catatanApprover: "Disetujui · cuti/izin valid" });
     toast("Pengajuan izin disetujui", "success");
   }
 
   function handleReject() {
-    update(row.id, { status: "Ditolak", approver: "HR Admin", catatanApprover: "Ditolak — jadwal operasional padat" });
+    update(row.id, { status: "Ditolak", approver: "HR Admin", catatanApprover: "Ditolak · jadwal operasional padat" });
     toast("Pengajuan izin ditolak", "error");
   }
 
@@ -62,7 +62,7 @@ export default function IzinDetailPage() {
           <div className="flex justify-between"><span className="text-slds-text-weak">Karyawan</span><span className="font-semibold">{row.nama}</span></div>
           <div className="flex justify-between"><span className="text-slds-text-weak">Cabang</span><span>{row.cabang}</span></div>
           <div className="flex justify-between"><span className="text-slds-text-weak">Tipe</span><span>{row.tipe}</span></div>
-          <div className="flex justify-between"><span className="text-slds-text-weak">Periode</span><span>{row.mulai} — {row.selesai}</span></div>
+          <div className="flex justify-between"><span className="text-slds-text-weak">Periode</span><span>{row.mulai} · {row.selesai}</span></div>
           <div className="pt-2 border-t border-slds-border">
             <p className="text-[11px] text-slds-text-weak uppercase font-semibold mb-1">Alasan</p>
             <p className="text-[12px]">{row.alasan}</p>
@@ -70,7 +70,7 @@ export default function IzinDetailPage() {
           {row.approver && (
             <div className="pt-2 border-t border-slds-border">
               <p className="text-[11px] text-slds-text-weak uppercase font-semibold mb-1">Approver</p>
-              <p>{row.approver}{row.catatanApprover ? ` — ${row.catatanApprover}` : ""}</p>
+              <p>{row.approver}{row.catatanApprover ? ` · ${row.catatanApprover}` : ""}</p>
             </div>
           )}
           {canApprove && (

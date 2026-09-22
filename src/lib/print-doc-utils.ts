@@ -1,4 +1,4 @@
-/** CSS bersama — meniru formulir cetak DOA Bogor (A4, serif, border hitam) */
+/** CSS bersama · meniru formulir cetak DOA Bogor (A4, serif, border hitam) */
 export const PRINT_DOC_CSS = `
   * { box-sizing: border-box; }
   body { margin: 12mm; font-family: "Times New Roman", Times, Georgia, serif; color: #000; font-size: 10pt; line-height: 1.25; }

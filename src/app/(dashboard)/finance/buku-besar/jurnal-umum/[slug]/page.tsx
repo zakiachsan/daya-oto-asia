@@ -114,8 +114,8 @@ export default function JurnalDetailPage() {
                 <tr key={line.accountKode + line.debit + line.credit} className="border-b border-slds-border last:border-0">
                   <td className="py-2 font-mono font-semibold">{line.accountKode}</td>
                   <td className="py-2">{line.accountNama}</td>
-                  <td className="py-2 text-right">{line.debit > 0 ? formatIDR(line.debit) : "—"}</td>
-                  <td className="py-2 text-right">{line.credit > 0 ? formatIDR(line.credit) : "—"}</td>
+                  <td className="py-2 text-right">{line.debit > 0 ? formatIDR(line.debit) : "-"}</td>
+                  <td className="py-2 text-right">{line.credit > 0 ? formatIDR(line.credit) : "-"}</td>
                 </tr>
               ))}
             </tbody>

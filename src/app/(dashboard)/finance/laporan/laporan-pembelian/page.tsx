@@ -13,7 +13,7 @@ export default function LaporanPembelianPage() {
     <div>
       <PageHeader
         title="Laporan Pembelian"
-        desc="Ringkasan faktur pembelian — UI preview (mock data)"
+        desc="Ringkasan faktur pembelian · UI preview (mock data)"
         breadcrumb={[
           { label: "Finance", href: "/finance" },
           { label: "Laporan Keuangan" },

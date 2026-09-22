@@ -9,7 +9,7 @@ const O = "operasional" as GuideModuleId;
 export const hrisGuideNav: ModuleGuideNav = {
   moduleId: "hris",
   title: "Panduan HRIS",
-  subtitle: "Klik menu di kiri — alur kerja ditampilkan dari atas ke bawah.",
+  subtitle: "Klik menu di kiri · alur kerja ditampilkan dari atas ke bawah.",
   sections: [
     { key: "dashboard", label: "Dashboard", items: [{ id: "dashboard", label: "Dashboard" }] },
     {
@@ -88,7 +88,7 @@ export const hrisGuideNav: ModuleGuideNav = {
         a(H, "Buka Assignment Cabang", "/hris/assignment"),
         a(H, "Pilih Karyawan & Cabang Tujuan"),
         a(H, "Set Periode Penugasan"),
-        a(H, "Simpan — Tinter Aktif di Cabang"),
+        a(H, "Simpan · Tinter Aktif di Cabang"),
         a(M, "Tinter Login App → Transaksi di Cabang Assigned", "/app/transaksi/baru"),
       ],
     ),
@@ -110,7 +110,7 @@ export const hrisGuideNav: ModuleGuideNav = {
       "Lembur (App → HRIS → Slip Gaji)",
       "Lembur",
       "/hris/lembur",
-      "Approval jam lembur — masuk perhitungan payroll periode berjalan.",
+      "Approval jam lembur · masuk perhitungan payroll periode berjalan.",
       [
         a(M, "Ajukan Lembur dari App", "/app/lembur"),
         a(H, "Review Pengajuan Lembur", "/hris/lembur"),
@@ -144,7 +144,7 @@ export const hrisGuideNav: ModuleGuideNav = {
         a(O, "Sumber Data Transaksi", "/operasional/transaksi"),
         a(H, "Buka Kinerja Tinter", "/hris/kinerja"),
         a(H, "Filter Cabang & Periode"),
-        a(H, "Review KPI per Tinter — Durasi, Qty, Efisiensi"),
+        a(H, "Review KPI per Tinter · Durasi, Qty, Efisiensi"),
         a(H, "Drill-down Detail Transaksi"),
       ],
     ),
@@ -153,7 +153,7 @@ export const hrisGuideNav: ModuleGuideNav = {
       "HR Analytics",
       "HR Analytics",
       "/hris/hr-analytics",
-      "Dashboard analitik — turnover, kehadiran, biaya tenaga kerja.",
+      "Dashboard analitik · turnover, kehadiran, biaya tenaga kerja.",
       [
         a(H, "Pilih Metrik & Periode", "/hris/hr-analytics"),
         a(H, "Review Trend & Grafik"),
@@ -165,7 +165,7 @@ export const hrisGuideNav: ModuleGuideNav = {
       "Data Karyawan",
       "Karyawan",
       "/hris/karyawan",
-      "Master data karyawan/tinter — profil, jabatan, cabang.",
+      "Master data karyawan/tinter · profil, jabatan, cabang.",
       [
         a(H, "Kelola Data Karyawan", "/hris/karyawan"),
         a(H, "Assign Cabang", "/hris/assignment"),

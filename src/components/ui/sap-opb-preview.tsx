@@ -42,7 +42,7 @@ function AstraLogo() {
 }
 
 /**
- * Form OPB SAP Astra — ONE TIME MATERIAL per transaksi/PKB.
+ * Form OPB SAP Astra · ONE TIME MATERIAL per transaksi/PKB.
  * Referensi: contoh OPB.pdf (Daihatsu Sales Operation → vendor PT Daya Oto Asia).
  */
 export function SapOpbPreview({ trx, className = "" }: SapOpbPreviewProps) {
@@ -80,11 +80,11 @@ export function SapOpbPreview({ trx, className = "" }: SapOpbPreviewProps) {
       <div className="sap-opb-vendor-block">
         <p className="sap-opb-vendor-label">Vendor / Penyedia Jasa</p>
         <p className="sap-opb-vendor-name">PT. DAYA OTO ASIA</p>
-        <p className="sap-opb-vendor-alamat">Body Repair — Cat Mixing &amp; Pengecatan</p>
+        <p className="sap-opb-vendor-alamat">Body Repair · Cat Mixing &amp; Pengecatan</p>
       </div>
 
       <div className="sap-opb-meta">
-        <UnderlineField label="No. PKB" value={trx.noPkb ?? "—"} />
+        <UnderlineField label="No. PKB" value={trx.noPkb ?? "-"} />
         <UnderlineField label="No. Polisi" value={trx.platNomor} />
         <UnderlineField label="Type Mobil" value={trx.mobil} wide />
         <UnderlineField label="No. SAP" value={sapNo} />

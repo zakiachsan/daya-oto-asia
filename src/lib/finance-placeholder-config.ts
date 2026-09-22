@@ -7,18 +7,18 @@ export type FinancePlaceholderDef = {
   mirrorLabel?: string;
 };
 
-/** Placeholder pages — key = path under /finance/ (no leading slash) */
+/** Placeholder pages · key = path under /finance/ (no leading slash) */
 export const FINANCE_PLACEHOLDERS: Record<string, FinancePlaceholderDef> = {
   "buku-besar/pencatatan-beban": {
     title: "Pencatatan Beban",
     section: "Buku Besar",
-    desc: "Catat beban operasional — auto jurnal Dr Beban / Cr Hutang.",
+    desc: "Catat beban operasional · auto jurnal Dr Beban / Cr Hutang.",
     features: ["Form beban multi-akun", "Status accrual vs lunas", "Link ke pembayaran kas/bank"],
   },
   "buku-besar/anggaran": {
     title: "Anggaran",
     section: "Buku Besar",
-    desc: "Anggaran per akun per periode — bandingkan realisasi vs budget.",
+    desc: "Anggaran per akun per periode · bandingkan realisasi vs budget.",
   },
   "buku-besar/histori-akun": {
     title: "Histori Akun",
@@ -34,7 +34,7 @@ export const FINANCE_PLACEHOLDERS: Record<string, FinancePlaceholderDef> = {
   "kas-bank/transfer-bank": {
     title: "Transfer Bank",
     section: "Kas & Bank",
-    desc: "Transfer antar rekening kas/bank — auto jurnal.",
+    desc: "Transfer antar rekening kas/bank · auto jurnal.",
   },
   "kas-bank/rekening-koran": {
     title: "Rekening Koran",
@@ -54,7 +54,7 @@ export const FINANCE_PLACEHOLDERS: Record<string, FinancePlaceholderDef> = {
   "penjualan/penerimaan-penjualan": {
     title: "Penerimaan Penjualan",
     section: "Penjualan",
-    desc: "Pelunasan piutang bengkel — Dr Kas / Cr Piutang.",
+    desc: "Pelunasan piutang bengkel · Dr Kas / Cr Piutang.",
     features: ["Pilih faktur penjualan", "Partial/full payment", "Auto jurnal & update AR"],
   },
   "penjualan/uang-muka-penjualan": {
@@ -70,14 +70,14 @@ export const FINANCE_PLACEHOLDERS: Record<string, FinancePlaceholderDef> = {
   "penjualan/pelanggan": {
     title: "Pelanggan",
     section: "Penjualan",
-    desc: "Master bengkel mitra — mirror dari Operasional.",
+    desc: "Master bengkel mitra · mirror dari Operasional.",
     mirrorHref: "/operasional/cabang",
     mirrorLabel: "Master Cabang (Operasional)",
   },
   "persediaan/penerimaan-barang": {
     title: "Penerimaan Barang",
     section: "Persediaan",
-    desc: "GR toner/cat — mirror dari PO Operasional.",
+    desc: "GR toner/cat · mirror dari PO Operasional.",
     mirrorHref: "/operasional/po",
     mirrorLabel: "PO & Penerimaan (Operasional)",
   },
@@ -103,7 +103,7 @@ export const FINANCE_PLACEHOLDERS: Record<string, FinancePlaceholderDef> = {
   "pembelian/pesanan-pembelian": {
     title: "Pesanan Pembelian",
     section: "Pembelian",
-    desc: "Monitor PO ke pabrik — mirror Operasional.",
+    desc: "Monitor PO ke pabrik · mirror Operasional.",
     mirrorHref: "/operasional/po",
     mirrorLabel: "PO & Penerimaan (Operasional)",
   },
@@ -115,7 +115,7 @@ export const FINANCE_PLACEHOLDERS: Record<string, FinancePlaceholderDef> = {
   "pembelian/pembayaran-pembelian": {
     title: "Pembayaran Pembelian",
     section: "Pembelian",
-    desc: "Pelunasan hutang vendor — Dr Hutang / Cr Kas.",
+    desc: "Pelunasan hutang vendor · Dr Hutang / Cr Kas.",
     features: ["DP → GR → Faktur → Pelunasan", "Link faktur pembelian"],
   },
   "pembelian/penerimaan-barang": {
@@ -163,7 +163,7 @@ export const FINANCE_PLACEHOLDERS: Record<string, FinancePlaceholderDef> = {
   "perusahaan/syarat-pembayaran": {
     title: "Syarat Pembayaran",
     section: "Perusahaan",
-    desc: "Net 30, COD, dll — master syarat bayar.",
+    desc: "Net 30, COD, dll · master syarat bayar.",
   },
   "perusahaan/proses-akhir-bulan": {
     title: "Proses Akhir Bulan",
@@ -180,7 +180,7 @@ export const FINANCE_PLACEHOLDERS: Record<string, FinancePlaceholderDef> = {
   "perusahaan/karyawan": {
     title: "Karyawan",
     section: "Perusahaan",
-    desc: "Master karyawan — mirror HRIS.",
+    desc: "Master karyawan · mirror HRIS.",
     mirrorHref: "/hris/karyawan",
     mirrorLabel: "Karyawan (HRIS)",
   },
