@@ -124,7 +124,7 @@ export default function OPBPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
         {[
           { label: "Draft", count: counts.draft, color: "border-slds-border bg-slds-bg" },
-          { label: "Menunggu TTD", count: counts.menunggu, color: "border-amber-200 bg-amber-50" },
+          { label: "Proses Invoice", count: counts.menunggu, color: "border-amber-200 bg-amber-50" },
           { label: "Rekonsiliasi", count: counts.rekonsiliasi, color: "border-blue-200 bg-blue-50" },
           { label: "Ditagihkan", count: counts.ditagihkan, color: "border-green-200 bg-green-50" },
         ].map((s) => (
@@ -180,7 +180,6 @@ export default function OPBPage() {
           { key: "cabang", label: "Cabang" },
           { key: "periode", label: "Periode" },
           { key: "total", label: "Total", render: (r) => formatIDR(Number(r.total)) },
-          { key: "status", label: "Status", render: (r) => <StatusBadge status={String(r.status)} /> },
           {
             key: "finance",
             label: "Finance",

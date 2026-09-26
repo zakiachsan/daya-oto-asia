@@ -1,20 +1,32 @@
 "use client";
 
 import type { TransaksiRow } from "@/lib/mock-data";
-import { printElementById } from "@/lib/print-doc-utils";
+import { resolveReceiptIdDisplay } from "@/lib/recipe-id-utils";
 
 type LabelCatPreviewProps = {
-  trx: Pick<TransaksiRow, "tanggal" | "mobil" | "kodeWarna" | "warna" | "tinter" | "receiptId" | "id">;
+  trx: Pick<
+    TransaksiRow,
+    "tanggal" | "mobil" | "kodeWarna" | "warna" | "tinter" | "receiptId" | "id" | "waktuCetakLabel" | "waktuCetakNota"
+  >;
   className?: string;
 };
 
 export function LabelCatPreview({ trx, className = "" }: LabelCatPreviewProps) {
-  const tanggal = new Date(trx.tanggal).toLocaleDateString("id-ID", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-  const receipt = trx.receiptId ?? trx.id;
+  const stamp = trx.waktuCetakLabel ?? trx.waktuCetakNota;
+  const tanggal = stamp
+    ? new Date(stamp).toLocaleString("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : new Date(trx.tanggal).toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+  const receipt = resolveReceiptIdDisplay(trx);
 
   return (
     <div
@@ -32,8 +44,4 @@ export function LabelCatPreview({ trx, className = "" }: LabelCatPreviewProps) {
       <p className="text-[9px] font-mono text-gray-400 mt-1">{receipt}</p>
     </div>
   );
-}
-
-export function printLabelCatPreview() {
-  printElementById("label-cat-print", "Label Cat · Daya Oto Asia");
 }

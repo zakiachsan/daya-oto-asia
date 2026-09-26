@@ -43,13 +43,13 @@ function ModuleMenuLinks({
           </p>
         </div>
       )}
-      {mod.menus.map((menu: ModuleMenu) => {
+      {mod.menus.map((menu: ModuleMenu, menuIndex) => {
         const active = isActive(menu.href);
         const showSection = menu.section && menu.section !== lastSection;
         if (menu.section) lastSection = menu.section;
 
         return (
-          <div key={menu.href}>
+          <div key={`${menu.href}::${menu.label}::${menuIndex}`}>
             {showSection && (
               <MenuSectionHeader label={menu.section!} />
             )}

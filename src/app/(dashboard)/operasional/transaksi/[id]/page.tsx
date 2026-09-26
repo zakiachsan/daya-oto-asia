@@ -6,9 +6,9 @@ import { ArrowLeft, Clock, Car, Paintbrush, Printer, PenLine, FileText, Plus } f
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatIDR, formatWaktu, formatDurasi, type TransaksiRow } from "@/lib/mock-data";
-import { NotaPreview, printNotaPreview } from "@/components/ui/nota-preview";
 import { NotaPenjualanPreview, printNotaPenjualanPreview } from "@/components/ui/nota-penjualan-preview";
-import { SapOpbPreview, printSapOpbPreview } from "@/components/ui/sap-opb-preview";
+import { LaporanPemakaianPreview } from "@/components/ui/laporan-pemakaian-preview";
+import { buildLaporanPemakaian } from "@/lib/laporan-pemakaian";
 import { useNotaPrint, useTransaksiList } from "@/lib/preview-store";
 import { CetakNotaAudit } from "@/components/ui/cetak-nota-audit";
 import { useToast } from "@/components/ui/toast";
@@ -37,14 +37,14 @@ export default function TransaksiDetailPage() {
 
   const row = trx;
   const totalGram = row.bahan.reduce((s, b) => s + b.gram, 0);
-  const canTambahBahan = trxStatus === "Draft" || trxStatus === "Cetak Nota";
+  const canTambahBahan = trxStatus === "Draft" || trxStatus === "Menunggu TTD";
 
   const timeline = [
     { label: "Mulai Transaksi", waktu: trx.waktuMulai, icon: Paintbrush, done: true },
     { label: "Selesai Mixing", waktu: trx.waktuSelesaiMixing, icon: Clock, done: !!trx.waktuSelesaiMixing },
     { label: "Cetak Nota", waktu: trx.waktuCetakNota, icon: Printer, done: !!trx.waktuCetakNota },
-    { label: "TTD GH", waktu: trx.waktuTTD, icon: PenLine, done: !!trx.waktuTTD },
-    { label: "Menunggu OPB", waktu: trxStatus !== "Draft" && trxStatus !== "Cetak Nota" && trxStatus !== "TTD GH" ? trx.waktuTTD : null, icon: FileText, done: ["Menunggu OPB", "OPB Terbit", "Proses Invoice", "Selesai"].includes(trxStatus) },
+    { label: "Menunggu TTD", waktu: trx.waktuCetakNota, icon: PenLine, done: trxStatus !== "Draft" && !!trx.waktuCetakNota },
+    { label: "Menunggu OPB", waktu: trx.waktuTTD, icon: FileText, done: ["Menunggu OPB", "OPB Terbit", "Proses Invoice", "Selesai"].includes(trxStatus) },
     { label: "OPB Terbit", waktu: trx.opbId ? trx.waktuCetakNota : null, icon: FileText, done: ["OPB Terbit", "Proses Invoice", "Selesai"].includes(trxStatus) },
   ];
 
@@ -77,35 +77,12 @@ export default function TransaksiDetailPage() {
               type="button"
               data-no-toast
               onClick={() => {
-                printSapOpbPreview();
-                toast("OPB SAP dicetak", "success");
-              }}
-              className="inline-flex items-center gap-1.5 px-3 py-2 border border-slds-border rounded-md text-[12px] font-semibold hover:bg-slds-bg"
-            >
-              <FileText className="h-3.5 w-3.5" /> Cetak OPB SAP
-            </button>
-            <button
-              type="button"
-              data-no-toast
-              onClick={() => {
                 printNotaPenjualanPreview();
                 toast("Nota penjualan dicetak", "success");
               }}
               className="inline-flex items-center gap-1.5 px-3 py-2 border border-slds-border rounded-md text-[12px] font-semibold hover:bg-slds-bg"
             >
               <FileText className="h-3.5 w-3.5" /> Cetak Nota Penjualan
-            </button>
-            <button
-              type="button"
-              data-no-toast
-              onClick={() => {
-                const isReprint = recordPrint(trx.id, trx.tinter, trx.cabang, "Admin HO");
-                printNotaPreview();
-                toast(isReprint ? "Cetak ulang tercatat di audit log" : "Nota pemakaian dicetak", isReprint ? "error" : "success");
-              }}
-              className="inline-flex items-center gap-1.5 px-3 py-2 border border-slds-border rounded-md text-[12px] font-semibold hover:bg-slds-bg"
-            >
-              <Printer className="h-3.5 w-3.5" /> Cetak Nota Pemakaian
             </button>
             <StatusBadge status={trx.status} />
           </div>
@@ -223,18 +200,22 @@ export default function TransaksiDetailPage() {
       )}
 
       <div className="mb-4 overflow-x-auto">
-        <h3 className="text-[13px] font-bold text-slds-text mb-2">Preview OPB SAP (One Time Material)</h3>
-        <SapOpbPreview trx={trx} />
-      </div>
-
-      <div className="mb-4 overflow-x-auto">
         <h3 className="text-[13px] font-bold text-slds-text mb-2">Preview Nota Penjualan</h3>
         <NotaPenjualanPreview trx={trx} />
       </div>
 
       <div className="mb-4 overflow-x-auto">
-        <h3 className="text-[13px] font-bold text-slds-text mb-2">Preview Nota Pemakaian (DOA Cabang Bogor)</h3>
-        <NotaPreview trx={trx} />
+        <h3 className="text-[13px] font-bold text-slds-text mb-2">Nota Pemakaian (layout laporan · per detail proyek)</h3>
+        <LaporanPemakaianPreview
+          bengkel={trx.cabang}
+          tinter={trx.tinter}
+          bulan={trx.tanggal.slice(0, 7)}
+          rows={buildLaporanPemakaian([trx], {
+            bulan: trx.tanggal.slice(0, 7),
+            cabang: "Semua Cabang",
+            tinter: "Semua Tinter",
+          })}
+        />
       </div>
 
       <div className="mb-4 bg-white border border-slds-border rounded-lg p-4 max-w-xl">

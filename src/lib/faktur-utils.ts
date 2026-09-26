@@ -9,6 +9,8 @@ export type FakturJualRow = {
   status: "Draft" | "Posted";
   opbId?: string;
   jurnalId?: string;
+  /** Format cetak (#57): Faktur Penjualan vs Rekap Invoice */
+  jenis?: string;
 };
 
 export function findOpbForFaktur(faktur: FakturJualRow, opbList: OpbRow[]): OpbRow | undefined {

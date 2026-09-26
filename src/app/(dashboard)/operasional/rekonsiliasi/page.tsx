@@ -1,19 +1,21 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AlertTriangle, CheckCircle2, FileText } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/ui/stat-card";
 import { DataTable } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { FilterBar } from "@/components/ui/filter-bar";
-import { MOCK_REKONSILIASI, type OpbRow } from "@/lib/mock-data";
+import type { OpbRow } from "@/lib/mock-data";
 import { useToast } from "@/components/ui/toast";
-import { useOpbList } from "@/lib/preview-store";
-
+import { useOpbList, useTransaksiList } from "@/lib/preview-store";
+import { buildRekonsiliasiFromData } from "@/lib/rekonsiliasi-utils";
 export default function RekonsiliasiPage() {
   const { toast } = useToast();
   const { items: opbList, setSap } = useOpbList();
+  const { all: transaksi } = useTransaksiList();
+  const rekonsiliasiRows = useMemo(() => buildRekonsiliasiFromData(transaksi, opbList), [transaksi, opbList]);
   const [tab, setTab] = useState<"ringkasan" | "detail" | "leakage">("ringkasan");
   const [sapDraft, setSapDraft] = useState<Record<string, string>>({});
 
@@ -74,20 +76,20 @@ export default function RekonsiliasiPage() {
             columns={[
               { key: "cabang", label: "Cabang" },
               { key: "opb", label: "OPB", render: (r) => `${r.opb} trx` },
-              { key: "notaCetak", label: "Nota Cetak", render: (r) => `${r.notaCetak} trx` },
-              { key: "stokPakai", label: "Stok Terpakai", render: (r) => `${r.stokPakai} trx` },
+              { key: "notaCetak", label: "Nota Tercetak", render: (r) => `${r.notaCetak} trx` },
+              { key: "opb", label: "OPB Keluar", render: (r) => `${r.opb} trx` },
               {
                 key: "selisih",
-                label: "Selisih",
+                label: "Selisih (Point B)",
                 render: (r) => (
                   <span className={Number(r.selisih) > 0 ? "text-red-600 font-bold" : "text-green-600"}>
-                    {Number(r.selisih) > 0 ? `+${r.selisih}` : r.selisih}
+                    {Number(r.selisih) > 0 ? `+${r.selisih} nota vs OPB` : "Match"}
                   </span>
                 ),
               },
               { key: "status", label: "Status", render: (r) => <StatusBadge status={String(r.status)} /> },
             ]}
-            data={MOCK_REKONSILIASI}
+            data={rekonsiliasiRows}
           />
         </>
       )}
@@ -137,7 +139,7 @@ export default function RekonsiliasiPage() {
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <p className="text-[13px] font-bold text-red-800">Stok habis tapi OPB tidak terbentuk</p>
             <p className="text-[12px] text-red-700 mt-1">
-              Prima Jember · 3 transaksi stok terpakai (TRX-0135, 0136, 0137) belum masuk OPB Agustus.
+              Prima Jember · 3 transaksi stok terpakai (DOA-0135, 0136, 0137) belum masuk OPB Agustus.
               Kemungkinan: admin cabang belum forward ke HO.
             </p>
             <button

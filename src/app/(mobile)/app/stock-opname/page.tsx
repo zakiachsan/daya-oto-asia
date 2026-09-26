@@ -19,7 +19,7 @@ export default function AppStockOpnamePage() {
   const { toast } = useToast();
   const { rows } = useInventoriStok();
   const { addMany } = useStockOpname();
-  const { ready, drafts, draftCount, saveItem, removeItem, clearSession } = useStockOpnameDraft(
+  const { ready, drafts, draftCount, saveItem, clearSession } = useStockOpnameDraft(
     OPNAME_CABANG,
     MOBILE_USER,
   );
@@ -48,16 +48,26 @@ export default function AppStockOpnamePage() {
     return { kaleng, gram };
   }
 
-  function handleSaveItem(itemId: string) {
-    const item = items.find((i) => i.id === itemId);
-    if (!item) return;
-    const { kaleng, gram } = getInputValues(itemId, item.kalengUtuh, item.gramTerbuka);
-    if (Number.isNaN(kaleng) || Number.isNaN(gram) || kaleng < 0 || gram < 0) {
-      toast("Isi kaleng dan gram fisik dengan angka valid", "error");
+  function handleSaveAllDraft() {
+    let saved = 0;
+    for (const item of items) {
+      const kRaw = fisik[`${item.id}-k`];
+      const gRaw = fisik[`${item.id}-g`];
+      const touched = (kRaw !== undefined && kRaw !== "") || (gRaw !== undefined && gRaw !== "");
+      if (!touched && !drafts[item.id]) continue;
+      const { kaleng, gram } = getInputValues(item.id, item.kalengUtuh, item.gramTerbuka);
+      if (Number.isNaN(kaleng) || Number.isNaN(gram) || kaleng < 0 || gram < 0) {
+        toast(`${item.produk}: isi kaleng/gram valid`, "error");
+        return;
+      }
+      saveItem(item, kaleng, gram);
+      saved++;
+    }
+    if (saved === 0) {
+      toast("Isi minimal satu produk sebelum simpan", "error");
       return;
     }
-    saveItem(item, kaleng, gram);
-    toast(`${item.produk} tersimpan · lanjut produk lain atau kirim batch`, "success");
+    toast(`${saved} produk tersimpan (draft)`, "success");
   }
 
   function handleSubmitBatch() {
@@ -93,7 +103,7 @@ export default function AppStockOpnamePage() {
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
         <p className="text-[12px] font-bold text-blue-800">Stock Opname Mingguan</p>
         <p className="text-[11px] text-blue-700 mt-0.5">
-          Simpan per produk (draft) · tidak harus sekaligus. Kirim batch ke supervisor setelah selesai.
+          Isi timbang lalu tap Simpan (sticky) · draft tersimpan otomatis. Kirim batch ke supervisor setelah selesai.
         </p>
       </div>
 
@@ -201,35 +211,6 @@ export default function AppStockOpnamePage() {
                   </div>
                 </div>
 
-                <div className="flex gap-2 mt-3">
-                  <button
-                    type="button"
-                    data-no-toast
-                    onClick={() => handleSaveItem(item.id)}
-                    className="flex-1 py-2.5 border border-brand text-brand bg-white rounded-xl font-semibold text-[13px] flex items-center justify-center gap-1.5"
-                  >
-                    <Save className="h-4 w-4" /> Simpan
-                  </button>
-                  {saved && (
-                    <button
-                      type="button"
-                      data-no-toast
-                      onClick={() => {
-                        removeItem(item.id);
-                        setFisik((p) => {
-                          const next = { ...p };
-                          delete next[`${item.id}-k`];
-                          delete next[`${item.id}-g`];
-                          return next;
-                        });
-                        toast("Draft dihapus", "info");
-                      }}
-                      className="px-3 py-2.5 border border-slds-border text-slds-text-weak rounded-xl text-[12px] font-semibold"
-                    >
-                      Hapus
-                    </button>
-                  )}
-                </div>
               </div>
             );
           })}
@@ -247,6 +228,14 @@ export default function AppStockOpnamePage() {
           <button
             type="button"
             data-no-toast
+            onClick={handleSaveAllDraft}
+            className="w-full py-3 border-2 border-brand text-brand bg-white rounded-xl font-bold text-[14px] flex items-center justify-center gap-2"
+          >
+            <Save className="h-4 w-4" /> Simpan
+          </button>
+          <button
+            type="button"
+            data-no-toast
             onClick={handleSubmitBatch}
             disabled={draftCount === 0}
             className="w-full py-3 bg-brand text-white rounded-xl font-bold text-[14px] flex items-center justify-center gap-2 disabled:opacity-50"
@@ -254,7 +243,7 @@ export default function AppStockOpnamePage() {
             <Send className="h-4 w-4" /> Kirim ke Supervisor ({draftCount})
           </button>
           <p className="text-[10px] text-slds-text-weak text-center">
-            Hanya produk yang sudah disimpan yang dikirim · sisanya bisa dilanjut nanti
+            Simpan draft dulu · kirim hanya produk yang sudah tersimpan
           </p>
         </div>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Package, AlertTriangle, Search } from "lucide-react";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -9,7 +10,10 @@ import { matchesOpnameSearch } from "@/lib/stock-opname-mobile-utils";
 import { useInventoriStok } from "@/lib/preview-store";
 import { MOBILE_CABANG } from "@/lib/mobile-app-utils";
 
-export default function AppStokPage() {
+function StokContent() {
+  const params = useSearchParams();
+  const highlight = params.get("highlight");
+  const gramAdded = params.get("gram");
   const { rows } = useInventoriStok();
   const cabang = "Surabaya";
   const [search, setSearch] = useState("");
@@ -25,6 +29,12 @@ export default function AppStokPage() {
       <Link href="/app" className="inline-flex items-center gap-1 text-[13px] text-brand font-semibold">
         <ArrowLeft className="h-4 w-4" /> Beranda
       </Link>
+
+      {highlight && gramAdded && (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-[12px] text-green-900">
+          Buka kaleng <span className="font-mono font-bold">{highlight}</span> · gram +{gramAdded} · kaleng utuh −1
+        </div>
+      )}
 
       <div className="bg-white rounded-xl p-4 border border-slds-border">
         <div className="flex items-start gap-3">
@@ -84,14 +94,17 @@ export default function AppStokPage() {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        <Link href="/app/buka-kaleng" className="py-3 text-center border border-brand text-brand rounded-xl font-semibold text-[13px] bg-white">
-          Buka Kaleng
-        </Link>
-        <Link href="/app/ajukan-stok" className="py-3 text-center bg-brand text-white rounded-xl font-semibold text-[13px]">
-          Ajukan Stok
-        </Link>
-      </div>
+      <Link href="/app/buka-kaleng" className="block py-3 text-center border border-brand text-brand rounded-xl font-semibold text-[13px] bg-white">
+        Buka Kaleng
+      </Link>
     </div>
+  );
+}
+
+export default function AppStokPage() {
+  return (
+    <Suspense fallback={<div className="p-4 text-[13px] text-slds-text-weak">Memuat stok…</div>}>
+      <StokContent />
+    </Suspense>
   );
 }

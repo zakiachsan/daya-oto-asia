@@ -97,6 +97,7 @@ export default function TransaksiPage() {
           },
           { key: "tanggal", label: "Tanggal" },
           { key: "cabang", label: "Cabang", className: "max-w-[140px]" },
+          { key: "platNomor", label: "Plat" },
           { key: "warna", label: "Warna" },
           { key: "status", label: "Status", render: (r) => <StatusBadge status={String(r.status)} /> },
         ]}

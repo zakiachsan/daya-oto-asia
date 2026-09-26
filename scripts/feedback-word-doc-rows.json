@@ -1,0 +1,322 @@
+[
+  {
+    "no": 21,
+    "link": "Aplikasi · Transaksi · Foto & Nota",
+    "feedback": "User dapat menambahkan bahan lain (button tambah bahan), kembali ke step 1 dengan data tersimpan, lalu lanjut di halaman foto & nota.",
+    "harapan": "",
+    "keterangan": "Doc Aplikasi #1",
+    "detail": ""
+  },
+  {
+    "no": 22,
+    "link": "Aplikasi · Transaksi",
+    "feedback": "Format Recipe ID: RCP-DOA-CABANG X-TGL-NO PEKERJAAN.",
+    "harapan": "",
+    "keterangan": "Doc Aplikasi #2",
+    "detail": ""
+  },
+  {
+    "no": 23,
+    "link": "Aplikasi · Transaksi · Mobil & Produk",
+    "feedback": "Saat pilih kategori basecoat/cat, langsung muncul list warna di kode warna. Untuk clear coat, kode warna hanya HS (360) dan MS (280).",
+    "harapan": "Referensi rasio Clear Coat dan Hardener based on AXT Mixing ratio (minta ke Pak Ricky foto rasio).",
+    "keterangan": "Doc Aplikasi #3",
+    "detail": ""
+  },
+  {
+    "no": 24,
+    "link": "Aplikasi · Transaksi · Mobil & Produk",
+    "feedback": "Tambahkan kategori Clear Coat; di list produk muncul HS (360) dan MS (280).",
+    "harapan": "",
+    "keterangan": "Doc Aplikasi #4",
+    "detail": ""
+  },
+  {
+    "no": 25,
+    "link": "Aplikasi · Transaksi · Step 1",
+    "feedback": "Kategori produk disamakan dengan semua kategori di nota referensi. Di field kode warna, tampilkan sub bahan berdasarkan nama bahan yang dipilih.",
+    "harapan": "",
+    "keterangan": "Doc Aplikasi #5",
+    "detail": ""
+  },
+  {
+    "no": 26,
+    "link": "Aplikasi · Transaksi · Step 1",
+    "feedback": "Referensi rumus komposisi gramasi untuk Clear Coat, Surfacer, dan Primer.",
+    "harapan": "Minta referensi ke Pak Ricky.",
+    "keterangan": "Doc Aplikasi #6",
+    "detail": ""
+  },
+  {
+    "no": 27,
+    "link": "Aplikasi · Transaksi · Step 1",
+    "feedback": "Untuk Thinner, kode warna diisi dengan PU (tidak perlu 5L dan 20L).",
+    "harapan": "",
+    "keterangan": "Doc Aplikasi #7",
+    "detail": ""
+  },
+  {
+    "no": 28,
+    "link": "Aplikasi · Transaksi · Step 3",
+    "feedback": "Print Label Cart perlu tanggal dan jam; button print label cart juga harus bisa print beneran.",
+    "harapan": "",
+    "keterangan": "Doc Aplikasi #8",
+    "detail": ""
+  },
+  {
+    "no": 29,
+    "link": "Aplikasi · Transaksi · Step 2",
+    "feedback": "Bisa tambah toner manual; user input sendiri gramasi dan toner code.",
+    "harapan": "",
+    "keterangan": "Doc Aplikasi #9",
+    "detail": ""
+  },
+  {
+    "no": 30,
+    "link": "Aplikasi · Transaksi · Layer",
+    "feedback": "Hilangkan deskripsi pada layer 1 dan 2.",
+    "harapan": "",
+    "keterangan": "Doc Aplikasi #10",
+    "detail": ""
+  },
+  {
+    "no": 31,
+    "link": "Aplikasi · Operasional (mixing ratio)",
+    "feedback": "Untuk Clear Coat, Surfacer, Primer: di Operasional ada mixing ratio; saat user pilih gramasi di aplikasi, mixing ratio otomatis terisi.",
+    "harapan": "KECUALI base coat: tidak pakai rasio; user tambah gramasi manual untuk base coat yang dipilih.",
+    "keterangan": "Doc Aplikasi #11",
+    "detail": ""
+  },
+  {
+    "no": 32,
+    "link": "Aplikasi · Transaksi · Status",
+    "feedback": "Setelah cetak nota, status menjadi Menunggu TTD. Setelah ditandatangani, status menjadi Menunggu OPB.",
+    "harapan": "",
+    "keterangan": "Doc Aplikasi #12",
+    "detail": ""
+  },
+  {
+    "no": 33,
+    "link": "Aplikasi · Cetak nota",
+    "feedback": "Template nota: row Primer/Surfacer, label 2C ganti EP 2K. Thinner isinya PU saja. Lain-lain tergantung pilihan user (Degreaser, PP Primer, atau input manual).",
+    "harapan": "Jika user pilih lain-lain, di step 2 mixing user tambah toner manual (nama hingga gramasi).",
+    "keterangan": "Doc Aplikasi #13",
+    "detail": ""
+  },
+  {
+    "no": 34,
+    "link": "Aplikasi · Transaksi · Step 1 · Lain-lain",
+    "feedback": "Untuk lain-lain, user bisa input manual: Nama Sub Kategori, Kode Warna, Harga.",
+    "harapan": "Kode warna dan harga otomatis tersimpan di DB setelah user tambahkan.",
+    "keterangan": "Doc Aplikasi #14",
+    "detail": ""
+  },
+  {
+    "no": 35,
+    "link": "Aplikasi · Transaksi",
+    "feedback": "Receipt ID pakai format DOA, contoh: DOA-2826-2813.",
+    "harapan": "",
+    "keterangan": "Doc Aplikasi #15",
+    "detail": ""
+  },
+  {
+    "no": 36,
+    "link": "Aplikasi · List Transaksi",
+    "feedback": "Untuk status Menunggu TTD, ada button di list \"Sudah Tanda Tangan\" agar petugas verifikasi tanpa buka detail.",
+    "harapan": "",
+    "keterangan": "Doc Aplikasi #16",
+    "detail": ""
+  },
+  {
+    "no": 37,
+    "link": "Aplikasi · Beranda",
+    "feedback": "Menu buka kaleng di take out.",
+    "harapan": "",
+    "keterangan": "Doc Aplikasi #17",
+    "detail": ""
+  },
+  {
+    "no": 38,
+    "link": "Aplikasi · Stok cabang",
+    "feedback": "Take out button Ajukan Stok.",
+    "harapan": "",
+    "keterangan": "Doc Aplikasi #18",
+    "detail": ""
+  },
+  {
+    "no": 39,
+    "link": "Aplikasi · Beranda · Ajukan stok",
+    "feedback": "Setelah user buka kaleng, kembali ke halaman sebelumnya (list kaleng cat) dengan info cat bertambah 1 kaleng dan gram bertambah (xx).",
+    "harapan": "",
+    "keterangan": "Doc Aplikasi #19",
+    "detail": ""
+  },
+  {
+    "no": 40,
+    "link": "Aplikasi · Beranda",
+    "feedback": "Tambah fitur notifikasi dari admin (posisi seperti section reminder stock, di section selamat pagi).",
+    "harapan": "Rotasi reminder ganti setiap 10 detik; ada halaman list notifikasi; user bisa mark read agar tidak muncul lagi di beranda.",
+    "keterangan": "Doc Aplikasi #20",
+    "detail": ""
+  },
+  {
+    "no": 41,
+    "link": "Aplikasi · Beranda",
+    "feedback": "Entry point Klaim warna di take out.",
+    "harapan": "",
+    "keterangan": "Doc Aplikasi #21",
+    "detail": ""
+  },
+  {
+    "no": 42,
+    "link": "Aplikasi · Transaksi",
+    "feedback": "Fitur Tukar-Tambah Nota: pilih 1 nota dibatalkan + 1 nota sedang berjalan; nota dibatalkan digabung ke nota berjalan.",
+    "harapan": "Nota dibatalkan tidak mengurangi stok yang sudah keluar (stok tetap terjual); saat digabung tidak mengurangi stok inventory lagi.",
+    "keterangan": "Doc Aplikasi #22",
+    "detail": ""
+  },
+  {
+    "no": 43,
+    "link": "Aplikasi · Terima barang",
+    "feedback": "Fitur ceklis terima barang dari distribusi (contoh DIST-2026-018): pilih ID & tanggal pengiriman, list barang, inbound + ceklis, stok masuk inventory cabang.",
+    "harapan": "Jika kaleng bocor/kurang, petugas timbang ulang; selisih gram tercatat di detail Terima Barang (petugas) dan detail Distribusi (admin).",
+    "keterangan": "Doc Aplikasi #23",
+    "detail": "Ref: /operasional/distribusi/DIST-2026-018"
+  },
+  {
+    "no": 44,
+    "link": "Aplikasi · Stock opname",
+    "feedback": "Stock opname: jangan simpan per item; cukup 1 button simpan sticky. Di ops, tampil per ID stock opname (bukan per item).",
+    "harapan": "Support draft agar data tidak hilang jika app/HP tertutup tiba-tiba.",
+    "keterangan": "Doc Aplikasi #24",
+    "detail": ""
+  },
+  {
+    "no": 45,
+    "link": "Website Operasional",
+    "feedback": "Minimum stock per cabang (tiap cabang beda). Jika stok habis, admin & petugas dapat notifikasi di app beranda (section selamat pagi); nama user pindah ke header.",
+    "harapan": "Stok yang diatur admin = item yang tersedia per cabang (utamanya base coat bisa beda per cabang).",
+    "keterangan": "Doc Operasional #1",
+    "detail": ""
+  },
+  {
+    "no": 46,
+    "link": "Website Operasional · /operasional/transaksi",
+    "feedback": "Tambah kolom dan filter plat nomor.",
+    "harapan": "",
+    "keterangan": "Doc Operasional #2",
+    "detail": ""
+  },
+  {
+    "no": 47,
+    "link": "Website Operasional · /operasional/transaksi/TRX-2026-0139",
+    "feedback": "Preview OPB SAP di take out. Format gambar Nota Pemakaian pakai layout /operasional/laporan-pemakaian (informasi per detail project; laporan-pemakaian tetap per bulan).",
+    "harapan": "",
+    "keterangan": "Doc Operasional #3",
+    "detail": ""
+  },
+  {
+    "no": 48,
+    "link": "Website Operasional · /operasional/opb",
+    "feedback": "Status Menunggu TTD diubah teks menjadi \"Proses Invoice\". Kolom Status dihapus.",
+    "harapan": "",
+    "keterangan": "Doc Operasional #4",
+    "detail": ""
+  },
+  {
+    "no": 49,
+    "link": "Website Operasional · Transaksi · OPB",
+    "feedback": "Status Menunggu OPB: saat input OPB tambahkan tanggal OPB (based on tanggal yang diinput).",
+    "harapan": "",
+    "keterangan": "Doc Operasional #5",
+    "detail": ""
+  },
+  {
+    "no": 50,
+    "link": "Website Operasional · /operasional/rekonsiliasi",
+    "feedback": "Kolom stok terpakai di take out. Halaman membandingkan nota tercetak vs OPB keluar; kolom selisih hitung point B.",
+    "harapan": "",
+    "keterangan": "Doc Operasional #6",
+    "detail": ""
+  },
+  {
+    "no": 51,
+    "link": "Website Operasional",
+    "feedback": "Menu /operasional/verifikasi-klaim dihapus.",
+    "harapan": "",
+    "keterangan": "Doc Operasional #7",
+    "detail": ""
+  },
+  {
+    "no": 52,
+    "link": "Website Operasional · /operasional/po",
+    "feedback": "Generate dokumen PO dengan TTD Management; tambah preview dokumen di detail PO.",
+    "harapan": "",
+    "keterangan": "Doc Operasional #8",
+    "detail": ""
+  },
+  {
+    "no": 53,
+    "link": "Website Operasional · Finance",
+    "feedback": "Menu PO & Penerimaan dipindah ke Finance; di detail ada generate PO, preview, download oleh Admin.",
+    "harapan": "",
+    "keterangan": "Doc Operasional #9",
+    "detail": ""
+  },
+  {
+    "no": 54,
+    "link": "Website Operasional",
+    "feedback": "Bikin menu dan fitur Surat Jalan.",
+    "harapan": "",
+    "keterangan": "Doc Operasional #10",
+    "detail": ""
+  },
+  {
+    "no": 55,
+    "link": "Website Operasional · Ajukan Stok",
+    "feedback": "Detail Ajukan Stok: hilangkan hyperlink PO; tampilkan ID untuk pindah ke Distribusi Cabang. Cabang buat surat jalan (relates #54).",
+    "harapan": "",
+    "keterangan": "Doc Operasional #11",
+    "detail": ""
+  },
+  {
+    "no": 56,
+    "link": "Finance · Proses",
+    "feedback": "Alur Finance: OPB terbit → Finance klik Proses Invoice per cabang → cetak invoice (2 format, minta Tim Finance) → rekonsiliasi OPB → kirim invoice → update status Lunas.",
+    "harapan": "",
+    "keterangan": "Doc Finance #1",
+    "detail": ""
+  },
+  {
+    "no": 57,
+    "link": "Finance · /finance/penjualan/faktur-penjualan",
+    "feedback": "Generate OPB/Faktur based on cabang + periode tanggal (user pilih dulu). Generate Faktur/Invoice + Generate Rekap (format dari Tim Finance); generate dari halaman Detail.",
+    "harapan": "Generate Faktur belum ada: tambah preview + button generate faktur/invoice.",
+    "keterangan": "Doc Finance #2",
+    "detail": ""
+  },
+  {
+    "no": 58,
+    "link": "Finance · Menu",
+    "feedback": "Menu Penerimaan barang di Finance dipindah ke Ops; jika sudah ada di Ops, take out dari Finance.",
+    "harapan": "",
+    "keterangan": "Doc Finance #3",
+    "detail": ""
+  },
+  {
+    "no": 59,
+    "link": "Finance · Surat Jalan",
+    "feedback": "Finance punya Surat Jalan view-only.",
+    "harapan": "",
+    "keterangan": "Doc Finance #4",
+    "detail": ""
+  },
+  {
+    "no": 60,
+    "link": "Finance · Laporan",
+    "feedback": "Menu Rekap Pemakaian Cabang per bulan (IDR): bandingkan nilai barang diterima dari pusat vs omset nota per bulan (contoh terima 50 jt, omset 30 jt).",
+    "harapan": "",
+    "keterangan": "Doc Finance #5",
+    "detail": ""
+  }
+]

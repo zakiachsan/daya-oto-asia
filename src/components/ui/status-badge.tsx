@@ -4,8 +4,6 @@ const STYLES: Record<string, string> = {
   Aktif: "bg-green-100 text-green-700",
   Aman: "bg-green-100 text-green-700",
   Draft: "bg-gray-100 text-gray-600",
-  "Cetak Nota": "bg-sky-100 text-sky-700",
-  "TTD GH": "bg-indigo-100 text-indigo-700",
   "Menunggu OPB": "bg-amber-100 text-amber-700",
   "OPB Terbit": "bg-blue-100 text-blue-700",
   "Proses Invoice": "bg-violet-100 text-violet-700",

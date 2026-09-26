@@ -25,7 +25,7 @@ export default function CabangPage() {
       toast("Nama dan kota wajib diisi", "error");
       return;
     }
-    setItems((prev) => [...prev, { id: String(prev.length + 1), nama: nama.trim(), kota: kota.trim(), tinter: 0, stokAlert: 0 }]);
+    setItems((prev) => [...prev, { id: String(prev.length + 1), nama: nama.trim(), kota: kota.trim(), tinter: 0, stokAlert: 0, minStokGram: 400 }]);
     setShowForm(false);
     setNama("");
     setKota("");
@@ -93,6 +93,7 @@ export default function CabangPage() {
           columns={[
             { key: "nama", label: "Nama Bengkel" },
             { key: "kota", label: "Kota" },
+            { key: "minStokGram", label: "Min. Stok (gr)", render: (r) => `${r.minStokGram ?? 400} gr` },
             { key: "tinter", label: "Tinter", render: (r) => `${r.tinter} orang` },
             {
               key: "stokAlert",

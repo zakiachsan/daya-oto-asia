@@ -4,15 +4,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   MOCK_TRANSAKSI,
   MOCK_OPB,
-  MOCK_KLAIM,
   MOCK_KARYAWAN,
   MOCK_FAKTUR_JUAL,
   MOCK_FAKTUR_BELI,
   MOCK_KAS_BANK,
   type TransaksiRow,
   type OpbRow,
-  type KlaimWarnaRow,
 } from "./mock-data";
+import { normalizeTransaksiRow } from "./transaksi-row-normalize";
 import type { FakturJualRow } from "./faktur-utils";
 import { dedupeFakturBeliById, type FakturBeliRow } from "./faktur-beli-utils";
 import type { FinancePaymentRow } from "./finance-payment-utils";
@@ -45,6 +44,7 @@ import {
   type AbsensiStatus,
 } from "./absensi-utils";
 import type { SavedFormulaRow } from "./saved-formula-utils";
+import { SEED_ADMIN_NOTIFICATIONS, type AdminNotification } from "./admin-notifications";
 import {
   INITIAL_PELANGGAN,
   INITIAL_PEMASOK,
@@ -74,7 +74,6 @@ const AJUAN_KEY = "daya-oto-ajuan-stok";
 const BUKA_KEY = "daya-oto-buka-kaleng";
 const OPB_KEY = "daya-oto-opb";
 const ASSIGN_KEY = "daya-oto-assignment";
-const KLAIM_KEY = "daya-oto-klaim-warna";
 const KLAIM_NOTA_KEY = "daya-oto-klaim-nota";
 const CETAK_NOTA_KEY = "daya-oto-cetak-nota-log";
 const FAKTUR_KEY = "daya-oto-faktur-jual";
@@ -95,6 +94,7 @@ const LEMBUR_KEY = "daya-oto-lembur";
 const ABSENSI_RIWAYAT_KEY = "daya-oto-absensi-riwayat";
 const SAVED_FORMULA_KEY = "daya-oto-saved-formulas";
 const EXTRA_KODE_WARNA_KEY = "daya-oto-extra-kode-warna";
+const ADMIN_NOTIF_KEY = "daya-oto-admin-notifications";
 const DEMO_CHECKLIST_KEY = "daya-oto-demo-checklist";
 const SYARAT_BAYAR_KEY = "daya-oto-syarat-pembayaran";
 const PELANGGAN_KEY = "daya-oto-pelanggan";
@@ -138,30 +138,34 @@ export function useTransaksiList() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setExtra(read<TransaksiRow>(TRX_KEY, []));
+    const loaded = read<TransaksiRow>(TRX_KEY, []).map(normalizeTransaksiRow);
+    setExtra(loaded);
+    write(TRX_KEY, loaded);
     setReady(true);
   }, []);
 
   const add = useCallback((row: TransaksiRow) => {
+    const normalized = normalizeTransaksiRow(row);
     setExtra((prev) => {
-      const next = [row, ...prev.filter((r) => r.id !== row.id)];
+      const next = [normalized, ...prev.filter((r) => r.id !== normalized.id)];
       write(TRX_KEY, next);
       return next;
     });
   }, []);
 
   const update = useCallback((id: string, patch: Partial<TransaksiRow>) => {
+    const lookupId = id.startsWith("TRX-") ? id.replace(/^TRX-/, "DOA-") : id;
     setExtra((prev) => {
-      const idx = prev.findIndex((r) => r.id === id);
+      const idx = prev.findIndex((r) => r.id === lookupId || r.id === id);
       if (idx >= 0) {
         const next = [...prev];
-        next[idx] = { ...next[idx], ...patch };
+        next[idx] = normalizeTransaksiRow({ ...next[idx], ...patch, id: lookupId });
         write(TRX_KEY, next);
         return next;
       }
-      const mock = MOCK_TRANSAKSI.find((r) => r.id === id);
+      const mock = MOCK_TRANSAKSI.find((r) => r.id === lookupId || r.id === id);
       if (!mock) return prev;
-      const next = [{ ...mock, ...patch }, ...prev];
+      const next = [normalizeTransaksiRow({ ...mock, ...patch, id: lookupId }), ...prev];
       write(TRX_KEY, next);
       return next;
     });
@@ -169,8 +173,8 @@ export function useTransaksiList() {
 
   const extraIds = new Set(extra.map((r) => r.id));
   const all = ready
-    ? [...extra, ...MOCK_TRANSAKSI.filter((m) => !extraIds.has(m.id))]
-    : MOCK_TRANSAKSI;
+    ? [...extra, ...MOCK_TRANSAKSI.filter((m) => !extraIds.has(m.id))].map(normalizeTransaksiRow)
+    : MOCK_TRANSAKSI.map(normalizeTransaksiRow);
 
   return { all, add, update, ready };
 }
@@ -261,6 +265,14 @@ export function useOpbList() {
     [],
   );
 
+  const patch = useCallback((id: string, data: Partial<OpbRow>) => {
+    setItems((prev) => {
+      const next = prev.map((r) => (r.id === id ? { ...r, ...data } : r));
+      write(OPB_KEY, next);
+      return next;
+    });
+  }, []);
+
   const setSap = useCallback((id: string, sap: string) => {
     setItems((prev) => {
       const next = prev.map((r) =>
@@ -271,7 +283,7 @@ export function useOpbList() {
     });
   }, []);
 
-  return { items, add, updateStatus, setSap };
+  return { items, add, updateStatus, setSap, patch };
 }
 
 function initialAssignment(): AssignmentMap {
@@ -296,37 +308,6 @@ export function useAssignment() {
   }, []);
 
   return { map, updateCabang };
-}
-
-export function useKlaimWarna() {
-  const [items, setItems] = useState<KlaimWarnaRow[]>(MOCK_KLAIM);
-
-  useEffect(() => {
-    setItems(read<KlaimWarnaRow>(KLAIM_KEY, MOCK_KLAIM));
-  }, []);
-
-  const updateStatus = useCallback(
-    (id: string, status: KlaimWarnaRow["status"], catatan?: string) => {
-      setItems((prev) => {
-        const next = prev.map((r) =>
-          r.id === id ? { ...r, status, ...(catatan !== undefined ? { catatan } : {}) } : r,
-        );
-        write(KLAIM_KEY, next);
-        return next;
-      });
-    },
-    [],
-  );
-
-  const add = useCallback((row: KlaimWarnaRow) => {
-    setItems((prev) => {
-      const next = [row, ...prev];
-      write(KLAIM_KEY, next);
-      return next;
-    });
-  }, []);
-
-  return { items, updateStatus, add };
 }
 
 export function useKlaimNota() {
@@ -438,7 +419,13 @@ export function useAbsensiRiwayat() {
   return { items, recordCheckIn, recordCheckOut, reset };
 }
 
-export type ExtraKodeWarnaRow = { kode: string; nama: string };
+export type ExtraKodeWarnaRow = {
+  kode: string;
+  nama: string;
+  subKategori?: string;
+  harga?: number;
+  produkKategori?: string;
+};
 
 export function useExtraKodeWarna() {
   const [items, setItems] = useState<ExtraKodeWarnaRow[]>([]);
@@ -468,6 +455,34 @@ export function useExtraKodeWarna() {
   }, []);
 
   return { items, add, merge };
+}
+
+export function useAdminNotifications(userId: string) {
+  const [items, setItems] = useState<AdminNotification[]>([]);
+
+  useEffect(() => {
+    setItems(read<AdminNotification>(ADMIN_NOTIF_KEY, SEED_ADMIN_NOTIFICATIONS));
+  }, []);
+
+  const unread = useMemo(
+    () => items.filter((n) => !n.readBy.includes(userId)),
+    [items, userId],
+  );
+
+  const markRead = useCallback(
+    (id: string) => {
+      setItems((prev) => {
+        const next = prev.map((n) =>
+          n.id === id && !n.readBy.includes(userId) ? { ...n, readBy: [...n.readBy, userId] } : n,
+        );
+        write(ADMIN_NOTIF_KEY, next);
+        return next;
+      });
+    },
+    [userId],
+  );
+
+  return { items, unread, markRead };
 }
 
 export function useSavedFormulas(tinter?: string) {

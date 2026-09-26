@@ -86,16 +86,16 @@ export default function AjuanStokDetailPage() {
               <p className="text-[12px]">{row.catatanApprover}</p>
             </div>
           )}
-          {row.refPo && (
+          {row.refDistribusi && (
             <div className="flex justify-between pt-2 border-t border-slds-border">
-              <span className="text-slds-text-weak">Ref. PO</span>
-              <Link href={`/operasional/po/${row.refPo}`} className="font-mono font-semibold text-brand hover:underline">{row.refPo}</Link>
+              <span className="text-slds-text-weak">ID Distribusi Cabang</span>
+              <Link href={`/operasional/distribusi/${row.refDistribusi}`} className="font-mono font-semibold text-brand hover:underline">{row.refDistribusi}</Link>
             </div>
           )}
-          {row.refDistribusi && (
-            <div className="flex justify-between">
-              <span className="text-slds-text-weak">Ref. Distribusi</span>
-              <Link href={`/operasional/distribusi/${row.refDistribusi}`} className="font-mono font-semibold text-brand hover:underline">{row.refDistribusi}</Link>
+          {row.refPo && (
+            <div className="flex justify-between text-[12px] text-slds-text-weak">
+              <span>Referensi internal</span>
+              <span className="font-mono">{row.refPo}</span>
             </div>
           )}
           {row.status === "Menunggu" && (

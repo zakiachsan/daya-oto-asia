@@ -102,5 +102,5 @@ export function tarifRowForKategori(kategori: string): { grup: string; label: st
 }
 
 export function notaNoFromTrxId(trxId: string) {
-  return trxId.replace(/^TRX-/, "");
+  return trxId.replace(/^DOA-/, "").replace(/^TRX-/, "");
 }

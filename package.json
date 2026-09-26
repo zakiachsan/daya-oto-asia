@@ -6,7 +6,12 @@
     "dev": "next dev -p 3300",
     "build": "next build",
     "start": "next start -p 3300",
-    "lint": "eslint"
+    "lint": "eslint",
+    "qa:interactive": "python scripts/qa-interactive-harness.py",
+    "qa:agent": "python scripts/qa-browser-use-deepseek.py",
+    "qa:harness": "python scripts/qa-browser-harness.py",
+    "qa:smoke": "node scripts/qa-feedback-check.mjs",
+    "qa:browser": "node scripts/qa-feedback-browser.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.511.0",
@@ -22,6 +27,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "^16.3.3",
+    "playwright": "^1.49.0",
     "ssh2": "^1.17.0",
     "tailwindcss": "^4",
     "typescript": "^5"

@@ -11,8 +11,8 @@ export const DEMO_STOK_CHAIN: StokChainStep[] = [
   {
     id: "trx",
     label: "Transaksi Mixing",
-    desc: "TRX-2026-0142 · Silver Metallic · -45gr",
-    href: "/operasional/transaksi/TRX-2026-0142",
+    desc: "DOA-2026-0142 · Silver Metallic · -45gr",
+    href: "/operasional/transaksi/DOA-2026-0142",
     status: "done",
   },
   {

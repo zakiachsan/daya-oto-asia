@@ -1,4 +1,5 @@
 import type { TransaksiRow } from "./mock-data";
+import type { ProdukKategoriId } from "./transaksi-status-utils";
 import {
   NOTA_PENJUALAN_GRUP,
   type NotaPenjualanBaris,
@@ -10,6 +11,7 @@ export type NotaPenjualanLineFill = {
   pemakaianMl: number;
   harga: number;
   jumlahRp: number;
+  labelOverride?: string;
 };
 
 const ALAMAT_ASTRA_BOGOR =
@@ -61,57 +63,131 @@ function findBaseCoatBaris(kategori: string): NotaPenjualanBaris {
   return match;
 }
 
-/** Derive pemakaian ml from gram bahan; back-calc if total tagihan lebih besar dari per-ml */
 function pemakaianMlForLine(totalGram: number, harga: number, jumlahRp: number) {
   const fromGram = totalGram;
   const fromTotal = harga > 0 ? Math.round((jumlahRp / harga) * 1000) : fromGram;
   return Math.max(fromGram, fromTotal);
 }
 
-/**
- * Baris terisi untuk nota penjualan · base coat dari kategori transaksi.
- * Untuk demo job besar (total > base), tambah clear coat + surfacer seperti scan referensi.
- */
-export function buildNotaPenjualanLines(trx: Pick<TransaksiRow, "kategori" | "bahan" | "total">): NotaPenjualanLineFill[] {
+function barisById(id: string) {
+  for (const g of NOTA_PENJUALAN_GRUP) {
+    const b = g.baris.find((x) => x.id === id);
+    if (b) return b;
+  }
+  return null;
+}
+
+function lineFromBaris(baris: NotaPenjualanBaris, totalGram: number, jumlahRp: number, labelOverride?: string): NotaPenjualanLineFill {
+  return {
+    barisId: baris.id,
+    pemakaianMl: pemakaianMlForLine(totalGram, baris.harga, jumlahRp),
+    harga: baris.harga,
+    jumlahRp,
+    labelOverride,
+  };
+}
+
+type NotaLineInput = Pick<
+  TransaksiRow,
+  "kategori" | "bahan" | "total" | "produkKategori" | "kodeWarna" | "warna" | "lainLainLabel"
+>;
+
+/** Baris nota dinamis dari kategori produk transaksi (#33) */
+export function buildNotaPenjualanLines(trx: NotaLineInput): NotaPenjualanLineFill[] {
   const totalGram = trx.bahan.reduce((s, b) => s + b.gram, 0);
-  const baseBaris = findBaseCoatBaris(trx.kategori);
+  const pk = (trx.produkKategori ?? "basecoat") as ProdukKategoriId;
   const lines: NotaPenjualanLineFill[] = [];
 
-  if (trx.total >= 300000) {
-    const cc = NOTA_PENJUALAN_GRUP.find((g) => g.judul === "CLEAR COAT")!.baris[1];
-    const sf = NOTA_PENJUALAN_GRUP.find((g) => g.judul === "PRIMER / SURFACER")!.baris[0];
-    const baseShare = Math.round(trx.total * 0.59);
-    const clearShare = Math.round(trx.total * 0.35);
-    const surfShare = trx.total - baseShare - clearShare;
-
-    lines.push({
-      barisId: baseBaris.id,
-      pemakaianMl: pemakaianMlForLine(totalGram, baseBaris.harga, baseShare),
-      harga: baseBaris.harga,
-      jumlahRp: baseShare,
-    });
-    lines.push({
-      barisId: cc.id,
-      pemakaianMl: pemakaianMlForLine(0, cc.harga, clearShare),
-      harga: cc.harga,
-      jumlahRp: clearShare,
-    });
-    lines.push({
-      barisId: sf.id,
-      pemakaianMl: pemakaianMlForLine(0, sf.harga, surfShare),
-      harga: sf.harga,
-      jumlahRp: surfShare,
-    });
+  if (pk === "clearcoat") {
+    const cc = NOTA_PENJUALAN_GRUP.find((g) => g.judul === "CLEAR COAT")!;
+    const baris = trx.kodeWarna === "MS280" ? cc.baris[1] : cc.baris[0];
+    lines.push(lineFromBaris(baris, totalGram, trx.total));
     return lines;
   }
 
-  lines.push({
-    barisId: baseBaris.id,
-    pemakaianMl: pemakaianMlForLine(totalGram, baseBaris.harga, trx.total),
-    harga: baseBaris.harga,
-    jumlahRp: trx.total,
-  });
+  if (pk === "surfacer" || pk === "primer") {
+    const sf = NOTA_PENJUALAN_GRUP.find((g) => g.judul === "PRIMER / SURFACER")!;
+    let baris = sf.baris[0];
+    if (pk === "primer" || trx.kodeWarna === "EP-2K") {
+      baris = sf.baris.find((b) => b.id === "sf-filler") ?? sf.baris[1];
+    } else if (pk === "surfacer" || trx.kodeWarna === "PU-2K-GREY") {
+      baris = sf.baris[0];
+    }
+    lines.push(lineFromBaris(baris, totalGram, trx.total));
+    return lines;
+  }
+
+  if (pk === "dempul") {
+    const pt = NOTA_PENJUALAN_GRUP.find((g) => g.judul === "PUTTY / DEMPUL")!.baris[0];
+    lines.push(lineFromBaris(pt, totalGram, trx.total));
+    return lines;
+  }
+
+  if (pk === "thinner") {
+    const th = NOTA_PENJUALAN_GRUP.find((g) => g.judul === "THINNER")!.baris[0];
+    lines.push(lineFromBaris(th, totalGram, trx.total));
+    return lines;
+  }
+
+  if (pk === "lain") {
+    if (trx.kodeWarna === "PP-PRIMER") {
+      const sf = NOTA_PENJUALAN_GRUP.find((g) => g.judul === "PRIMER / SURFACER")!.baris[2];
+      lines.push(lineFromBaris(sf, totalGram, trx.total));
+      return lines;
+    }
+    const ll = NOTA_PENJUALAN_GRUP.find((g) => g.judul === "LAIN-LAIN")!.baris[0];
+    const label = trx.lainLainLabel ?? trx.warna;
+    lines.push(lineFromBaris(ll, totalGram, trx.total, label));
+    return lines;
+  }
+
+  const baseBaris = findBaseCoatBaris(trx.kategori);
+  lines.push(lineFromBaris(baseBaris, totalGram, trx.total));
   return lines;
+}
+
+function produkLineToNotaInput(line: NonNullable<TransaksiRow["produkLines"]>[number]): NotaLineInput {
+  return {
+    kategori: line.kategori,
+    bahan: line.bahan,
+    total: line.total,
+    produkKategori: line.produkKategori,
+    kodeWarna: line.kodeWarna,
+    warna: line.warna,
+    lainLainLabel: line.lainLainLabel,
+  };
+}
+
+/** Semua kategori dalam satu receipt (tambah bahan) */
+export function buildNotaPenjualanLinesForTrx(
+  trx: Pick<
+    TransaksiRow,
+    | "kategori"
+    | "bahan"
+    | "total"
+    | "produkKategori"
+    | "kodeWarna"
+    | "warna"
+    | "lainLainLabel"
+    | "produkLines"
+  >,
+): NotaPenjualanLineFill[] {
+  const rounds: NotaLineInput[] = [
+    ...(trx.produkLines ?? []).map(produkLineToNotaInput),
+    {
+      kategori: trx.kategori,
+      bahan: trx.bahan,
+      total: trx.total,
+      produkKategori: trx.produkKategori,
+      kodeWarna: trx.kodeWarna,
+      warna: trx.warna,
+      lainLainLabel: trx.lainLainLabel,
+    },
+  ];
+  if (trx.produkLines?.length) {
+    return rounds.flatMap((r) => buildNotaPenjualanLines(r));
+  }
+  return buildNotaPenjualanLines(trx);
 }
 
 export function notaPenjualanGrandTotal(lines: NotaPenjualanLineFill[]) {

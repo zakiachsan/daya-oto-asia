@@ -2,15 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronRight, Printer, Check, PenLine, Clock, Plus, Scale, Camera, Tag, Save, Bookmark, X } from "lucide-react";
+import { ChevronRight, Check, Clock, Plus, Scale, Save, Bookmark, X } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
-import { NotaPenjualanPreview, printNotaPenjualanPreview } from "@/components/ui/nota-penjualan-preview";
-import { LabelCatPreview, printLabelCatPreview } from "@/components/ui/label-cat-preview";
-import { useExtraKodeWarna, useNotaPrint, useSavedFormulas, useTransaksiList } from "@/lib/preview-store";
-import { formatDurasi, formatIDR, getHargaKategori, MOCK_KODE_WARNA } from "@/lib/mock-data";
-import type { TransaksiLayer, TransaksiRow } from "@/lib/mock-data";
+import { isDraftFotoNotaPhase } from "@/lib/transaksi-foto-nota-utils";
+import { useExtraKodeWarna, useSavedFormulas, useTransaksiList } from "@/lib/preview-store";
+import { formatIDR, getHargaKategori, MOCK_KODE_WARNA } from "@/lib/mock-data";
+import type { TransaksiLayer, TransaksiProdukLine, TransaksiRow } from "@/lib/mock-data";
 import { findFormula } from "@/lib/kode-warna-formulas";
-import { resolveFormulaNames, scaleFormulaGrams, totalGram, withAcum } from "@/lib/formula-utils";
+import { formulaStorageBaseVolume, mixingGuideLinesForLayer } from "@/lib/formula-utils";
 import { PRODUK_KATEGORI, type ProdukKategoriId, type TransaksiStatus } from "@/lib/transaksi-status-utils";
 import { MOBILE_CABANG, MOBILE_USER } from "@/lib/mobile-app-utils";
 import {
@@ -23,17 +22,24 @@ import {
 import { findAxtProduct } from "@/lib/formula-utils";
 import { TonerPickerModal } from "@/components/mobile/toner-picker-modal";
 import { buildDraftWizardSnapshot, hydrateDraftWizard } from "@/lib/transaksi-draft-utils";
+import { createDoaTransaksiId } from "@/lib/transaksi-id-utils";
+import { formatRecipeId } from "@/lib/recipe-id-utils";
+import {
+  extraKodeOptionsForProdukKategori,
+  kodeOptionsForProdukKategori,
+  hargaForProdukOption,
+  labelForKodeWarnaOption,
+  type ProdukKodeOption,
+} from "@/lib/transaksi-produk-options";
+import { defaultFormulaItemsForKode, defaultVolumeForKategori } from "@/lib/produk-gramasi-formulas";
+import { findMixingRatio } from "@/lib/mixing-ratio-master";
+import { ClearCoatMixingRatioChart } from "@/components/mobile/clear-coat-mixing-ratio-chart";
+import type { ClearCoatChartKode } from "@/lib/clear-coat-mixing-chart";
 
 const STEPS = ["Mobil & Produk", "Mixing", "Foto & Nota"];
 const VOLUME_PRESETS = [50, 100, 150, 200];
 
-function createTrxId() {
-  return `TRX-2026-${String(150 + Math.floor(Math.random() * 50)).padStart(4, "0")}`;
-}
-
-function layerTypeLabel(layer: number) {
-  if (layer === 1) return "Warna standar";
-  if (layer === 2) return "Xyralic / pearl";
+function layerTabLabel(layer: number) {
   return `Layer ${layer}`;
 }
 
@@ -62,7 +68,7 @@ function BuatTransaksiContent() {
   const { toast } = useToast();
   const { add, all, ready } = useTransaksiList();
   const draftLoadedRef = useRef(false);
-  const { recordPrint } = useNotaPrint();
+  const pendingTambahBahanRef = useRef(false);
   const { items: savedFormulas, save: saveFormula, remove: removeSavedFormula } = useSavedFormulas(MOBILE_USER);
   const { items: persistedExtraKodes, add: addExtraKode, merge: mergeExtraKodes } = useExtraKodeWarna();
   const draftId = params.get("draft");
@@ -76,7 +82,7 @@ function BuatTransaksiContent() {
       setTrxId(draftId);
       return;
     }
-    setTrxId(createTrxId());
+    setTrxId(createDoaTransaksiId());
   }, [draftId]);
 
   useEffect(() => {
@@ -91,8 +97,16 @@ function BuatTransaksiContent() {
       router.replace(`/app/transaksi/${draftId}`);
       return;
     }
+    const tambahBahanParam = params.get("tambahBahan");
+    if (isDraftFotoNotaPhase(trx) && !tambahBahanParam) {
+      router.replace(`/app/transaksi/${draftId}`);
+      return;
+    }
     draftLoadedRef.current = true;
     const h = hydrateDraftWizard(trx);
+    if (tambahBahanParam && isDraftFotoNotaPhase(trx)) {
+      pendingTambahBahanRef.current = true;
+    }
     setKodeWarna(trx.kodeWarna);
     setWarna(trx.warna);
     setKategori(trx.kategori);
@@ -100,7 +114,7 @@ function BuatTransaksiContent() {
     setPlatNomor(trx.platNomor);
     setNoPkb(trx.noPkb ?? "");
     setJumlahPanel(trx.jumlahPanel ?? 1);
-    setStep(h.step);
+    setStep(Math.min(h.step, 1));
     setMfr(h.mfr);
     setModelYear(h.modelYear);
     setMobil(h.mobil);
@@ -115,8 +129,15 @@ function BuatTransaksiContent() {
     setWaktuSelesaiMixing(h.waktuSelesaiMixing);
     setMixingActive(h.mixingActive);
     setElapsedSec(h.elapsedSec);
-    toast(`Draft ${draftId} dimuat · lanjutkan pekerjaan`, "info");
-  }, [ready, draftId, all, toast, router]);
+    setProdukLines(trx.produkLines ?? []);
+    setPrinted(!!trx.waktuCetakNota);
+    setSigned(!!trx.waktuTTD);
+    setShowNota(!!trx.waktuCetakNota);
+    setLainSubKategori(trx.lainLainSubKategori ?? "");
+    if (trx.lainLainHarga != null) setLainHarga(trx.lainLainHarga);
+    toast(`Draft dimuat · lanjutkan mixing`, "info");
+  }, [ready, draftId, all, toast, router, params]);
+
   const prefMobil = params.get("mobil") ?? "";
   const prefWarna = params.get("warna") ?? "Silver Metallic";
 
@@ -147,6 +168,12 @@ function BuatTransaksiContent() {
   const [formulaLabel, setFormulaLabel] = useState("");
   const [formulaCatatan, setFormulaCatatan] = useState("");
   const [loadedFormulaId, setLoadedFormulaId] = useState<string | null>(null);
+  const [lainSubKategori, setLainSubKategori] = useState("");
+  const [lainHarga, setLainHarga] = useState(53000);
+  const [produkLines, setProdukLines] = useState<TransaksiProdukLine[]>([]);
+  const [tambahBahanMode, setTambahBahanMode] = useState(false);
+  const [waktuCetakLabel, setWaktuCetakLabel] = useState<string | null>(null);
+  const parentLoadedRef = useRef(false);
 
   const [waktuMulai, setWaktuMulai] = useState<number | null>(null);
   const [waktuSelesaiMixing, setWaktuSelesaiMixing] = useState<number | null>(null);
@@ -161,11 +188,12 @@ function BuatTransaksiContent() {
   const [gramOverrides, setGramOverrides] = useState<Record<string, number>>({});
 
   const kodeOptions = useMemo(
-    () => [
-      ...MOCK_KODE_WARNA,
-      ...persistedExtraKodes.map((k) => ({ kode: k.kode, nama: k.nama, kategori: "Special" as const })),
-    ],
-    [persistedExtraKodes],
+    () =>
+      kodeOptionsForProdukKategori(
+        produkKategori,
+        extraKodeOptionsForProdukKategori(produkKategori, persistedExtraKodes),
+      ),
+    [produkKategori, persistedExtraKodes],
   );
 
   const savedForKode = useMemo(
@@ -173,27 +201,95 @@ function BuatTransaksiContent() {
     [savedFormulas, kodeWarna],
   );
 
+  const isBasecoat = produkKategori === "basecoat";
+  const clearCoatChartKode: ClearCoatChartKode | null =
+    produkKategori === "clearcoat" && (kodeWarna === "HS360" || kodeWarna === "MS280")
+      ? kodeWarna
+      : null;
+
   const formulaBase = layerFormulas[activeLayer] ?? defaultFormula.items;
+  const storageBaseVolume = formulaStorageBaseVolume(
+    produkKategori,
+    mixingVolume,
+    defaultFormula.baseVolume,
+  );
 
-  const scaledItems = useMemo(() => {
-    const customNames = Object.fromEntries(
-      (layerFormulas[activeLayer] ?? []).filter((b) => b.nama).map((b) => [b.kode, b.nama!]),
-    );
-    const scaled = scaleFormulaGrams(formulaBase, defaultFormula.baseVolume, mixingVolume);
-    return resolveFormulaNames(
-      scaled.map((item) => ({
-        ...item,
-        gram: gramOverrides[`${activeLayer}-${item.kode}`] ?? item.gram,
-      })),
-    ).map((item) => ({
-      ...item,
-      nama: customNames[item.kode] ?? item.nama,
-    }));
-  }, [formulaBase, defaultFormula.baseVolume, mixingVolume, gramOverrides, activeLayer, layerFormulas]);
+  const mixingGuideLines = useMemo(
+    () => mixingGuideLinesForLayer(formulaBase, storageBaseVolume, mixingVolume),
+    [formulaBase, storageBaseVolume, mixingVolume],
+  );
 
-  const formulaLines = useMemo(() => withAcum(scaledItems), [scaledItems]);
-  const harga = getHargaKategori(kategori);
+  const weighedMixingGram = useMemo(() => {
+    let sum = 0;
+    let any = false;
+    for (const line of mixingGuideLines) {
+      const key = `${activeLayer}-${line.kode}`;
+      if (gramOverrides[key] !== undefined) {
+        any = true;
+        sum += gramOverrides[key];
+      }
+    }
+    return any ? Math.round(sum * 10) / 10 : null;
+  }, [mixingGuideLines, gramOverrides, activeLayer]);
+  const selectedOpt = kodeOptions.find((k) => k.kode === kodeWarna);
+  const harga =
+    produkKategori === "lain" && lainHarga > 0
+      ? lainHarga
+      : selectedOpt?.harga != null
+        ? selectedOpt.harga
+        : getHargaKategori(kategori);
   const mobilLabel = `${mfr} ${mobil.replace(/^Toyota\s?/i, "")}${modelYear ? ` ${modelYear}` : ""}`.trim();
+
+  useEffect(() => {
+    if (!ready || !parentId || parentLoadedRef.current || draftId) return;
+    const parent = all.find((t) => t.id === parentId);
+    if (!parent) return;
+    parentLoadedRef.current = true;
+    setPlatNomor(parent.platNomor);
+    setNoPkb(parent.noPkb ?? "");
+    setMobil(parent.mobil.replace(/^\S+\s/, "") || parent.mobil);
+    setMfr(parent.mobil.split(" ")[0] ?? "Toyota");
+    toast(`Data mobil dari ${parentId} dimuat · pilih bahan tambahan`, "info");
+  }, [ready, parentId, all, draftId, toast]);
+
+  useEffect(() => {
+    const noPekerjaan = platNomor.replace(/\s+/g, " ").trim() || trxId.slice(-4);
+    setRecipeId(formatRecipeId({ cabang: MOBILE_CABANG, noPekerjaan }));
+  }, [platNomor, trxId]);
+
+  useEffect(() => {
+    if (kodeOptions.length && !kodeOptions.some((k) => k.kode === kodeWarna)) {
+      selectProdukKode(kodeOptions[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [produkKategori, kodeOptions.length]);
+
+  function applyAutoMixingFormula(kode: string, vol: number) {
+    if (produkKategori === "basecoat") return;
+    const items = defaultFormulaItemsForKode(kode, vol).map((i) => ({
+      kode: i.kode,
+      gram: i.gram,
+      nama: i.nama,
+    }));
+    setLayerFormulas({ 1: items, 2: items, 3: items });
+    setGramOverrides({});
+  }
+
+  function selectProdukKode(opt: ProdukKodeOption) {
+    setLoadedFormulaId(null);
+    setKodeWarna(opt.kode);
+    setWarna(opt.nama);
+    setKategori(opt.kategori ?? kategori);
+    if (produkKategori === "basecoat") {
+      selectKodeWarna(opt.kode);
+      return;
+    }
+    const vol = defaultVolumeForKategori(opt.kode);
+    setMixingVolume(vol);
+    applyAutoMixingFormula(opt.kode, vol);
+    const ratio = findMixingRatio(opt.kode);
+    if (ratio) toast(`Mixing ratio ${ratio.ratioLabel} terisi otomatis`, "info");
+  }
 
   useEffect(() => {
     if (step === 1 && !waktuMulai) {
@@ -210,17 +306,20 @@ function BuatTransaksiContent() {
     return () => clearInterval(id);
   }, [mixingActive, waktuMulai]);
 
+  const hideMobilFields = isPenambahan || tambahBahanMode || produkLines.length > 0;
+
   function validateStep0() {
+    if (!kodeWarna.trim()) {
+      toast("Kode warna wajib diisi", "error");
+      return false;
+    }
+    if (hideMobilFields) return true;
     if (!mfr.trim()) {
       toast("Merk wajib diisi", "error");
       return false;
     }
     if (!mobil.trim()) {
       toast("Model wajib diisi", "error");
-      return false;
-    }
-    if (!kodeWarna.trim()) {
-      toast("Kode warna wajib diisi", "error");
       return false;
     }
     if (!platNomor.trim()) {
@@ -233,6 +332,57 @@ function BuatTransaksiContent() {
     }
     return true;
   }
+
+  function snapshotCurrentProdukLine(): TransaksiProdukLine {
+    const layers = buildLayers();
+    const bahan = layers.flatMap((l) => l.bahan);
+    return {
+      produkKategori,
+      kodeWarna,
+      warna,
+      kategori,
+      bahan,
+      layers: isBasecoat && layerCount > 1 ? layers : undefined,
+      mixingVolume,
+      total: harga,
+      lainLainLabel: produkKategori === "lain" ? warna : undefined,
+      lainLainSubKategori: produkKategori === "lain" ? lainSubKategori : undefined,
+    };
+  }
+
+  function resetProdukRoundForTambah() {
+    setProdukKategori("clearcoat");
+    setMixingActive(false);
+    setWaktuMulai(null);
+    setWaktuSelesaiMixing(null);
+    setElapsedSec(0);
+    setLayerCount(1);
+    setActiveLayer(1);
+    setGramOverrides({});
+    setLoadedFormulaId(null);
+    const opt = kodeOptionsForProdukKategori("clearcoat", [])[0];
+    if (opt) selectProdukKode(opt);
+  }
+
+  function handleTambahBahan() {
+    if (!waktuSelesaiMixing) {
+      toast("Selesaikan mixing bahan saat ini dulu", "error");
+      return;
+    }
+    setProdukLines((prev) => [...prev, snapshotCurrentProdukLine()]);
+    setTambahBahanMode(true);
+    setStep(0);
+    setFotoSample(false);
+    resetProdukRoundForTambah();
+    toast("Tambah bahan · pilih kategori & kode", "info");
+  }
+
+  useEffect(() => {
+    if (!pendingTambahBahanRef.current || !waktuSelesaiMixing) return;
+    pendingTambahBahanRef.current = false;
+    handleTambahBahan();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [waktuSelesaiMixing]);
 
   function selectKodeWarna(kode: string) {
     const kw = kodeOptions.find((k) => k.kode === kode);
@@ -288,7 +438,7 @@ function BuatTransaksiContent() {
     const captured = captureFormulaForSave({
       layerCount,
       mixingVolume,
-      formulaBaseVolume: defaultFormula.baseVolume,
+      formulaBaseVolume: storageBaseVolume,
       layerFormulas,
       gramOverrides,
     });
@@ -318,14 +468,36 @@ function BuatTransaksiContent() {
   function handleVolumeChange(vol: number) {
     setMixingVolume(vol);
     setGramOverrides({});
+    if (produkKategori !== "basecoat") applyAutoMixingFormula(kodeWarna, vol);
   }
 
   function addCustomKode() {
+    if (produkKategori === "lain") {
+      const sub = prompt("Nama sub-kategori (mis. Degreaser):")?.trim();
+      const kode = prompt("Kode warna / produk:")?.trim();
+      if (!kode) return;
+      const nama = prompt("Nama di nota:") ?? kode;
+      const hargaStr = prompt("Harga (Rp):", String(lainHarga));
+      const harga = Number(hargaStr?.replace(/\D/g, "")) || lainHarga;
+      const normalized = kode.toUpperCase();
+      addExtraKode({
+        kode: normalized,
+        nama: nama.trim(),
+        subKategori: sub,
+        harga,
+        produkKategori: "lain",
+      });
+      setLainSubKategori(sub ?? "");
+      setLainHarga(harga);
+      selectProdukKode({ kode: normalized, nama: nama.trim(), harga });
+      toast("Lain-lain tersimpan · dipakai di nota berikutnya", "success");
+      return;
+    }
     const kode = prompt("Kode warna baru (mis. 2XY):");
     if (!kode?.trim()) return;
     const nama = prompt("Nama warna:") ?? kode;
     const normalized = kode.trim().toUpperCase();
-    addExtraKode({ kode: normalized, nama: nama.trim() });
+    addExtraKode({ kode: normalized, nama: nama.trim(), produkKategori });
     selectKodeWarna(normalized);
     toast("Kode warna ditambahkan ke daftar", "success");
   }
@@ -348,14 +520,12 @@ function BuatTransaksiContent() {
     [layerFormulas, activeLayer],
   );
 
-  const isBasecoat = produkKategori === "basecoat";
-
   function addLayer() {
     if (!isBasecoat || layerCount >= 3) return;
     const next = layerCount + 1;
     setLayerCount(next);
     setActiveLayer(next);
-    toast(`Layer ${next} ditambahkan · ${layerTypeLabel(next)}`, "info");
+    toast(`Layer ${next} ditambahkan`, "info");
   }
 
   function buildLayers(): TransaksiLayer[] {
@@ -363,22 +533,13 @@ function BuatTransaksiContent() {
     return Array.from({ length: count }, (_, i) => {
       const layer = i + 1;
       const base = layerFormulas[layer] ?? defaultFormula.items;
-      const scaled = scaleFormulaGrams(base, defaultFormula.baseVolume, mixingVolume);
-      const customNames = Object.fromEntries(base.filter((b) => b.nama).map((b) => [b.kode, b.nama!]));
-      const items = resolveFormulaNames(
-        scaled.map((item) => ({
-          ...item,
-          gram: gramOverrides[`${layer}-${item.kode}`] ?? item.gram,
-        })),
-      ).map((item) => ({
-        ...item,
-        nama: customNames[item.kode] ?? item.nama,
+      const guide = mixingGuideLinesForLayer(base, storageBaseVolume, mixingVolume);
+      const bahan = guide.map((line) => ({
+        kode: line.kode,
+        nama: line.nama,
+        gram: gramOverrides[`${layer}-${line.kode}`] ?? line.gram,
       }));
-      return {
-        layer,
-        label: layerTypeLabel(layer),
-        bahan: items.map((f) => ({ kode: f.kode, nama: f.nama, gram: f.gram })),
-      };
+      return { layer, label: layerTabLabel(layer), bahan };
     });
   }
 
@@ -389,20 +550,23 @@ function BuatTransaksiContent() {
     const durasiMixingMenit = Math.max(1, Math.round((selesai.getTime() - mulai.getTime()) / 60000));
     const layers = buildLayers();
     const bahan = layers.flatMap((l) => l.bahan);
+    const mergedBahan = [...produkLines.flatMap((p) => p.bahan), ...bahan];
+    const mergedTotal = produkLines.reduce((s, p) => s + p.total, 0) + harga;
 
     return {
       id: trxId,
-      receiptId: trxId,
+      receiptId: recipeId,
       tanggal: now.toISOString().slice(0, 10),
       cabang: MOBILE_CABANG,
       warna,
       kodeWarna,
       kategori,
       produkKategori,
+      produkLines: produkLines.length > 0 ? produkLines : undefined,
       layers: isBasecoat && layerCount > 1 ? layers : undefined,
       tinter: MOBILE_USER,
       status,
-      total: harga,
+      total: produkLines.length > 0 ? mergedTotal : harga,
       mobil: mobilLabel,
       platNomor,
       noPkb: noPkb || undefined,
@@ -414,9 +578,13 @@ function BuatTransaksiContent() {
       waktuSelesaiMixing: waktuSelesaiMixing ? selesai.toISOString() : null,
       durasiMixingMenit: waktuSelesaiMixing ? durasiMixingMenit : null,
       waktuCetakNota: printed ? now.toISOString() : null,
+      waktuCetakLabel,
       waktuTTD: signed ? now.toISOString() : null,
+      lainLainLabel: produkKategori === "lain" ? warna : undefined,
+      lainLainSubKategori: produkKategori === "lain" ? lainSubKategori : undefined,
+      lainLainHarga: produkKategori === "lain" ? lainHarga : undefined,
       durasiTotalMenit: signed ? durasiMixingMenit + 3 : null,
-      bahan,
+      bahan: produkLines.length > 0 ? mergedBahan : bahan,
       opbId: null,
       draftWizard: buildDraftWizardSnapshot({
         step,
@@ -441,23 +609,28 @@ function BuatTransaksiContent() {
     if (!trxId) return;
     if (step === 0 && !validateStep0()) return;
     add(buildRow("Draft"));
-    toast(`Draft ${trxId} tersimpan · bisa lanjut edit atau buka dari daftar transaksi`, "success");
-  }
-
-  function backToMixing() {
-    setStep(1);
-    setMixingActive(true);
-    setWaktuSelesaiMixing(null);
-    if (waktuMulai) {
-      setElapsedSec(Math.floor((Date.now() - waktuMulai) / 1000));
-    }
-    toast("Kembali ke mixing · tambah atau ubah bahan", "info");
+    toast(`Draft tersimpan · ${trxId}`, "success");
+    if (waktuSelesaiMixing) router.push(`/app/transaksi/${trxId}`);
+    else router.push("/app/transaksi");
   }
 
   function finishMixing() {
+    const selesai = Date.now();
     setMixingActive(false);
-    setWaktuSelesaiMixing(Date.now());
-    setStep(2);
+    setWaktuSelesaiMixing(selesai);
+    setTambahBahanMode(false);
+    const row = buildRow("Draft");
+    add({
+      ...row,
+      waktuSelesaiMixing: new Date(selesai).toISOString(),
+      durasiMixingMenit:
+        waktuMulai != null ? Math.max(1, Math.round((selesai - waktuMulai) / 60000)) : row.durasiMixingMenit,
+      draftWizard: row.draftWizard
+        ? { ...row.draftWizard, step: 2, waktuSelesaiMixing: new Date(selesai).toISOString() }
+        : row.draftWizard,
+    });
+    toast("Mixing selesai · lanjut foto & nota", "success");
+    router.push(`/app/transaksi/${trxId}`);
   }
 
   function formatElapsed(sec: number) {
@@ -466,63 +639,31 @@ function BuatTransaksiContent() {
     return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   }
 
-  function handleCetakNota() {
-    if (!fotoSample) {
-      toast("Foto sample plat wajib diambil sebelum cetak nota", "error");
-      return;
-    }
-    recordPrint(trxId, MOBILE_USER, MOBILE_CABANG);
-    setShowNota(true);
-    setPrinted(true);
-    printNotaPenjualanPreview();
-    toast("Nota penjualan dicetak · stok dikurangi", "success");
-  }
-
-  function handleSelesai() {
-    if (!trxId) return;
-    const status: TransaksiStatus = signed ? "Menunggu OPB" : printed ? "Cetak Nota" : "Draft";
-    add(buildRow(status));
-    toast(`Transaksi ${trxId} → ${status}`, "success");
-    router.push(`/app/transaksi/${trxId}`);
-  }
-
-  const previewTrx = trxId
-    ? buildRow(printed ? (signed ? "Menunggu OPB" : "Cetak Nota") : "Draft")
-    : null;
-
   return (
     <div className="space-y-4">
       <div className="bg-brand/10 border border-brand/20 rounded-xl px-3 py-2">
         <p className="text-[10px] font-bold uppercase text-brand">Receipt ID</p>
-        <p className="text-[13px] font-mono font-bold text-slds-text">{trxId || "…"}</p>
+        <p className="text-[13px] font-mono font-bold text-slds-text leading-snug break-all">{recipeId || "…"}</p>
         {isResumingDraft && (
-          <p className="text-[10px] text-brand font-semibold mt-1">Melanjutkan draft tersimpan</p>
+          <p className="text-[10px] text-brand font-semibold mt-1">
+            Melanjutkan draft · bahan tercatat tidak bisa diubah (lihat detail DOA)
+          </p>
         )}
       </div>
 
-      {isPenambahan && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-start gap-2">
-          <Plus className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
-          <div>
-            <p className="text-[12px] font-bold text-blue-900">Penambahan Bahan</p>
-            <p className="text-[11px] text-blue-800">Lanjutan transaksi {parentId}</p>
-          </div>
-        </div>
-      )}
-
       <div className="flex items-center gap-1">
         {STEPS.map((s, i) => (
-          <div key={s} className="flex items-center gap-1 flex-1">
+          <div key={s} className="flex items-center gap-1 flex-1 min-w-0">
             <div
               className={`flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold shrink-0
               ${i <= step ? "bg-brand text-white" : "bg-slds-bg text-slds-text-weak border border-slds-border"}`}
             >
               {i < step ? <Check className="h-3.5 w-3.5" /> : i + 1}
             </div>
-            <span className={`text-[10px] font-semibold hidden sm:block ${i <= step ? "text-brand" : "text-slds-text-weak"}`}>
+            <span className={`text-[10px] font-semibold truncate ${i <= step ? "text-brand" : "text-slds-text-weak"}`}>
               {s}
             </span>
-            {i < STEPS.length - 1 && <ChevronRight className="h-3 w-3 text-slds-text-weak mx-auto" />}
+            {i < STEPS.length - 1 && <ChevronRight className="h-3 w-3 text-slds-text-weak shrink-0 mx-auto" />}
           </div>
         ))}
       </div>
@@ -542,20 +683,6 @@ function BuatTransaksiContent() {
                 ))}
               </select>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="text-[11px] font-semibold text-slds-text-weak uppercase">Merk *</label>
-                <input value={mfr} onChange={(e) => setMfr(e.target.value)} className="w-full mt-1 px-3 py-2 border border-slds-border rounded-lg text-[13px] focus:border-brand focus:outline-none" />
-              </div>
-              <div>
-                <label className="text-[11px] font-semibold text-slds-text-weak uppercase">Tahun</label>
-                <input value={modelYear} onChange={(e) => setModelYear(e.target.value)} className="w-full mt-1 px-3 py-2 border border-slds-border rounded-lg text-[13px] focus:border-brand focus:outline-none" />
-              </div>
-            </div>
-            <div>
-              <label className="text-[11px] font-semibold text-slds-text-weak uppercase">Model *</label>
-              <input value={mobil} onChange={(e) => !isPenambahan && setMobil(e.target.value)} disabled={isPenambahan} className="w-full mt-1 px-3 py-2.5 border border-slds-border rounded-lg text-[14px] focus:border-brand focus:outline-none disabled:bg-slds-bg" />
-            </div>
             <div>
               <div className="flex justify-between items-center">
                 <label className="text-[11px] font-semibold text-slds-text-weak uppercase">Kode Warna *</label>
@@ -563,9 +690,16 @@ function BuatTransaksiContent() {
                   <Plus className="h-3 w-3" /> Tambah
                 </button>
               </div>
-              <select value={kodeWarna} onChange={(e) => selectKodeWarna(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-slds-border rounded-lg text-[14px] focus:border-brand focus:outline-none">
+              <select
+                value={kodeWarna}
+                onChange={(e) => {
+                  const opt = kodeOptions.find((k) => k.kode === e.target.value);
+                  if (opt) selectProdukKode(opt);
+                }}
+                className="w-full mt-1 px-3 py-2.5 border border-slds-border rounded-lg text-[14px] focus:border-brand focus:outline-none"
+              >
                 {kodeOptions.map((k) => (
-                  <option key={k.kode} value={k.kode}>{k.kode} · {k.nama}</option>
+                  <option key={k.kode} value={k.kode}>{labelForKodeWarnaOption(k)}</option>
                 ))}
               </select>
             </div>
@@ -605,6 +739,26 @@ function BuatTransaksiContent() {
                 ✓ Formula tersimpan dimuat · edit di step Mixing lalu simpan ulang jika perlu
               </p>
             )}
+            {!hideMobilFields && (
+              <>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-[11px] font-semibold text-slds-text-weak uppercase">Merk *</label>
+                <input value={mfr} onChange={(e) => setMfr(e.target.value)} className="w-full mt-1 px-3 py-2 border border-slds-border rounded-lg text-[13px] focus:border-brand focus:outline-none" />
+              </div>
+              <div>
+                <label className="text-[11px] font-semibold text-slds-text-weak uppercase">Tahun</label>
+                <input value={modelYear} onChange={(e) => setModelYear(e.target.value)} className="w-full mt-1 px-3 py-2 border border-slds-border rounded-lg text-[13px] focus:border-brand focus:outline-none" />
+              </div>
+            </div>
+            <div>
+              <label className="text-[11px] font-semibold text-slds-text-weak uppercase">Model *</label>
+              <input value={mobil} onChange={(e) => setMobil(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-slds-border rounded-lg text-[14px] focus:border-brand focus:outline-none" />
+            </div>
+              </>
+            )}
+            {!hideMobilFields && (
+              <>
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="text-[11px] font-semibold text-slds-text-weak uppercase">No. Polisi *</label>
@@ -615,16 +769,12 @@ function BuatTransaksiContent() {
                 <input value={noPkb} onChange={(e) => setNoPkb(e.target.value)} placeholder="Opsional" className="w-full mt-1 px-3 py-2 border border-slds-border rounded-lg text-[13px] focus:border-brand focus:outline-none" />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="text-[11px] font-semibold text-slds-text-weak uppercase">Jumlah Panel *</label>
-                <input type="number" min={1} value={jumlahPanel} onChange={(e) => setJumlahPanel(Number(e.target.value) || 1)} className="w-full mt-1 px-3 py-2 border border-slds-border rounded-lg text-[13px] focus:border-brand focus:outline-none" />
-              </div>
-              <div>
-                <label className="text-[11px] font-semibold text-slds-text-weak uppercase">Recipe ID</label>
-                <div className="mt-1 px-3 py-2 bg-slds-bg border border-slds-border rounded-lg text-[13px] font-mono">{recipeId}</div>
-              </div>
+            <div>
+              <label className="text-[11px] font-semibold text-slds-text-weak uppercase">Jumlah Panel *</label>
+              <input type="number" min={1} value={jumlahPanel} onChange={(e) => setJumlahPanel(Number(e.target.value) || 1)} className="w-full mt-1 px-3 py-2 border border-slds-border rounded-lg text-[13px] focus:border-brand focus:outline-none" />
             </div>
+              </>
+            )}
           </div>
           <button type="button" data-no-toast onClick={() => validateStep0() && setStep(1)} className="w-full py-3.5 bg-brand text-white rounded-xl font-bold text-[14px]">
             Mulai Mixing
@@ -666,12 +816,11 @@ function BuatTransaksiContent() {
                           : "bg-slds-bg text-slds-text-weak border-transparent"}`}
                     >
                       <span className="block">Layer {l}</span>
-                      <span className="block text-[9px] font-semibold opacity-80 mt-0.5">{layerTypeLabel(l)}</span>
                     </button>
                   ))}
                 </div>
               ) : (
-                <p className="text-[11px] text-slds-text-weak">Layer 1 · Warna standar</p>
+                <p className="text-[11px] text-slds-text-weak">Layer 1</p>
               )}
             </div>
           )}
@@ -692,46 +841,87 @@ function BuatTransaksiContent() {
             </div>
           </div>
 
-          <div className="flex gap-1.5 flex-wrap">
-            {VOLUME_PRESETS.map((v) => (
-              <button key={v} type="button" data-no-toast onClick={() => handleVolumeChange(v)} className={`px-3 py-1.5 rounded-lg text-[12px] font-bold border ${mixingVolume === v ? "bg-brand text-white border-brand" : "bg-white border-slds-border text-slds-text"}`}>
-                {v}G
-              </button>
-            ))}
-          </div>
+          {clearCoatChartKode ? (
+            <ClearCoatMixingRatioChart
+              kode={clearCoatChartKode}
+              selectedTotal={mixingVolume}
+              onSelectTotal={handleVolumeChange}
+            />
+          ) : (
+            <div className="flex gap-1.5 flex-wrap">
+              {VOLUME_PRESETS.map((v) => (
+                <button key={v} type="button" data-no-toast onClick={() => handleVolumeChange(v)} className={`px-3 py-1.5 rounded-lg text-[12px] font-bold border ${mixingVolume === v ? "bg-brand text-white border-brand" : "bg-white border-slds-border text-slds-text"}`}>
+                  {v}G
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="bg-white rounded-xl border border-slds-border overflow-hidden">
             <div className="px-4 py-2.5 bg-slds-bg border-b border-slds-border flex justify-between items-center">
               <p className="text-[12px] font-bold text-slds-text">
                 {warna}
-                {isBasecoat && layerCount > 1 ? ` · Layer ${activeLayer} (${layerTypeLabel(activeLayer)})` : ""}
+                {isBasecoat && layerCount > 1 ? ` · Layer ${activeLayer}` : ""}
               </p>
-              <p className="text-[11px] font-bold text-brand">Target: {totalGram(formulaLines)}G</p>
+              <p className="text-[11px] font-bold text-brand tabular-nums">
+                {weighedMixingGram ?? "—"}/{mixingVolume}
+              </p>
             </div>
-            {formulaLines.map((f, idx) => (
-              <div key={`${activeLayer}-${f.kode}-${idx}`} className="grid grid-cols-[1fr_1fr_72px_72px] gap-0 px-3 py-2.5 border-b border-slds-border last:border-0 items-center">
-                <p className="text-[12px] font-bold font-mono">{f.kode}</p>
-                <p className="text-[10px] text-slds-text-weak truncate">{f.nama.replace(/^AXT-\d+\s/, "")}</p>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={f.gram}
-                  onChange={(e) => setGramOverrides((prev) => ({ ...prev, [`${activeLayer}-${f.kode}`]: Number(e.target.value) || 0 }))}
-                  className="w-full px-1.5 py-1 border border-slds-border rounded text-[13px] text-right font-bold"
-                />
-                <p className="text-[14px] font-bold text-brand text-right">{f.acum}</p>
-              </div>
-            ))}
+            <div className="grid grid-cols-[1fr_1fr_72px_72px] gap-0 px-3 py-1.5 border-b border-slds-border bg-slds-bg/80 text-[9px] font-bold uppercase text-slds-text-weak">
+              <span>Kode</span>
+              <span>Bahan</span>
+              <span className="text-right">Gram</span>
+              <span className="text-right text-brand">Panduan</span>
+            </div>
+            <p className="px-4 py-2 text-[10px] text-slds-text-weak border-b border-slds-border">
+              <span className="font-semibold text-brand">Panduan</span> = referensi volume {mixingVolume}g (tetap). Isi <span className="font-semibold">Gram</span>{" "}
+              hasil timbang · header <span className="font-semibold tabular-nums">timbang/{mixingVolume}</span>.
+            </p>
+            {mixingGuideLines.map((line, idx) => {
+              const overrideKey = `${activeLayer}-${line.kode}`;
+              const weighed = gramOverrides[overrideKey];
+              return (
+                <div
+                  key={`${activeLayer}-${line.kode}-${idx}`}
+                  className="grid grid-cols-[1fr_1fr_72px_72px] gap-0 px-3 py-2.5 border-b border-slds-border last:border-0 items-center"
+                >
+                  <p className="text-[12px] font-bold font-mono">{line.kode}</p>
+                  <p className="text-[10px] text-slds-text-weak truncate">{line.nama.replace(/^AXT-\d+\s/, "")}</p>
+                  <input
+                    type="number"
+                    step="0.1"
+                    inputMode="decimal"
+                    value={weighed === undefined ? "" : weighed}
+                    placeholder="—"
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      setGramOverrides((prev) => {
+                        const next = { ...prev };
+                        if (raw === "") delete next[overrideKey];
+                        else next[overrideKey] = Number(raw) || 0;
+                        return next;
+                      });
+                    }}
+                    className="w-full px-1.5 py-1 border border-slds-border rounded text-[13px] text-right font-bold"
+                  />
+                  <p className="text-[14px] font-bold text-brand text-right tabular-nums">
+                    {line.gram.toFixed(1).replace(".", ",")}
+                  </p>
+                </div>
+              );
+            })}
           </div>
 
-          <button
-            type="button"
-            data-no-toast
-            onClick={() => setShowTonerPicker(true)}
-            className="w-full py-2.5 border-2 border-dashed border-brand text-brand rounded-xl font-semibold text-[13px] flex items-center justify-center gap-1"
-          >
-            <Plus className="h-4 w-4" /> Tambah Toner
-          </button>
+          {!clearCoatChartKode && (
+            <button
+              type="button"
+              data-no-toast
+              onClick={() => setShowTonerPicker(true)}
+              className="w-full py-2.5 border-2 border-dashed border-brand text-brand rounded-xl font-semibold text-[13px] flex items-center justify-center gap-1"
+            >
+              <Plus className="h-4 w-4" /> Tambah Toner
+            </button>
+          )}
 
           <button
             type="button"
@@ -743,84 +933,16 @@ function BuatTransaksiContent() {
           </button>
 
           <div className="flex gap-2">
-            <button type="button" data-no-toast onClick={() => { setStep(0); setMixingActive(false); setWaktuMulai(null); setElapsedSec(0); }} className="flex-1 py-3 border border-slds-border rounded-xl text-[14px] font-semibold">
-              Kembali
-            </button>
-            <button type="button" data-no-toast onClick={finishMixing} className="flex-1 py-3 bg-brand text-white rounded-xl font-bold text-[14px]">
+            {!isResumingDraft && (
+              <button type="button" data-no-toast onClick={() => { setStep(0); setMixingActive(false); }} className="flex-1 py-3 border border-slds-border rounded-xl text-[14px] font-semibold">
+                Kembali
+              </button>
+            )}
+            <button type="button" data-no-toast onClick={finishMixing} className={`py-3 bg-brand text-white rounded-xl font-bold text-[14px] ${isResumingDraft ? "w-full" : "flex-1"}`}>
               Selesai Mixing
             </button>
           </div>
           <DraftSaveSection onSave={handleSaveDraft} disabled={!trxId} />
-        </div>
-      )}
-
-      {step === 2 && (
-        <div className="space-y-3">
-          {!printed && (
-            <button
-              type="button"
-              data-no-toast
-              onClick={backToMixing}
-              className="w-full py-2.5 border border-slds-border bg-white rounded-xl text-[13px] font-semibold text-slds-text"
-            >
-              ← Kembali ke Mixing (tambah / ubah bahan)
-            </button>
-          )}
-          <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-center">
-            <p className="text-[11px] text-green-800 font-semibold uppercase">Durasi Mixing</p>
-            <p className="text-2xl font-bold text-green-900 mt-1">
-              {formatDurasi(waktuMulai && waktuSelesaiMixing ? Math.max(1, Math.round((waktuSelesaiMixing - waktuMulai) / 60000)) : null)}
-            </p>
-          </div>
-
-          <button
-            type="button"
-            data-no-toast
-            onClick={() => { setFotoSample(true); toast("Foto sample plat tersimpan", "success"); }}
-            className={`w-full py-3 rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2 border-2 ${fotoSample ? "border-green-300 bg-green-50 text-green-800" : "border-slds-border bg-white"}`}
-          >
-            <Camera className="h-4 w-4" /> {fotoSample ? "Foto Sample ✓" : "Ambil Foto Sample Plat *"}
-          </button>
-
-          <button
-            type="button"
-            data-no-toast
-            onClick={() => { setShowLabel(true); printLabelCatPreview(); toast("Label dicetak", "success"); }}
-            className="w-full py-3 border border-brand text-brand rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2 bg-white"
-          >
-            <Tag className="h-4 w-4" /> Print Label Cat
-          </button>
-
-          {showLabel && previewTrx && <LabelCatPreview trx={previewTrx} className="mx-auto" />}
-
-          {showNota && previewTrx && (
-            <div className="overflow-x-auto -mx-1">
-              <NotaPenjualanPreview trx={previewTrx} className="min-w-[320px] shadow-sm" />
-            </div>
-          )}
-
-          {!printed ? (
-            <button type="button" data-no-toast onClick={handleCetakNota} className="w-full py-3.5 bg-slds-text text-white rounded-xl font-bold text-[14px] flex items-center justify-center gap-2">
-              <Printer className="h-4 w-4" /> Cetak Nota Penjualan
-            </button>
-          ) : (
-            <>
-              <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-[12px] text-green-800">✓ Nota tercetak · status: Cetak Nota</div>
-              {!signed ? (
-                <button type="button" data-no-toast onClick={() => { setSigned(true); toast("TTD GH berhasil", "success"); }} className="w-full py-3 border-2 border-brand text-brand rounded-xl font-bold text-[14px] flex items-center justify-center gap-2">
-                  <PenLine className="h-4 w-4" /> TTD GH (Group Head Vendor)
-                </button>
-              ) : (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-[12px] text-green-800">✓ Ditandatangani GH</div>
-              )}
-              {signed && (
-                <button type="button" data-no-toast onClick={handleSelesai} className="w-full py-3 bg-brand text-white rounded-xl font-bold text-[14px]">
-                  Kirim · Menunggu OPB
-                </button>
-              )}
-            </>
-          )}
-          {!printed && <DraftSaveSection onSave={handleSaveDraft} disabled={!trxId} />}
         </div>
       )}
 

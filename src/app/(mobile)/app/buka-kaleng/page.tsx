@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Scale, Package } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { useBukaKaleng, useInventoriStok } from "@/lib/preview-store";
@@ -8,6 +9,7 @@ import { MOCK_PRODUK } from "@/lib/mock-data";
 import { MOBILE_USER } from "@/lib/mobile-app-utils";
 
 export default function BukaKalengPage() {
+  const router = useRouter();
   const { toast } = useToast();
   const { items, add } = useBukaKaleng();
   const { bukaKaleng } = useInventoriStok();
@@ -33,9 +35,8 @@ export default function BukaKalengPage() {
       tanggal: new Date().toISOString().slice(0, 10),
     });
     bukaKaleng({ kodeProduk: produk, cabang: "Surabaya", netGram, oleh: MOBILE_USER });
-    toast(`${netGram} gr masuk stok · 1 kaleng utuh berkurang`, "success");
-    setBeratKosong(120);
-    setBeratIsi(1120);
+    toast(`${netGram} gr masuk stok · +1 kaleng dibuka`, "success");
+    router.push(`/app/stok?highlight=${encodeURIComponent(produk)}&gram=${netGram}`);
   }
 
   return (

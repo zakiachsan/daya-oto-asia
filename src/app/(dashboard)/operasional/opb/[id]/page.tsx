@@ -19,12 +19,13 @@ export default function OpbDetailPage() {
   const params = useParams();
   const id = String(params.id);
   const { toast } = useToast();
-  const { items, updateStatus, setSap } = useOpbList();
+  const { items, updateStatus, setSap, patch } = useOpbList();
   const { all: transaksi } = useTransaksiList();
   const { all: fakturJual } = useFakturJual();
   const { items: hutang } = useHutangPiutang();
   const opb = items.find((o) => o.id === id);
   const [sapInput, setSapInput] = useState(opb?.sap ?? "");
+  const [tanggalOpb, setTanggalOpb] = useState(opb?.tanggalOpb ?? new Date().toISOString().slice(0, 10));
 
   if (!opb) {
     return (
@@ -83,6 +84,18 @@ export default function OpbDetailPage() {
           <div className="text-[13px] space-y-2">
             <div className="flex justify-between"><span className="text-slds-text-weak">Cabang</span><span className="font-semibold">{row.cabang}</span></div>
             <div className="flex justify-between"><span className="text-slds-text-weak">Periode</span><span className="font-semibold">{row.periode}</span></div>
+            <label className="block pt-2">
+              <span className="text-[11px] font-semibold text-slds-text-weak uppercase">Tanggal OPB</span>
+              <input
+                type="date"
+                value={tanggalOpb}
+                onChange={(e) => {
+                  setTanggalOpb(e.target.value);
+                  patch(row.id, { tanggalOpb: e.target.value });
+                }}
+                className="w-full mt-1 px-2 py-1.5 border border-slds-border rounded-md text-[13px]"
+              />
+            </label>
             <div className="flex justify-between"><span className="text-slds-text-weak">Jumlah Trx</span><span className="font-semibold">{row.jumlahTrx}</span></div>
             <div className="flex justify-between pt-2 border-t border-slds-border font-bold">
               <span>Total Tagihan</span><span className="text-brand">{formatIDR(row.total)}</span>

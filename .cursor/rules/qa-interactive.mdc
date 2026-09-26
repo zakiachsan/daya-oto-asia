@@ -1,0 +1,19 @@
+---
+description: When performing QA or browser verification on this app, run interactive harness
+alwaysApply: true
+---
+
+# QA browser (daya-oto-asia)
+
+When the user asks for **QA**, **uji**, **test browser**, **verifikasi UI**, or **cek feedback** (and does not say **smoke only**):
+
+1. Confirm or assume dev server on **http://localhost:3300** (`npm run dev`).
+2. If they mention **DeepSeek**, **QA agent**, or **browser-use agent** → run **`npm run qa:agent`** (requires `DEEPSEEK_API_KEY` in `.env.local`; see `.cursor/skills/qa-agent-deepseek/SKILL.md`).
+3. Otherwise run **`npm run qa:interactive`** (smoke + klik via browser-harness).
+4. Summarize PASS/FAIL from output.
+
+Never write API keys into the repo or chat logs.
+
+Do not skip interactive/agent QA in favor of smoke-only unless the user opts out.
+
+Read `.cursor/skills/qa-interactive/SKILL.md` for details.

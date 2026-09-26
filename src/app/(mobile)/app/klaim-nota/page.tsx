@@ -87,7 +87,7 @@ export default function KlaimNotaPage() {
           </label>
           <label className="block">
             <span className="text-[11px] font-semibold text-slds-text-weak uppercase">Receipt ID *</span>
-            <input value={receiptId} onChange={(e) => setReceiptId(e.target.value)} placeholder="TRX-2026-xxxx" className="w-full mt-1 px-3 py-2 border border-slds-border rounded-lg text-[13px] font-mono" />
+            <input value={receiptId} onChange={(e) => setReceiptId(e.target.value)} placeholder="DOA-2026-xxxx" className="w-full mt-1 px-3 py-2 border border-slds-border rounded-lg text-[13px] font-mono" />
           </label>
           <label className="block">
             <span className="text-[11px] font-semibold text-slds-text-weak uppercase">Alasan Pembatalan *</span>

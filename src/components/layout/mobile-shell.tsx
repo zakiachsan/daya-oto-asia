@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Paintbrush, MapPin, Scale, User } from "lucide-react";
-import { useMobileHrPending } from "@/lib/mobile-app-utils";
+import { MOBILE_USER, useMobileHrPending } from "@/lib/mobile-app-utils";
 
 const NAV = [
   { href: "/app", label: "Beranda", icon: Home, exact: true },
@@ -20,14 +20,9 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col min-h-screen bg-slds-bg max-w-md mx-auto">
       <header className="sticky top-0 z-20 bg-brand text-white px-4 py-3 shadow-md">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[10px] uppercase tracking-wider opacity-80">Daya Oto Asia</p>
-            <h1 className="text-base font-bold">App Tinter</h1>
-          </div>
-          <Link href="/modules" className="text-[11px] bg-white/20 px-2.5 py-1 rounded-full">
-            Web Admin
-          </Link>
+        <div>
+          <p className="text-[10px] uppercase tracking-wider opacity-80">Daya Oto Asia</p>
+          <h1 className="text-base font-bold">{MOBILE_USER}</h1>
         </div>
       </header>
 

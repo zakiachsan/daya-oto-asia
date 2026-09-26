@@ -37,17 +37,13 @@ export const NOTA_PENJUALAN_GRUP: NotaPenjualanGrup[] = [
     judul: "PRIMER / SURFACER",
     baris: [
       { id: "sf-pu", label: "A. PU 2K GREY", harga: 110000 },
-      { id: "sf-filler", label: "B. 2C HS. Filler", harga: 110000 },
+      { id: "sf-filler", label: "B. EP 2K", harga: 110000 },
       { id: "sf-pp", label: "C. PP Primer", harga: 115000 },
     ],
   },
   {
     judul: "THINNER",
-    baris: [
-      { id: "th-xs", label: "A. Extra Slow Dry", harga: 60000 },
-      { id: "th-s", label: "B. Slow Dry", harga: 60000 },
-      { id: "th-f", label: "C. Fast Dry", harga: 45000 },
-    ],
+    baris: [{ id: "th-pu", label: "A. PU", harga: 60000, kategoriKeys: ["Thinner"] }],
   },
   {
     judul: "PUTTY / DEMPUL",

@@ -10,7 +10,7 @@ import {
 } from "@/lib/nota-penjualan-tarif";
 import {
   astraPelangganForCabang,
-  buildNotaPenjualanLines,
+  buildNotaPenjualanLinesForTrx,
   notaPenjualanGrandTotal,
 } from "@/lib/nota-penjualan-utils";
 import { printElementById } from "@/lib/print-doc-utils";
@@ -30,6 +30,10 @@ type NotaPenjualanPreviewProps = {
     | "tinter"
     | "total"
     | "bahan"
+    | "produkKategori"
+    | "kodeWarna"
+    | "lainLainLabel"
+    | "produkLines"
   >;
   className?: string;
 };
@@ -62,7 +66,7 @@ export function NotaPenjualanPreview({ trx, className = "" }: NotaPenjualanPrevi
   const pelanggan = astraPelangganForCabang(trx.cabang);
   const notaNo = notaPenjualanNoFromTrxId(trx.id);
   const tanggal = formatNotaPenjualanTanggal(trx.tanggal);
-  const filledLines = buildNotaPenjualanLines(trx);
+  const filledLines = buildNotaPenjualanLinesForTrx(trx);
   const fillById = new Map(filledLines.map((l) => [l.barisId, l]));
   const grandTotal = notaPenjualanGrandTotal(filledLines);
 
@@ -105,26 +109,30 @@ export function NotaPenjualanPreview({ trx, className = "" }: NotaPenjualanPrevi
           </tr>
         </thead>
         <tbody>
-          {NOTA_PENJUALAN_GRUP.map((grup) => (
-            <Fragment key={grup.judul}>
-              <tr className="np-grup-row">
-                <td colSpan={5}>{grup.judul}</td>
-              </tr>
-              {grup.baris.map((b) => {
-                const fill = fillById.get(b.id);
-                const active = !!fill;
-                return (
-                  <tr key={b.id} className={active ? "np-row-active" : ""}>
-                    <td className="col-no center" />
-                    <td className="col-nama indent">{b.label}</td>
-                    <td className="col-ml center">{fill ? fill.pemakaianMl : ""}</td>
-                    <td className="col-harga center">{fill ? formatNotaPenjualanHarga(fill.harga) : ""}</td>
-                    <td className="col-jumlah right">{fill ? formatNotaPenjualanHarga(fill.jumlahRp) : ""}</td>
-                  </tr>
-                );
-              })}
-            </Fragment>
-          ))}
+          {NOTA_PENJUALAN_GRUP.map((grup) => {
+            const activeBaris = grup.baris.filter((b) => fillById.has(b.id));
+            if (activeBaris.length === 0) return null;
+            return (
+              <Fragment key={grup.judul}>
+                <tr className="np-grup-row">
+                  <td colSpan={5}>{grup.judul}</td>
+                </tr>
+                {activeBaris.map((b) => {
+                  const fill = fillById.get(b.id)!;
+                  const label = fill.labelOverride ?? b.label;
+                  return (
+                    <tr key={b.id} className="np-row-active">
+                      <td className="col-no center" />
+                      <td className="col-nama indent">{label}</td>
+                      <td className="col-ml center">{fill.pemakaianMl}</td>
+                      <td className="col-harga center">{formatNotaPenjualanHarga(fill.harga)}</td>
+                      <td className="col-jumlah right">{formatNotaPenjualanHarga(fill.jumlahRp)}</td>
+                    </tr>
+                  );
+                })}
+              </Fragment>
+            );
+          })}
           <tr className="np-total-row">
             <td colSpan={4} className="right">TOTAL</td>
             <td className="col-jumlah right">{formatNotaPenjualanHarga(grandTotal)}</td>

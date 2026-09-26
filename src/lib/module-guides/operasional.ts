@@ -43,7 +43,6 @@ export const operasionalGuideNav: ModuleGuideNav = {
       key: "lainnya",
       label: "Lainnya",
       items: [
-        { id: "verifikasi-klaim", label: "Verifikasi Klaim Warna" },
         { id: "laporan-pemakaian", label: "Laporan Pemakaian Base" },
         { id: "monitoring", label: "Monitoring" },
       ],
@@ -117,7 +116,6 @@ export const operasionalGuideNav: ModuleGuideNav = {
         a(O, "Cocokkan OPB vs Nota Cetak vs Stok"),
         a(O, "Review Selisih di Luar Toleransi"),
         a(O, "Flag Leakage · Tindak Lanjut"),
-        a(O, "Verifikasi Klaim jika perlu", "/operasional/verifikasi-klaim"),
       ],
     ),
     "po-penerimaan": g(
@@ -189,19 +187,6 @@ export const operasionalGuideNav: ModuleGuideNav = {
         a(O, "Lihat Saldo Gram/Liter per Item"),
         a(O, "Drill-down Mutasi Stok"),
         a(O, "Pantau Stok Minimum → Ajuan Stok", "/operasional/ajuan-stok"),
-      ],
-    ),
-    "verifikasi-klaim": g(
-      "verifikasi-klaim",
-      "Verifikasi Klaim Warna",
-      "Verifikasi Klaim Warna",
-      "/operasional/verifikasi-klaim",
-      "Bengkel klaim pekerjaan warna sudah dilakukan. Supervisor cek transaksi matching (kode warna + cabang + plat).",
-      [
-        a(M, "Ajukan Klaim Warna dari App", "/app/klaim-warna"),
-        a(O, "Review Klaim Pending", "/operasional/verifikasi-klaim"),
-        a(O, "Cek Transaksi Matching di Sistem"),
-        a(O, "Approve / Reject + Alasan"),
       ],
     ),
     "laporan-pemakaian": g(

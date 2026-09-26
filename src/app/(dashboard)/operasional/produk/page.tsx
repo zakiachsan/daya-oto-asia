@@ -7,6 +7,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ActionFormPanel, fieldClass, labelClass } from "@/components/ui/action-form-panel";
 import { MOCK_PRODUK } from "@/lib/mock-data";
+import { MIXING_RATIO_MASTER } from "@/lib/mixing-ratio-master";
 import { useToast } from "@/components/ui/toast";
 import { useBukaKaleng } from "@/lib/preview-store";
 
@@ -108,6 +109,29 @@ export default function ProdukPage() {
         ]}
         data={filtered}
       />
+
+      <div className="mt-4 bg-white border border-slds-border rounded-lg p-4">
+        <p className="text-[13px] font-bold text-slds-text mb-2">Mixing Ratio → App Tinter (#31)</p>
+        <table className="w-full text-[12px]">
+          <thead>
+            <tr className="text-left text-slds-text-weak border-b">
+              <th className="pb-2">Kode</th>
+              <th className="pb-2">Produk</th>
+              <th className="pb-2">Rasio</th>
+            </tr>
+          </thead>
+          <tbody>
+            {MIXING_RATIO_MASTER.map((r) => (
+              <tr key={r.kode} className="border-b border-slds-border/50 last:border-0">
+                <td className="py-2 font-mono">{r.kode}</td>
+                <td className="py-2">{r.nama}</td>
+                <td className="py-2 font-semibold text-brand">{r.ratioLabel}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="text-[11px] text-slds-text-weak mt-2">Basecoat tidak pakai rasio · gramasi manual di app.</p>
+      </div>
 
       <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
         <p className="text-[12px] font-bold text-blue-800">Workflow Buka Kaleng</p>

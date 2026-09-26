@@ -1,9 +1,8 @@
-/** Status lifecycle transaksi tinter · referensi feedback Sheet #14 & PPT slide 9–11 */
+/** Status lifecycle transaksi tinter · alur Word (#32): Menunggu TTD → Menunggu OPB */
 
 export const TRANSAKSI_STATUSES = [
   "Draft",
-  "Cetak Nota",
-  "TTD GH",
+  "Menunggu TTD",
   "Menunggu OPB",
   "OPB Terbit",
   "Proses Invoice",
@@ -15,9 +14,9 @@ export type TransaksiStatus = (typeof TRANSAKSI_STATUSES)[number];
 
 export type TransaksiActor = "tinter" | "admin";
 
-/** Map status lama ke status baru (localStorage legacy) */
 const LEGACY_STATUS: Record<string, TransaksiStatus> = {
-  "Menunggu TTD": "Cetak Nota",
+  "Cetak Nota": "Menunggu TTD",
+  "TTD GH": "Menunggu OPB",
 };
 
 export function normalizeTransaksiStatus(status: string): TransaksiStatus {
@@ -28,9 +27,7 @@ export function normalizeTransaksiStatus(status: string): TransaksiStatus {
 }
 
 const TINTER_NEXT: Partial<Record<TransaksiStatus, TransaksiStatus>> = {
-  Draft: "Cetak Nota",
-  "Cetak Nota": "TTD GH",
-  "TTD GH": "Menunggu OPB",
+  "Menunggu TTD": "Menunggu OPB",
 };
 
 const ADMIN_NEXT: Partial<Record<TransaksiStatus, TransaksiStatus>> = {
@@ -54,12 +51,15 @@ export function canActorUpdateStatus(status: TransaksiStatus, actor: TransaksiAc
 
 export const TRANSAKSI_STATUS_FILTER = ["Semua Status", ...TRANSAKSI_STATUSES.filter((s) => s !== "Dibatalkan")] as const;
 
+/** Urutan dropdown fase 1 transaksi · selaras nota (#25) */
 export const PRODUK_KATEGORI = [
-  { id: "basecoat", label: "Basecoat / Cat" },
-  { id: "dempul", label: "Dempul / Putty" },
-  { id: "primer", label: "Primer & Surfacer" },
+  { id: "basecoat", label: "Base coat" },
+  { id: "clearcoat", label: "Clear Coat" },
+  { id: "surfacer", label: "Surfacer" },
+  { id: "primer", label: "Primer" },
   { id: "thinner", label: "Thinner" },
-  { id: "lain", label: "Lain-lain (Silicon Degreaser)" },
+  { id: "dempul", label: "Putty/Dempul" },
+  { id: "lain", label: "lain-lain" },
 ] as const;
 
 export type ProdukKategoriId = (typeof PRODUK_KATEGORI)[number]["id"];

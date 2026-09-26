@@ -9,10 +9,10 @@ export const MOCK_USER = {
 };
 
 export const MOCK_CABANG = [
-  { id: "1", nama: "Bengkel Auto 2000 Surabaya", kota: "Surabaya", tinter: 2, stokAlert: 1 },
-  { id: "2", nama: "Bengkel Cakrawala Malang", kota: "Malang", tinter: 1, stokAlert: 0 },
-  { id: "3", nama: "Bengkel Prima Jember", kota: "Jember", tinter: 2, stokAlert: 2 },
-  { id: "4", nama: "Bengkel Surya Kediri", kota: "Kediri", tinter: 1, stokAlert: 0 },
+  { id: "1", nama: "Bengkel Auto 2000 Surabaya", kota: "Surabaya", tinter: 2, stokAlert: 1, minStokGram: 500 },
+  { id: "2", nama: "Bengkel Cakrawala Malang", kota: "Malang", tinter: 1, stokAlert: 0, minStokGram: 300 },
+  { id: "3", nama: "Bengkel Prima Jember", kota: "Jember", tinter: 2, stokAlert: 2, minStokGram: 400 },
+  { id: "4", nama: "Bengkel Surya Kediri", kota: "Kediri", tinter: 1, stokAlert: 0, minStokGram: 350 },
 ];
 
 export type TransaksiBahan = { kode: string; nama: string; gram: number };
@@ -21,6 +21,20 @@ export type TransaksiLayer = {
   layer: number;
   label: string;
   bahan: TransaksiBahan[];
+};
+
+/** Satu kategori produk dalam receipt yang sama (tambah bahan) */
+export type TransaksiProdukLine = {
+  produkKategori: ProdukKategoriId;
+  kodeWarna: string;
+  warna: string;
+  kategori: string;
+  bahan: TransaksiBahan[];
+  layers?: TransaksiLayer[];
+  mixingVolume: number;
+  total: number;
+  lainLainLabel?: string;
+  lainLainSubKategori?: string;
 };
 
 export type TransaksiRow = {
@@ -55,18 +69,52 @@ export type TransaksiRow = {
   opbId: string | null;
   /** Penambahan bahan ke mobil yang sama (sebelum lock) */
   parentId?: string;
+  /** Beberapa kategori produk · satu Receipt ID */
+  produkLines?: TransaksiProdukLine[];
   /** Field nota Bogor */
   noPkb?: string;
   jumlahPanel?: number;
   noVendor?: string;
   mixingVolume?: number;
   recipeId?: string;
+  /** Label baris lain-lain di nota (#33) */
+  lainLainLabel?: string;
+  lainLainSubKategori?: string;
+  lainLainHarga?: number;
+  /** Waktu cetak label cat (#28) */
+  waktuCetakLabel?: string | null;
   draftWizard?: TransaksiDraftWizard;
 };
 
 export const MOCK_TRANSAKSI: TransaksiRow[] = [
   {
-    id: "TRX-2026-0142",
+    id: "DOA-2609-2813",
+    tanggal: "2026-09-26",
+    cabang: "Auto 2000 Surabaya",
+    warna: "Silver Metallic",
+    kodeWarna: "1G3",
+    kategori: "Silver",
+    tinter: "Andi Wijaya",
+    status: "Menunggu TTD",
+    receiptId: "RCP-DOA-Auto2000Surabaya-26/09/2026-L9999QA",
+    fotoSample: true,
+    total: 210000,
+    mobil: "Toyota Avanza 2024",
+    platNomor: "L 9999 QA",
+    jumlahPanel: 1,
+    mixingVolume: 50,
+    recipeId: "RCP-DOA-Auto2000Surabaya-26/09/2026-L9999QA",
+    waktuMulai: "2026-09-26T08:00:00",
+    waktuSelesaiMixing: "2026-09-26T08:20:00",
+    durasiMixingMenit: 20,
+    waktuCetakNota: "2026-09-26T08:25:00",
+    waktuTTD: null,
+    durasiTotalMenit: null,
+    bahan: [{ kode: "AXT-207", nama: "AXT-207 BLACK TONER", gram: 10 }],
+    opbId: null,
+  },
+  {
+    id: "DOA-2026-0142",
     tanggal: "2026-09-10",
     cabang: "Auto 2000 Surabaya",
     warna: "Silver Metallic",
@@ -74,7 +122,7 @@ export const MOCK_TRANSAKSI: TransaksiRow[] = [
     kategori: "Silver",
     tinter: "Andi Wijaya",
     status: "Selesai",
-    receiptId: "TRX-2026-0142",
+    receiptId: "RCP-DOA-Auto2000Surabaya-10/09/2026-L1234ABC",
     fotoSample: true,
     total: 210000,
     mobil: "Toyota Avanza 2024",
@@ -98,15 +146,15 @@ export const MOCK_TRANSAKSI: TransaksiRow[] = [
     opbId: "OPB-2026-0089",
   },
   {
-    id: "TRX-2026-0141",
+    id: "DOA-2026-0141",
     tanggal: "2026-09-10",
     cabang: "Cakrawala Malang",
     warna: "Merah Solid",
     kodeWarna: "3R1",
     kategori: "Red",
     tinter: "Rudi Hartono",
-    status: "Cetak Nota",
-    receiptId: "TRX-2026-0141",
+    status: "Menunggu TTD",
+    receiptId: "RCP-DOA-CakrawalaMalang-10/09/2026-N5678XY",
     fotoSample: true,
     total: 210000,
     mobil: "Honda Brio 2022",
@@ -128,7 +176,7 @@ export const MOCK_TRANSAKSI: TransaksiRow[] = [
     opbId: null,
   },
   {
-    id: "TRX-2026-0140",
+    id: "DOA-2026-0140",
     tanggal: "2026-09-09",
     cabang: "Prima Jember",
     warna: "Pearl White",
@@ -136,7 +184,7 @@ export const MOCK_TRANSAKSI: TransaksiRow[] = [
     kategori: "Pearl",
     tinter: "Eko Prasetyo",
     status: "Draft",
-    receiptId: "TRX-2026-0140",
+    receiptId: "RCP-DOA-PrimaJember-09/09/2026-P9012JK",
     total: 230000,
     mobil: "Mitsubishi Xpander 2023",
     platNomor: "P 9012 JK",
@@ -156,7 +204,7 @@ export const MOCK_TRANSAKSI: TransaksiRow[] = [
     opbId: null,
   },
   {
-    id: "TRX-2026-0139",
+    id: "DOA-2026-0139",
     tanggal: "2026-09-09",
     cabang: "Auto 2000 Surabaya",
     warna: "Hitam Special",
@@ -164,7 +212,7 @@ export const MOCK_TRANSAKSI: TransaksiRow[] = [
     kategori: "Special",
     tinter: "Andi Wijaya",
     status: "Menunggu OPB",
-    receiptId: "TRX-2026-0139",
+    receiptId: "RCP-DOA-Auto2000Surabaya-09/09/2026-L3456DEF",
     fotoSample: true,
     total: 210000,
     mobil: "Toyota Fortuner 2021",
@@ -207,58 +255,14 @@ export type OpbRow = {
   total: number;
   status: "Draft" | "Menunggu TTD" | "Rekonsiliasi" | "Ditagihkan";
   sap: string;
+  /** Tanggal OPB diinput admin (#49) */
+  tanggalOpb?: string;
 };
 
 export const MOCK_OPB: OpbRow[] = [
   { id: "OPB-2026-0089", cabang: "Auto 2000 Surabaya", periode: "Agustus 2026", jumlahTrx: 47, total: 12500000, status: "Menunggu TTD", sap: "" },
   { id: "OPB-2026-0088", cabang: "Cakrawala Malang", periode: "Agustus 2026", jumlahTrx: 23, total: 5800000, status: "Ditagihkan", sap: "SAP-2026-445" },
   { id: "OPB-2026-0087", cabang: "Prima Jember", periode: "Agustus 2026", jumlahTrx: 31, total: 8200000, status: "Rekonsiliasi", sap: "" },
-];
-
-export type KlaimWarnaRow = {
-  id: string;
-  tanggal: string;
-  cabang: string;
-  kodeWarna: string;
-  warna: string;
-  platNomor: string;
-  klaimOleh: string;
-  status: "Menunggu Verifikasi" | "Valid" | "Ditolak";
-  catatan?: string;
-};
-
-export const MOCK_KLAIM: KlaimWarnaRow[] = [
-  {
-    id: "KL-001",
-    tanggal: "2026-09-10",
-    cabang: "Auto 2000 Surabaya",
-    kodeWarna: "1G3",
-    warna: "Silver Metallic",
-    platNomor: "L 9999 ZZ",
-    klaimOleh: "Admin Bengkel",
-    status: "Menunggu Verifikasi",
-  },
-  {
-    id: "KL-002",
-    tanggal: "2026-09-09",
-    cabang: "Prima Jember",
-    kodeWarna: "PW2",
-    warna: "Pearl White",
-    platNomor: "P 7777 AB",
-    klaimOleh: "Kepala Bengkel",
-    status: "Menunggu Verifikasi",
-  },
-  {
-    id: "KL-003",
-    tanggal: "2026-09-08",
-    cabang: "Cakrawala Malang",
-    kodeWarna: "3R1",
-    warna: "Merah Solid",
-    platNomor: "N 5678 XY",
-    klaimOleh: "Admin Bengkel",
-    status: "Valid",
-    catatan: "Cocok TRX-2026-0141",
-  },
 ];
 
 export const MOCK_STOK = [
