@@ -26,22 +26,22 @@ export default function PerubahanEquitasPage() {
       <div className="bg-white border border-slds-border rounded-lg overflow-x-auto">
         <table className="w-full text-[13px]">
           <thead>
-            <tr className="border-b border-slds-border text-left text-[11px] uppercase text-slds-text-weak bg-slds-bg">
-              <th className="px-4 py-2 font-semibold">Komponen Ekuitas</th>
-              <th className="px-4 py-2 font-semibold text-right">Saldo Awal</th>
-              <th className="px-4 py-2 font-semibold text-right">Penambahan</th>
-              <th className="px-4 py-2 font-semibold text-right">Pengurangan</th>
-              <th className="px-4 py-2 font-semibold text-right">Saldo Akhir</th>
+            <tr className="bg-slds-bg border-b border-slds-border">
+              <th className="px-4 py-3 text-left font-semibold text-slds-text-weak uppercase text-[10px] tracking-wide">Komponen Ekuitas</th>
+              <th className="px-4 py-3 text-right font-semibold text-slds-text-weak uppercase text-[10px] tracking-wide">Saldo Awal</th>
+              <th className="px-4 py-3 text-right font-semibold text-slds-text-weak uppercase text-[10px] tracking-wide">Penambahan</th>
+              <th className="px-4 py-3 text-right font-semibold text-slds-text-weak uppercase text-[10px] tracking-wide">Pengurangan</th>
+              <th className="px-4 py-3 text-right font-semibold text-slds-text-weak uppercase text-[10px] tracking-wide">Saldo Akhir</th>
             </tr>
           </thead>
           <tbody>
             {MOCK_PERUBAHAN_EKUITAS.map((r) => (
               <tr key={r.komponen} className="border-b border-slds-border last:border-0">
-                <td className="px-4 py-2 font-semibold">{r.komponen}</td>
-                <td className="px-4 py-2 text-right">{formatIDR(r.saldoAwal)}</td>
-                <td className="px-4 py-2 text-right text-green-600">{r.penambahan > 0 ? formatIDR(r.penambahan) : "-"}</td>
-                <td className="px-4 py-2 text-right text-red-600">{r.pengurangan > 0 ? formatIDR(r.pengurangan) : "-"}</td>
-                <td className="px-4 py-2 text-right font-semibold">{formatIDR(r.saldoAkhir)}</td>
+                <td className="px-4 py-3 font-semibold">{r.komponen}</td>
+                <td className="px-4 py-3 text-right">{formatIDR(r.saldoAwal)}</td>
+                <td className="px-4 py-3 text-right text-green-600">{r.penambahan > 0 ? formatIDR(r.penambahan) : "-"}</td>
+                <td className="px-4 py-3 text-right text-red-600">{r.pengurangan > 0 ? formatIDR(r.pengurangan) : "-"}</td>
+                <td className="px-4 py-3 text-right font-semibold">{formatIDR(r.saldoAkhir)}</td>
               </tr>
             ))}
           </tbody>

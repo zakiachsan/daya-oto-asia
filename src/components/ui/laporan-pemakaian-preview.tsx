@@ -6,6 +6,7 @@ import {
   formatBulanLaporan,
   formatPolisiLaporan,
   formatTanggalCetakLaporan,
+  formatTanggalHariLaporan,
   padLaporanGrid,
   rowGramTotal,
   totalGramByDay,
@@ -19,6 +20,11 @@ type LaporanPemakaianPreviewProps = {
   bulan: string;
   rows: LaporanPemakaianRow[];
   className?: string;
+  /**
+   * "bulan" = laporan bulanan (dua grid: TGL 1–15 | TGL 16–31).
+   * "transaksi" = satu transaksi saja → satu tabel, kolom tanggal ikut data yang ada.
+   */
+  layout?: "bulan" | "transaksi";
 };
 
 function DoaLogo() {
@@ -52,24 +58,38 @@ function DayBlock({
   grid: ReturnType<typeof padLaporanGrid>;
   allRows: LaporanPemakaianRow[];
 }) {
+  const pakaiTanggal = days.length > 0;
   return (
     <div className="lp-block">
       <p className="lp-block-label">{label}</p>
       <table className="lp-table">
         <thead>
-          <tr>
-            <th rowSpan={2} className="col-no">No.</th>
-            <th rowSpan={2} className="col-kode">KODE BARANG</th>
-            <th rowSpan={2} className="col-nama">NAMA BARANG</th>
-            <th rowSpan={2} className="col-pol">NO POLISI</th>
-            <th colSpan={days.length} className="lp-tgl-header">TGL</th>
-            <th rowSpan={2} className="col-sum">TOTAL (gr)</th>
-          </tr>
-          <tr>
-            {days.map((d) => (
-              <th key={d} className="col-day">{d}</th>
-            ))}
-          </tr>
+          {pakaiTanggal ? (
+            <>
+              <tr>
+                <th rowSpan={2} className="col-no">No.</th>
+                <th rowSpan={2} className="col-kode">KODE BARANG</th>
+                <th rowSpan={2} className="col-nama">NAMA BARANG</th>
+                <th rowSpan={2} className="col-pol">NO POLISI</th>
+                <th colSpan={days.length} className="lp-tgl-header">TGL</th>
+                <th rowSpan={2} className="col-sum">TOTAL (gr)</th>
+              </tr>
+              <tr>
+                {days.map((d) => (
+                  <th key={d} className="col-day">{d}</th>
+                ))}
+              </tr>
+            </>
+          ) : (
+            /* Tanpa kolom tanggal · satu transaksi: tanggalnya sudah dijelaskan di label blok */
+            <tr>
+              <th className="col-no">No.</th>
+              <th className="col-kode">KODE BARANG</th>
+              <th className="col-nama">NAMA BARANG</th>
+              <th className="col-pol">NO POLISI</th>
+              <th className="col-sum">TOTAL (gr)</th>
+            </tr>
+          )}
         </thead>
         <tbody>
           {grid.map((r, idx) => {
@@ -80,20 +100,24 @@ function DayBlock({
                 <td className="mono">{r.kodeBarang}</td>
                 <td className="nama">{r.namaBarang}</td>
                 <td className="pol">{formatPolisiLaporan(r.noPolisi)}</td>
-                {days.map((d) => (
-                  <td key={d} className="center day-val">{r.byDay[d] ? r.byDay[d] : ""}</td>
-                ))}
+                {pakaiTanggal &&
+                  days.map((d) => (
+                    <td key={d} className="center day-val">{r.byDay[d] ? r.byDay[d] : ""}</td>
+                  ))}
                 <td className="center sum-val">{rowGramTotal(r) || ""}</td>
               </tr>
             );
           })}
           <tr className="lp-total-row">
             <td colSpan={4} className="right">TOTAL (gr)</td>
-            {days.map((d) => (
-              <td key={d} className="center">{totalGramByDay(allRows, d) || ""}</td>
-            ))}
+            {pakaiTanggal &&
+              days.map((d) => (
+                <td key={d} className="center">{totalGramByDay(allRows, d) || ""}</td>
+              ))}
             <td className="center">
-              {days.reduce((s, d) => s + totalGramByDay(allRows, d), 0) || ""}
+              {pakaiTanggal
+                ? days.reduce((s, d) => s + totalGramByDay(allRows, d), 0) || ""
+                : totalGramLaporan(allRows) || ""}
             </td>
           </tr>
         </tbody>
@@ -104,16 +128,30 @@ function DayBlock({
 
 /**
  * Laporan pemakaian base · referensi DOA Cabang Bogor hal. 2.
- * Dua grid side-by-side: TGL 1–15 | TGL 16–31.
+ * Default dua grid side-by-side: TGL 1–15 | TGL 16–31.
+ * `layout="transaksi"` (dipakai di detail transaksi) = satu tabel saja.
  */
-export function LaporanPemakaianPreview({ bengkel, tinter, bulan, rows, className = "" }: LaporanPemakaianPreviewProps) {
+export function LaporanPemakaianPreview({
+  bengkel,
+  tinter,
+  bulan,
+  rows,
+  className = "",
+  layout = "bulan",
+}: LaporanPemakaianPreviewProps) {
   const daysInMonth = new Date(Number(bulan.slice(0, 4)), Number(bulan.slice(5, 7)), 0).getDate();
   const days1 = Array.from({ length: Math.min(15, daysInMonth) }, (_, i) => i + 1);
   const days2 = Array.from({ length: Math.max(0, daysInMonth - 15) }, (_, i) => i + 16);
-  const grid = padLaporanGrid(buildLaporanGrid(rows));
+  const ringkas = layout === "transaksi";
+  /* Satu transaksi: kolom tanggal nggak perlu (semua barisnya tanggal sama) → tanggal tampil di label blok */
+  const daysData = Array.from(new Set(rows.map((r) => r.tanggal))).sort((a, b) => a - b);
+  const labelTransaksi = daysData.length
+    ? `PEMAKAIAN TANGGAL ${daysData.map((d) => formatTanggalHariLaporan(bulan, d)).join(" · ")}`
+    : "PEMAKAIAN";
+  const grid = ringkas ? buildLaporanGrid(rows) : padLaporanGrid(buildLaporanGrid(rows));
 
   return (
-    <div className={`laporan-pemakaian ${className}`} id="laporan-pemakaian-preview">
+    <div className={`laporan-pemakaian ${ringkas ? "lp-transaksi" : ""} ${className}`} id="laporan-pemakaian-preview">
       <div className="lp-header">
         <div className="lp-header-left">
           <DoaLogo />
@@ -134,16 +172,24 @@ export function LaporanPemakaianPreview({ bengkel, tinter, bulan, rows, classNam
         </div>
       </div>
 
-      <div className="lp-split">
-        <DayBlock label="TGL 1 – 15" days={days1} grid={grid} allRows={rows} />
-        {days2.length > 0 && (
-          <DayBlock label="TGL 16 – 31" days={days2} grid={grid} allRows={rows} />
-        )}
-      </div>
+      {ringkas && !rows.length ? (
+        <p className="lp-empty">Belum ada pemakaian base tercatat untuk transaksi ini.</p>
+      ) : ringkas ? (
+        <DayBlock label={labelTransaksi} days={[]} grid={grid} allRows={rows} />
+      ) : (
+        <div className="lp-split">
+          <DayBlock label="TGL 1 – 15" days={days1} grid={grid} allRows={rows} />
+          {days2.length > 0 && (
+            <DayBlock label="TGL 16 – 31" days={days2} grid={grid} allRows={rows} />
+          )}
+        </div>
+      )}
 
-      <div className="lp-grand-total">
-        TOTAL BULAN INI &nbsp; {totalGramLaporan(rows)} gr
-      </div>
+      {!(ringkas && !rows.length) && (
+        <div className="lp-grand-total">
+          {ringkas ? "TOTAL PEMAKAIAN" : "TOTAL BULAN INI"} &nbsp; {totalGramLaporan(rows)} gr
+        </div>
+      )}
 
       <div className="lp-footer">
         <div className="lp-sig">
@@ -192,6 +238,7 @@ const LAPORAN_PRINT_CSS = `
   .lp-row-data .day-val { font-weight: 700; background: #fffde7; }
   .lp-total-row td { font-weight: 700; background: #f5f5f5; }
   .lp-grand-total { border: 2px solid #000; padding: 5px 8px; text-align: right; font-weight: 700; font-size: 9pt; margin-top: 8px; }
+  .lp-empty { border: 1px dashed #000; padding: 8px; text-align: center; font-size: 8pt; margin: 0; }
   .lp-footer { display: flex; justify-content: space-between; margin-top: 20px; font-size: 8pt; }
   .lp-sig { width: 38%; text-align: center; }
   .lp-sig-line { border-bottom: 1px solid #000; height: 40px; margin-bottom: 4px; }

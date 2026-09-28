@@ -120,7 +120,7 @@ export default function InventoriPage() {
             </div>
             <div>
               <p className="text-[11px] text-slds-text-weak uppercase font-semibold">{s.label}</p>
-              <p className="text-xl font-bold text-slds-text">{s.value}</p>
+              <p className="text-2xl font-bold text-slds-text">{s.value}</p>
             </div>
           </div>
         ))}

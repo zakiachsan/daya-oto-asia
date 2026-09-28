@@ -25,7 +25,7 @@ export default function OperasionalDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div>
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-bold text-slds-text">Transaksi Terbaru</h2>
+            <h2 className="text-[13px] font-bold text-slds-text">Transaksi Terbaru</h2>
             <Link href="/operasional/transaksi" className="text-[12px] text-brand font-semibold">Lihat semua</Link>
           </div>
           <DataTable
@@ -46,7 +46,7 @@ export default function OperasionalDashboard() {
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-bold text-slds-text">Cabang</h2>
+          <h2 className="text-[13px] font-bold text-slds-text">Cabang</h2>
           <Link href="/operasional/cabang" className="text-[12px] text-brand font-semibold">Kelola cabang</Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">

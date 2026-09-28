@@ -66,7 +66,7 @@ export default function SlipGajiDetailPage() {
               <span className="font-semibold">-{formatIDR(row.potongan)}</span>
             </div>
             <div className="flex justify-between"><span className="text-slds-text-weak">PPh 21</span><span className="font-semibold">-{formatIDR(row.pph21)}</span></div>
-            <div className="flex justify-between pt-3 border-t-2 border-slds-border text-[15px] font-bold">
+            <div className="flex justify-between pt-3 border-t-2 border-slds-border text-[13px] font-bold">
               <span>Gaji Bersih</span><span className="text-brand">{formatIDR(row.bersih)}</span>
             </div>
           </div>

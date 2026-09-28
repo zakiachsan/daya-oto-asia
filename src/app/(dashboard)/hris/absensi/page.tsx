@@ -68,12 +68,12 @@ export default function AbsensiPage() {
         <div className="bg-white border border-slds-border rounded-lg overflow-hidden">
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="bg-slds-bg border-b border-slds-border text-left text-[11px] uppercase text-slds-text-weak">
-                <th className="px-4 py-2">Karyawan</th>
-                <th className="px-4 py-2">Hadir</th>
-                <th className="px-4 py-2">Telat</th>
-                <th className="px-4 py-2">Alpha</th>
-                <th className="px-4 py-2">Kehadiran</th>
+              <tr className="bg-slds-bg border-b border-slds-border text-left text-[10px] uppercase text-slds-text-weak">
+                <th className="px-4 py-3 font-semibold">Karyawan</th>
+                <th className="px-4 py-3 font-semibold">Hadir</th>
+                <th className="px-4 py-3 font-semibold">Telat</th>
+                <th className="px-4 py-3 font-semibold">Alpha</th>
+                <th className="px-4 py-3 font-semibold">Kehadiran</th>
               </tr>
             </thead>
             <tbody>

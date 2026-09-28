@@ -260,16 +260,16 @@ export function FinanceContactMasterPage({ mode }: { mode: MasterMode }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
         <div className="bg-white border border-slds-border rounded-lg p-4">
-          <p className="text-[11px] text-slds-text-weak uppercase tracking-wide">Total {cfg.title}</p>
-          <p className="text-xl font-bold text-slds-text mt-1">{items.length}</p>
+          <p className="text-[11px] font-semibold text-slds-text-weak uppercase tracking-wide">Total {cfg.title}</p>
+          <p className="text-2xl font-bold text-slds-text mt-1">{items.length}</p>
         </div>
         <div className="bg-white border border-slds-border rounded-lg p-4">
-          <p className="text-[11px] text-slds-text-weak uppercase tracking-wide">Aktif</p>
-          <p className="text-xl font-bold text-green-600 mt-1">{items.filter((r) => r.status === "Aktif").length}</p>
+          <p className="text-[11px] font-semibold text-slds-text-weak uppercase tracking-wide">Aktif</p>
+          <p className="text-2xl font-bold text-green-600 mt-1">{items.filter((r) => r.status === "Aktif").length}</p>
         </div>
         <div className="bg-white border border-slds-border rounded-lg p-4">
-          <p className="text-[11px] text-slds-text-weak uppercase tracking-wide">Total {cfg.saldoLabel}</p>
-          <p className="text-xl font-bold text-brand mt-1">{formatIDR(totalSaldo)}</p>
+          <p className="text-[11px] font-semibold text-slds-text-weak uppercase tracking-wide">Total {cfg.saldoLabel}</p>
+          <p className="text-2xl font-bold text-brand mt-1">{formatIDR(totalSaldo)}</p>
         </div>
       </div>
 
@@ -303,7 +303,7 @@ export function FinanceContactMasterPage({ mode }: { mode: MasterMode }) {
               key: "status",
               label: "Status",
               render: (r) => (
-                <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${r.status === "Aktif" ? "bg-green-100 text-green-700" : "bg-slds-bg text-slds-text-weak"}`}>
+                <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${r.status === "Aktif" ? "bg-green-100 text-green-700" : "bg-slds-bg text-slds-text-weak"}`}>
                   {r.status}
                 </span>
               ),
@@ -349,7 +349,7 @@ export function FinanceContactMasterPage({ mode }: { mode: MasterMode }) {
               key: "status",
               label: "Status",
               render: (r) => (
-                <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${r.status === "Aktif" ? "bg-green-100 text-green-700" : "bg-slds-bg text-slds-text-weak"}`}>
+                <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${r.status === "Aktif" ? "bg-green-100 text-green-700" : "bg-slds-bg text-slds-text-weak"}`}>
                   {r.status}
                 </span>
               ),

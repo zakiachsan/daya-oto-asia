@@ -12,7 +12,7 @@ export function GuideSections({ sections }: { sections: GuideSection[] }) {
     <div className="space-y-3">
       {sections.map((s) => (
         <details key={s.title} className="bg-white border border-slds-border rounded-lg group" open>
-          <summary className="px-4 py-3 cursor-pointer text-[14px] font-bold text-slds-text list-none flex items-center justify-between">
+          <summary className="px-4 py-3 cursor-pointer text-[13px] font-bold text-slds-text list-none flex items-center justify-between">
             {s.title}
             <ChevronRight className="h-4 w-4 text-slds-text-weak group-open:rotate-90 transition-transform" />
           </summary>

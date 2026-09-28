@@ -77,9 +77,9 @@ export const FINANCE_PLACEHOLDERS: Record<string, FinancePlaceholderDef> = {
   "persediaan/penerimaan-barang": {
     title: "Penerimaan Barang",
     section: "Persediaan",
-    desc: "GR toner/cat · mirror dari PO Operasional.",
-    mirrorHref: "/operasional/po",
-    mirrorLabel: "PO & Penerimaan (Operasional)",
+    desc: "GR toner/cat · dari PO & Penerimaan.",
+    mirrorHref: "/finance/pembelian/po",
+    mirrorLabel: "PO & Penerimaan",
   },
   "persediaan/barang-jasa": {
     title: "Barang & Jasa",
@@ -103,9 +103,9 @@ export const FINANCE_PLACEHOLDERS: Record<string, FinancePlaceholderDef> = {
   "pembelian/pesanan-pembelian": {
     title: "Pesanan Pembelian",
     section: "Pembelian",
-    desc: "Monitor PO ke pabrik · mirror Operasional.",
-    mirrorHref: "/operasional/po",
-    mirrorLabel: "PO & Penerimaan (Operasional)",
+    desc: "Monitor PO ke pabrik · halaman utama PO & Penerimaan.",
+    mirrorHref: "/finance/pembelian/po",
+    mirrorLabel: "PO & Penerimaan",
   },
   "pembelian/uang-muka-pembelian": {
     title: "Uang Muka Pembelian",
@@ -122,8 +122,8 @@ export const FINANCE_PLACEHOLDERS: Record<string, FinancePlaceholderDef> = {
     title: "Penerimaan Barang",
     section: "Pembelian",
     desc: "Goods received dari PO vendor.",
-    mirrorHref: "/operasional/po",
-    mirrorLabel: "PO & Penerimaan (Operasional)",
+    mirrorHref: "/finance/pembelian/po",
+    mirrorLabel: "PO & Penerimaan",
   },
   "pembelian/pemasok": {
     title: "Pemasok",

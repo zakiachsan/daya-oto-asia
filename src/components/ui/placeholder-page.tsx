@@ -21,7 +21,7 @@ export function PlaceholderPage({ title, desc, moduleHref, features }: Placehold
       />
       <div className="bg-white border border-slds-border rounded-lg p-8 text-center">
         <Construction className="h-10 w-10 mx-auto text-slds-text-weak/40 mb-3" />
-        <p className="text-base font-bold text-slds-text">UI Placeholder</p>
+        <p className="text-[13px] font-bold text-slds-text">UI Placeholder</p>
         <p className="text-[13px] text-slds-text-weak mt-1 max-w-md mx-auto">
           Halaman ini akan diisi dengan komponen final. Struktur navigasi & layout sudah siap.
         </p>

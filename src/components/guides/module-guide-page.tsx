@@ -61,13 +61,13 @@ function FlowNode({
       {action.href ? (
         <Link
           href={action.href}
-          className="block text-sm font-semibold no-underline hover:underline"
+          className="block text-[13px] font-semibold no-underline hover:underline"
           style={{ color: theme.badge }}
         >
           {action.label}
         </Link>
       ) : (
-        <div className="text-sm font-semibold text-[#001526]">{action.label}</div>
+        <div className="text-[13px] font-semibold text-[#001526]">{action.label}</div>
       )}
       {action.also && (
         <div className="text-[10px] text-[#888] mt-1.5">
@@ -162,7 +162,7 @@ export function ModuleGuidePage({ nav }: ModuleGuidePageProps) {
             <>
               <div className="mb-5">
                 <div className="text-[11px] text-[#888] mb-1">{guide.menuLabel}</div>
-                <h2 className="text-lg font-bold text-[#001526]">{guide.title}</h2>
+                <h2 className="text-[13px] font-bold text-[#001526]">{guide.title}</h2>
                 <p className="text-[13px] text-[#555] mt-1 max-w-lg">{guide.summary}</p>
               </div>
 

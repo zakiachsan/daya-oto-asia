@@ -47,7 +47,7 @@ export const DEMO_STOK_CHAIN: StokChainStep[] = [
     id: "po",
     label: "PO / Distribusi",
     desc: "PO-2026-034 → GR → stok cabang terisi",
-    href: "/operasional/po/PO-2026-034",
+    href: "/finance/pembelian/po/PO-2026-034",
     status: "pending",
   },
 ];

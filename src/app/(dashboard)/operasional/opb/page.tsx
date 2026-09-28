@@ -13,6 +13,7 @@ import { FinanceLinkBadge } from "@/components/finance/finance-link-badge";
 import { useFakturJual, useHutangPiutang, useOpbList, useTransaksiList } from "@/lib/preview-store";
 import { fakturJualForOpb, getOpbFinanceStatus } from "@/lib/ops-finance-bridge";
 import { fakturSlug } from "@/lib/faktur-utils";
+import { formatTanggalOpb, nextOpbId } from "@/lib/opb-utils";
 
 function cabangShort(nama: string) {
   return nama.replace(/^Bengkel /, "");
@@ -23,7 +24,14 @@ const CABANG_OPTIONS = MOCK_CABANG.map((c) => ({
   label: cabangShort(c.nama),
 }));
 
-const STATUS_FILTER = ["Semua Status", "Draft", "Menunggu TTD", "Rekonsiliasi", "Ditagihkan"];
+/* feedback #27: nilai status tetap "Menunggu TTD", label tampilannya "Proses Invoice" */
+const STATUS_FILTER = [
+  { label: "Semua Status", value: "Semua Status" },
+  { label: "Draft", value: "Draft" },
+  { label: "Proses Invoice", value: "Menunggu TTD" },
+  { label: "Rekonsiliasi", value: "Rekonsiliasi" },
+  { label: "Ditagihkan", value: "Ditagihkan" },
+];
 
 export default function OPBPage() {
   const { toast } = useToast();
@@ -34,6 +42,8 @@ export default function OPBPage() {
   const [showForm, setShowForm] = useState(false);
   const [periode, setPeriode] = useState("September 2026");
   const [cabang, setCabang] = useState(CABANG_OPTIONS[0].label);
+  /* Tanggal OPB diinput admin saat generate · default hari ini */
+  const [tanggalOpb, setTanggalOpb] = useState(() => new Date().toISOString().slice(0, 10));
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Semua Status");
@@ -57,9 +67,10 @@ export default function OPBPage() {
     const total = finalized.reduce((s, t) => s + t.total, 0) || jumlahTrx * 210000;
 
     const newOPB: OpbRow = {
-      id: `OPB-2026-${String(90 + items.length).padStart(4, "0")}`,
+      id: nextOpbId(items),
       cabang,
       periode,
+      tanggalOpb,
       jumlahTrx,
       total,
       status: "Draft",
@@ -67,11 +78,12 @@ export default function OPBPage() {
     };
     add(newOPB);
     setShowForm(false);
-    toast(`OPB ${newOPB.id} digenerate · ${jumlahTrx} trx, ${formatIDR(total)}`, "success");
+    toast(`OPB ${newOPB.id} digenerate · ${jumlahTrx} trx, ${formatIDR(total)} · tgl ${formatTanggalOpb(tanggalOpb)}`, "success");
   }
 
   const counts = {
     draft: items.filter((o) => o.status === "Draft").length,
+    /* label kartu "Proses Invoice" · nilai status masih "Menunggu TTD" */
     menunggu: items.filter((o) => o.status === "Menunggu TTD").length,
     rekonsiliasi: items.filter((o) => o.status === "Rekonsiliasi").length,
     ditagihkan: items.filter((o) => o.status === "Ditagihkan").length,
@@ -97,7 +109,7 @@ export default function OPBPage() {
 
       {showForm && (
         <ActionFormPanel title="Generate OPB Bulanan" onClose={() => setShowForm(false)} onSave={handleGenerate} saveLabel="Generate">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className={labelClass}>Periode</label>
               <select value={periode} onChange={(e) => setPeriode(e.target.value)} className={`${fieldClass} bg-white`}>
@@ -113,6 +125,15 @@ export default function OPBPage() {
                   <option key={c.id} value={c.label}>{c.label}</option>
                 ))}
               </select>
+            </div>
+            <div>
+              <label className={labelClass}>Tanggal OPB</label>
+              <input
+                type="date"
+                value={tanggalOpb}
+                onChange={(e) => setTanggalOpb(e.target.value)}
+                className={fieldClass}
+              />
             </div>
           </div>
           <p className="text-[11px] text-slds-text-weak mt-3">
@@ -151,7 +172,7 @@ export default function OPBPage() {
           className="px-3 py-2 border border-slds-border rounded-md text-[13px] bg-white focus:border-brand focus:outline-none"
         >
           {STATUS_FILTER.map((o) => (
-            <option key={o} value={o}>{o}</option>
+            <option key={o.value} value={o.value}>{o.label}</option>
           ))}
         </select>
         <select
@@ -179,6 +200,7 @@ export default function OPBPage() {
           },
           { key: "cabang", label: "Cabang" },
           { key: "periode", label: "Periode" },
+          { key: "tanggalOpb", label: "Tgl. OPB", render: (r) => formatTanggalOpb(r.tanggalOpb) },
           { key: "total", label: "Total", render: (r) => formatIDR(Number(r.total)) },
           {
             key: "finance",

@@ -1,18 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, Printer, Save } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { ArrowLeft, ArrowRight, FileText, Printer, Save } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { OpbPreview, printOpbPreview } from "@/components/ui/opb-preview";
 import { formatIDR, type OpbRow } from "@/lib/mock-data";
-import { getOpbTransaksi, OPB_PIPELINE } from "@/lib/opb-utils";
+import { getOpbTransaksi, OPB_PIPELINE, opbStatusLabel } from "@/lib/opb-utils";
 import { FinanceLinkBadge } from "@/components/finance/finance-link-badge";
 import { useFakturJual, useHutangPiutang, useOpbList, useTransaksiList } from "@/lib/preview-store";
 import { fakturJualForOpb, getOpbFinanceStatus } from "@/lib/ops-finance-bridge";
 import { fakturSlug } from "@/lib/faktur-utils";
+import { buildFakturUntukOpb } from "@/lib/finance-invoice-batch-utils";
 import { useToast } from "@/components/ui/toast";
 
 export default function OpbDetailPage() {
@@ -21,11 +22,26 @@ export default function OpbDetailPage() {
   const { toast } = useToast();
   const { items, updateStatus, setSap, patch } = useOpbList();
   const { all: transaksi } = useTransaksiList();
-  const { all: fakturJual } = useFakturJual();
+  const { all: fakturJual, add: addFaktur } = useFakturJual();
+  const router = useRouter();
   const { items: hutang } = useHutangPiutang();
   const opb = items.find((o) => o.id === id);
   const [sapInput, setSapInput] = useState(opb?.sap ?? "");
   const [tanggalOpb, setTanggalOpb] = useState(opb?.tanggalOpb ?? new Date().toISOString().slice(0, 10));
+
+  /* Data OPB dari localStorage baru terbaca setelah mount · sinkronkan sekali
+     supaya field tidak menampilkan nilai contoh yang sudah usang */
+  useEffect(() => {
+    const tgl = opb?.tanggalOpb;
+    if (!tgl) return;
+    setTanggalOpb((prev) => (prev === tgl ? prev : tgl));
+  }, [opb?.tanggalOpb]);
+
+  useEffect(() => {
+    const sap = opb?.sap;
+    if (!sap) return;
+    setSapInput((prev) => (prev === sap ? prev : sap));
+  }, [opb?.sap]);
 
   if (!opb) {
     return (
@@ -52,6 +68,20 @@ export default function OpbDetailPage() {
     }
   }
 
+  /** Generate invoice langsung dari halaman detail OPB (feedback #57) lalu buka detail fakturnya */
+  function handleGenerateInvoice() {
+    if (!opb) return;
+    if (faktur) {
+      router.push(`/finance/penjualan/faktur-penjualan/${fakturSlug(faktur.id)}`);
+      return;
+    }
+    const [baru] = buildFakturUntukOpb([opb], fakturJual);
+    addFaktur(baru);
+    patch(opb.id, { status: "Ditagihkan" });
+    toast(`Invoice ${baru.id} digenerate dari ${opb.id} · status OPB jadi Ditagihkan`, "success");
+    router.push(`/finance/penjualan/faktur-penjualan/${fakturSlug(baru.id)}`);
+  }
+
   function handleSaveSap() {
     if (!sapInput.trim()) {
       toast("No. SAP wajib diisi", "error");
@@ -71,7 +101,7 @@ export default function OpbDetailPage() {
           { label: "OPB & Tagihan", href: "/operasional/opb" },
           { label: row.id },
         ]}
-        actions={<StatusBadge status={row.status} />}
+        actions={<StatusBadge status={opbStatusLabel(row.status)} />}
       />
 
       <Link href="/operasional/opb" className="inline-flex items-center gap-1 text-[13px] text-brand font-semibold mb-4 hover:underline">
@@ -125,12 +155,28 @@ export default function OpbDetailPage() {
           </div>
 
           <div className="pt-3 border-t border-slds-border space-y-2">
-            {row.status === "Ditagihkan" && !faktur && (
-              <Link
-                href="/finance/penjualan/faktur-penjualan"
+            {/* Generate invoice dari halaman detail (#57) — tidak perlu ke daftar faktur dulu */}
+            {!faktur && opb.status === "Draft" && (
+              <p className="text-[11px] text-slds-text-weak leading-relaxed">
+                OPB masih Draft · kirim ke Finance dulu (ubah status jadi Proses Invoice) sebelum invoice digenerate.
+              </p>
+            )}
+            {!faktur && opb.status !== "Draft" && (
+              <button
+                type="button"
+                data-no-toast
+                onClick={handleGenerateInvoice}
                 className="w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-green-600 text-white rounded-md text-[12px] font-semibold hover:bg-green-700"
               >
-                Generate Faktur Penjualan
+                <FileText className="h-3.5 w-3.5" /> Generate Invoice
+              </button>
+            )}
+            {faktur && (
+              <Link
+                href={`/finance/penjualan/faktur-penjualan/${fakturSlug(faktur.id)}`}
+                className="w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-green-600 text-white rounded-md text-[12px] font-semibold hover:bg-green-700"
+              >
+                <FileText className="h-3.5 w-3.5" /> Buka Invoice {faktur.id}
               </Link>
             )}
             {(row.status === "Draft" || row.status === "Menunggu TTD") && (
@@ -206,7 +252,7 @@ export default function OpbDetailPage() {
           ) : (
             <table className="w-full text-[13px]">
               <thead>
-                <tr className="border-b border-slds-border text-left text-[11px] uppercase text-slds-text-weak">
+                <tr className="border-b border-slds-border text-left text-[10px] uppercase text-slds-text-weak">
                   <th className="pb-2 font-semibold">No. Trx</th>
                   <th className="pb-2 font-semibold">Warna</th>
                   <th className="pb-2 font-semibold">Tinter</th>

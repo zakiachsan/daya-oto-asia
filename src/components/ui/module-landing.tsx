@@ -27,7 +27,7 @@ export function ModuleLanding({ title, desc, menus }: ModuleLandingProps) {
                 {m.section && (
                   <p className="text-[10px] font-bold uppercase tracking-wider text-slds-text-weak mb-0.5">{m.section}</p>
                 )}
-                <h3 className="text-base font-bold text-slds-text">{m.label}</h3>
+                <h3 className="text-[13px] font-bold text-slds-text">{m.label}</h3>
                 {m.desc && <p className="text-[11px] text-slds-text-weak mt-0.5">{m.desc}</p>}
               </div>
               <ChevronRight className="h-4 w-4 text-slds-text-weak group-hover:text-brand shrink-0" />

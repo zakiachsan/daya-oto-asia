@@ -7,6 +7,8 @@ export type TransaksiCatatanItem = {
   kodeWarna: string;
   nama: string;
   mixingVolume?: number;
+  /** Durasi mixing bahan ini · null = belum tercatat */
+  durasiMixingMenit?: number | null;
   bahan: { kode: string; nama: string; gram: number }[];
   total?: number;
 };
@@ -23,6 +25,7 @@ function lineToCatatan(urut: number, line: TransaksiProdukLine): TransaksiCatata
     kodeWarna: line.kodeWarna,
     nama: line.warna,
     mixingVolume: line.mixingVolume,
+    durasiMixingMenit: line.durasiMixingMenit ?? null,
     bahan: line.bahan.map((b) => ({ kode: b.kode, nama: b.nama, gram: b.gram })),
     total: line.total,
   };
@@ -40,6 +43,7 @@ export function buildTransaksiCatatan(
     | "mixingVolume"
     | "total"
     | "kategori"
+    | "durasiMixingMenit"
   >,
 ): TransaksiCatatanItem[] {
   const items: TransaksiCatatanItem[] = [];
@@ -54,6 +58,7 @@ export function buildTransaksiCatatan(
       kodeWarna: trx.kodeWarna,
       nama: trx.warna,
       mixingVolume: trx.mixingVolume,
+      durasiMixingMenit: trx.durasiMixingMenit,
       bahan: trx.bahan.map((b) => ({ kode: b.kode, nama: b.nama, gram: b.gram })),
       total: trx.total,
     });

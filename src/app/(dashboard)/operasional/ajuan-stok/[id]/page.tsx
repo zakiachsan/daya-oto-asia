@@ -6,7 +6,8 @@ import { ArrowLeft, Check, X, Package, Truck } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ajuanStatusBadge } from "@/lib/ajuan-stok-utils";
-import { useAjuanStok } from "@/lib/preview-store";
+import { distribusiStatus, nextDistribusiId } from "@/lib/distribusi-utils";
+import { useAjuanStok, useDistribusiList } from "@/lib/preview-store";
 import { useToast } from "@/components/ui/toast";
 
 export default function AjuanStokDetailPage() {
@@ -14,6 +15,7 @@ export default function AjuanStokDetailPage() {
   const id = String(params.id);
   const { toast } = useToast();
   const { items, updateStatus, update } = useAjuanStok();
+  const { items: distribusiItems, add: addDistribusi } = useDistribusiList();
   const found = items.find((r) => r.id === id);
 
   if (!found) {
@@ -27,6 +29,12 @@ export default function AjuanStokDetailPage() {
 
   const row = found;
 
+  /* Distribusi yang lahir dari ajuan ini (kalau sudah disetujui) */
+  const distribusi =
+    distribusiItems.find((d) => d.refAjuan === row.id) ??
+    distribusiItems.find((d) => d.id === row.refDistribusi);
+  const distStatus = distribusi ? distribusiStatus(distribusi) : null;
+
   const timeline = [
     { label: "Diajukan Tinter", done: true, detail: `${row.tanggal} · ${row.tinter}` },
     { label: "Menunggu Approval Pusat", done: row.status !== "Menunggu", active: row.status === "Menunggu" },
@@ -34,15 +42,46 @@ export default function AjuanStokDetailPage() {
       label: row.status === "Ditolak" ? "Ditolak" : "Disetujui",
       done: row.status === "Disetujui" || row.status === "Ditolak",
       active: row.status === "Disetujui" || row.status === "Ditolak",
+      detail: row.catatanApprover,
     },
-    { label: "PO / Distribusi", done: !!row.refPo || !!row.refDistribusi, detail: row.refPo ?? row.refDistribusi },
+    {
+      label: "Distribusi Dibuat",
+      done: !!distribusi,
+      active: !distribusi && row.status === "Disetujui",
+      detail: distribusi ? `${distribusi.id} · ${distStatus?.toLowerCase()} → ${distribusi.ke}` : "otomatis dibuat saat ajuan disetujui",
+      href: distribusi ? `/operasional/distribusi/${distribusi.id}` : undefined,
+    },
+    {
+      label: "Dikirim Pusat",
+      done: !!distribusi?.waktuKirim,
+      detail: distribusi?.waktuKirim ? `Driver ${distribusi.driver ?? "-"}` : distribusi ? "menunggu tombol Kirim Distribusi" : undefined,
+    },
+    {
+      label: "Diterima Cabang",
+      done: distStatus === "Selesai",
+      detail: distStatus === "Selesai" ? "stok cabang sudah bertambah" : undefined,
+    },
   ];
 
   function handleApprove() {
-    const refPo = `PO-2026-${String(40 + items.length).padStart(3, "0")}`;
+    const distId = nextDistribusiId(distribusiItems);
+    /* Bikin draft distribusi: qty & produk nyalin dari ajuan, cabang = cabang pemohon */
+    addDistribusi({
+      id: distId,
+      tanggal: new Date().toISOString().slice(0, 10),
+      dari: "Pusat",
+      ke: row.cabang,
+      items: row.qty,
+      status: "Draft",
+      refAjuan: row.id,
+      lines: [{ kode: row.kodeProduk ?? row.produk, nama: row.produk, qty: row.qty }],
+    });
     updateStatus(row.id, "Disetujui");
-    update(row.id, { catatanApprover: "Disetujui · stok cabang kritis", refPo });
-    toast(`Ajuan disetujui · ${refPo} bisa diproses`, "success");
+    update(row.id, {
+      catatanApprover: `Disetujui · distribusi ${distId} dibuat (draft, tinggal dikirim)`,
+      refDistribusi: distId,
+    });
+    toast(`Ajuan disetujui · ${distId} dibuat sebagai draft distribusi`, "success");
   }
 
   function handleReject() {
@@ -121,7 +160,13 @@ export default function AjuanStokDetailPage() {
                     {step.done ? "✓" : "·"}
                   </div>
                   <div>
-                    <p className={`text-[13px] font-semibold ${step.active ? "text-brand" : "text-slds-text"}`}>{step.label}</p>
+                    {step.href ? (
+                      <Link href={step.href} className={`text-[13px] font-semibold hover:underline ${step.active ? "text-brand" : "text-brand"}`}>
+                        {step.label}
+                      </Link>
+                    ) : (
+                      <p className={`text-[13px] font-semibold ${step.active ? "text-brand" : "text-slds-text"}`}>{step.label}</p>
+                    )}
                     {step.detail && <p className="text-[12px] text-slds-text-weak">{step.detail}</p>}
                   </div>
                 </div>
@@ -131,7 +176,7 @@ export default function AjuanStokDetailPage() {
 
           <div className="bg-slds-bg border border-slds-border rounded-lg p-4 text-[12px] text-slds-text-weak">
             <p className="font-semibold text-slds-text mb-1 flex items-center gap-1"><Package className="h-3.5 w-3.5" /> Alur setelah disetujui</p>
-            <p>Ajuan disetujui → PO ke supplier atau distribusi antar cabang → stok cabang terisi kembali.</p>
+            <p>Ajuan disetujui → draft distribusi ke cabang dibuat otomatis (qty & produk nyalin dari ajuan) → pusat klik Kirim Distribusi → surat jalan terbit → cabang konfirmasi terima di app → stok cabang bertambah.</p>
             <p className="mt-2 flex items-center gap-1"><Truck className="h-3.5 w-3.5" /> Mobile tinter bisa cek status ajuan dari halaman Ajukan Stok.</p>
           </div>
         </div>

@@ -1,50 +1,27 @@
-import type { TransaksiRow } from "./mock-data";
-import type { FakturJualRow } from "./faktur-utils";
+import type { OpbRow } from "./mock-data";
+import { nextFakturJualId, type FakturJualRow } from "./faktur-utils";
 
-/** Generate faktur/invoice batch per cabang + rentang tanggal (#57) */
-export function transaksiForBatch(
-  all: TransaksiRow[],
-  cabang: string,
-  dari: string,
-  sampai: string,
-) {
-  return all.filter((t) => {
-    if (t.tanggal < dari || t.tanggal > sampai) return false;
-    if (cabang !== "Semua Cabang" && !t.cabang.includes(cabang.replace(/^Bengkel /, ""))) return false;
-    return t.status !== "Draft" && t.status !== "Dibatalkan";
-  });
-}
-
-export function buildBatchFaktur(params: {
-  cabang: string;
-  dari: string;
-  sampai: string;
-  transaksi: TransaksiRow[];
-  seq: number;
-}): FakturJualRow[] {
-  const rows = transaksiForBatch(params.transaksi, params.cabang, params.dari, params.sampai);
-  const total = rows.reduce((s, t) => s + t.total, 0);
-  const baseId = `INV-BATCH-${params.dari.replace(/-/g, "")}-${String(params.seq).padStart(3, "0")}`;
-
-  const a: FakturJualRow = {
-    id: `${baseId}-A`,
-    tanggal: params.sampai,
-    pelanggan: params.cabang,
-    periode: `${params.dari} s/d ${params.sampai}`,
-    total: Math.round(total * 0.6),
+/** Generate 1 Faktur Penjualan per OPB · total ambil dari OPB, bukan dibagi-bagi (#57) */
+export function buildFakturPenjualan(opb: OpbRow, seq: number): FakturJualRow {
+  return {
+    id: `INV-2026-${String(seq).padStart(4, "0")}`,
+    tanggal: new Date().toISOString().slice(0, 10),
+    pelanggan: opb.cabang,
+    periode: opb.periode,
+    total: opb.total,
     status: "Draft",
-    opbId: `BATCH-${params.cabang.slice(0, 3).toUpperCase()}`,
+    opbId: opb.id,
     jenis: "Faktur Penjualan",
   };
-  const b: FakturJualRow = {
-    id: `${baseId}-B`,
-    tanggal: params.sampai,
-    pelanggan: params.cabang,
-    periode: `${params.dari} s/d ${params.sampai}`,
-    total: total - Math.round(total * 0.6),
-    status: "Draft",
-    opbId: `BATCH-${params.cabang.slice(0, 3).toUpperCase()}`,
-    jenis: "Rekap Invoice",
-  };
-  return [a, b];
+}
+
+/** Faktur untuk beberapa OPB sekaligus (tombol Proses Invoice per cabang & Batch Cabang) */
+export function buildFakturUntukOpb(opbList: OpbRow[], fakturJual: FakturJualRow[]): FakturJualRow[] {
+  const hasil: FakturJualRow[] = [];
+  let seq = Number(nextFakturJualId(fakturJual).split("-").pop());
+  for (const opb of opbList) {
+    hasil.push(buildFakturPenjualan(opb, seq));
+    seq += 1;
+  }
+  return hasil;
 }

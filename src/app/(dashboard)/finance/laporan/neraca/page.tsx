@@ -35,7 +35,7 @@ export default function NeracaPage() {
                 <span className="font-semibold">{formatIDR(a.saldo)}</span>
               </div>
             ))}
-            <div className="flex justify-between text-[14px] font-bold pt-3 border-t border-slds-border">
+            <div className="flex justify-between text-[13px] font-bold pt-3 border-t border-slds-border">
               <span>Total Aktiva</span>
               <span className="text-brand">{formatIDR(totalAktiva)}</span>
             </div>
@@ -53,7 +53,7 @@ export default function NeracaPage() {
                 <span className="font-semibold">{formatIDR(a.saldo)}</span>
               </div>
             ))}
-            <div className="flex justify-between text-[14px] font-bold pt-3 border-t border-slds-border">
+            <div className="flex justify-between text-[13px] font-bold pt-3 border-t border-slds-border">
               <span>Total Pasiva</span>
               <span className="text-brand">{formatIDR(totalPasiva)}</span>
             </div>

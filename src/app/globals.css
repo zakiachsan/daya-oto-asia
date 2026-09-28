@@ -434,12 +434,15 @@ table.doc-table th { font-weight: bold; background: #f5f5f5; }
 .nota-penjualan .np-header {
   display: flex;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px 16px;
   margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 
-.nota-penjualan .np-header-left { flex: 1.1; min-width: 0; }
-.nota-penjualan .np-header-right { flex: 0.9; min-width: 200px; }
+/* Dua kolom berdampingan hanya kalau muat; di layar sempit (preview mobile)
+   kolom kanan turun ke bawah supaya label/nilai tidak bertabrakan. */
+.nota-penjualan .np-header-left { flex: 1.1 1 240px; min-width: 0; }
+.nota-penjualan .np-header-right { flex: 0.9 1 240px; min-width: 0; }
 
 .nota-penjualan .np-brand-row {
   display: flex;
@@ -458,6 +461,9 @@ table.doc-table th { font-weight: bold; background: #f5f5f5; }
   font-size: 8.5pt;
   margin: 2px 0 8px;
   line-height: 1.35;
+  /* Alamat = lanjutan blok nilai "Kepada", jadi digeser sejajar kolom nilai
+     (label 88px + titik dua 10px), bukan rata label. */
+  padding-left: 98px;
 }
 
 .nota-penjualan .np-field {
@@ -471,6 +477,10 @@ table.doc-table th { font-weight: bold; background: #f5f5f5; }
 .nota-penjualan .np-field-colon { flex-shrink: 0; width: 10px; }
 .nota-penjualan .np-field-value {
   flex: 1;
+  /* min-width: 0 wajib: tanpa ini nilai panjang menolak menyusut dan
+     meluber keluar kolom, bukan turun ke baris berikutnya. */
+  min-width: 0;
+  overflow-wrap: anywhere;
   border-bottom: 1px solid #000;
   min-height: 14px;
   padding-bottom: 1px;
@@ -550,7 +560,8 @@ table.doc-table th { font-weight: bold; background: #f5f5f5; }
   letter-spacing: 0.05em;
 }
 
-/* Rekap admin lampiran invoice · referensi scan rekap admin PDF */
+/* Rekap Order Pembelian Bahan · lampiran invoice
+   (tata letak = contoh resmi Tim Finance, WhatsApp 28 Sep 2026) */
 .rekap-invoice {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 9pt;
@@ -562,82 +573,55 @@ table.doc-table th { font-weight: bold; background: #f5f5f5; }
   border: 1px solid #ccc;
 }
 
-.rekap-invoice-brand {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.rekap-invoice-company {
-  font-weight: 700;
-  font-size: 11pt;
-  margin: 0 0 2px;
-}
-
-.rekap-invoice-pelanggan {
-  font-weight: 600;
-  font-size: 9pt;
-  margin: 0;
-}
-
-.rekap-invoice-ref {
-  font-size: 8pt;
-  margin: 4px 0 0;
-  color: #444746;
-}
-
-.rekap-invoice-title {
+.rekap-invoice-kop {
   text-align: center;
   font-weight: 700;
-  font-size: 12pt;
-  letter-spacing: 0.04em;
-  margin: 0 0 12px;
+  font-size: 11pt;
+  margin: 0 0 8px;
 }
 
 .rekap-invoice-table {
   width: 100%;
   border-collapse: collapse;
-  border: 2px solid #000;
-  font-size: 8.5pt;
+  border: 1px solid #000;
+  font-size: 9pt;
 }
 
 .rekap-invoice-table th,
 .rekap-invoice-table td {
   border: 1px solid #000;
-  padding: 3px 5px;
+  padding: 2px 5px;
   vertical-align: middle;
+  font-weight: 400;
 }
 
 .rekap-invoice-table thead th {
-  font-weight: 700;
   text-align: center;
   background: #fff;
 }
 
-.rekap-invoice-table .col-no { width: 6%; }
-.rekap-invoice-table .col-tgl { width: 12%; }
-.rekap-invoice-table .col-pol { width: 14%; }
-.rekap-invoice-table .col-sap { width: 18%; }
-.rekap-invoice-table .col-dpp { width: 25%; }
-.rekap-invoice-table .col-ppn { width: 25%; }
+.rekap-invoice-table .rekap-judul {
+  font-weight: 700;
+  font-size: 10.5pt;
+  border-bottom: none;
+  padding-top: 4px;
+}
+
+.rekap-invoice-table .rekap-judul-pelanggan {
+  font-weight: 700;
+  font-size: 9.5pt;
+}
+
+.rekap-invoice-table .col-no { width: 8%; }
+.rekap-invoice-table .col-tgl { width: 14%; }
+.rekap-invoice-table .col-pol { width: 20%; }
+.rekap-invoice-table .col-sap { width: 20%; }
+.rekap-invoice-table .col-dpp { width: 19%; }
+.rekap-invoice-table .col-ppn { width: 19%; }
 
 .rekap-invoice-table .center { text-align: center; }
-.rekap-invoice-table .right { text-align: right; }
-.rekap-invoice-table .mono {
-  font-family: "Courier New", monospace;
-  font-size: 8pt;
-}
 
-.rekap-row-real td { background: #fffde7; }
-.rekap-total-row td { font-weight: 700; }
-
-.rekap-invoice-note {
-  font-size: 7.5pt;
-  font-style: italic;
-  margin-top: 8px;
-  color: #444746;
-}
+.rekap-total-row td { font-weight: 400; }
 
 /* Laporan pemakaian base · DOA Bogor hal. 2, side-by-side TGL 1–15 | 16–31 */
 .laporan-pemakaian {
@@ -810,3 +794,28 @@ table.doc-table th { font-weight: bold; background: #f5f5f5; }
 }
 
 .laporan-pemakaian .lp-sig p { margin: 0; }
+
+/* Varian "satu transaksi" (dipakai di detail transaksi) · tabel dibaca di layar,
+   jadi font & padding dinaikkan dari ukuran blanko cetak (6,5pt / 1px 2px).
+   Cetak tidak terpengaruh: print pakai LAPORAN_PRINT_CSS sendiri, bukan file ini. */
+.laporan-pemakaian.lp-transaksi .lp-block-label { font-size: 13px; }
+.laporan-pemakaian.lp-transaksi .lp-table {
+  font-size: 13px;
+  table-layout: auto;
+}
+.laporan-pemakaian.lp-transaksi .lp-table th,
+.laporan-pemakaian.lp-transaksi .lp-table td {
+  padding: 7px 10px;
+}
+.laporan-pemakaian.lp-transaksi .lp-table thead th { font-size: 11px; letter-spacing: 0.03em; }
+.laporan-pemakaian.lp-transaksi .lp-table .col-no { width: 44px; }
+.laporan-pemakaian.lp-transaksi .lp-table .col-kode { width: 120px; }
+.laporan-pemakaian.lp-transaksi .lp-table .col-nama { width: auto; }
+.laporan-pemakaian.lp-transaksi .lp-table .col-pol { width: 120px; }
+.laporan-pemakaian.lp-transaksi .lp-table .col-day { width: 64px; font-size: 13px; }
+.laporan-pemakaian.lp-transaksi .lp-table .col-sum { width: 92px; }
+.laporan-pemakaian.lp-transaksi .lp-table .mono { font-size: 12px; }
+.laporan-pemakaian.lp-transaksi .lp-table .nama { font-size: 13px; white-space: normal; }
+.laporan-pemakaian.lp-transaksi .lp-table .pol { font-size: 12px; }
+.laporan-pemakaian.lp-transaksi .lp-grand-total { font-size: 13px; }
+.laporan-pemakaian.lp-transaksi .lp-empty { font-size: 13px; }

@@ -4,24 +4,29 @@ import Link from "next/link";
 import { PageHeader } from "@/components/ui/page-header";
 import { DataTable } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { distribusiStatus, suratJalanId } from "@/lib/distribusi-utils";
 import { useDistribusiList } from "@/lib/preview-store";
 
 export default function SuratJalanOpsPage() {
   const { items } = useDistribusiList();
-  const rows = items.map((d) => ({
-    id: `SJ-${d.id.replace("DIST-", "")}`,
-    distId: d.id,
-    tanggal: d.tanggal,
-    tujuan: d.ke,
-    items: d.lines.length,
-    status: d.status === "Selesai" ? "Terkirim" : "Draft",
-  }));
+  /* Surat jalan terbit hanya setelah distribusi dikirim (bukan Draft) */
+  const rows = items
+    .filter((d) => distribusiStatus(d) !== "Draft")
+    .map((d) => ({
+      id: suratJalanId(d.id),
+      distId: d.id,
+      tanggal: d.tanggal,
+      kirim: d.waktuKirim?.slice(0, 10) ?? "-",
+      tujuan: d.ke,
+      items: d.lines.length,
+      status: distribusiStatus(d) === "Selesai" ? "Diterima" : "Terkirim",
+    }));
 
   return (
     <div>
       <PageHeader
         title="Surat Jalan"
-        desc="Dokumen pengiriman ke cabang · cabang dapat buat SJ dari ajuan/distribusi"
+        desc="Terbit otomatis saat distribusi dikirim · status mengikuti konfirmasi terima cabang"
         breadcrumb={[{ label: "Operasional", href: "/operasional" }, { label: "Surat Jalan" }]}
       />
       <DataTable
@@ -37,6 +42,7 @@ export default function SuratJalanOpsPage() {
           },
           { key: "distId", label: "Distribusi ID" },
           { key: "tanggal", label: "Tanggal" },
+          { key: "kirim", label: "Tgl. Kirim" },
           { key: "tujuan", label: "Tujuan" },
           { key: "items", label: "Item" },
           { key: "status", label: "Status", render: (r) => <StatusBadge status={String(r.status)} /> },

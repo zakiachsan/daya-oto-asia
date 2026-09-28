@@ -1,6 +1,7 @@
 import { AXT_PRODUK } from "./axt-products";
 import type { TransaksiDraftWizard } from "./transaksi-draft-utils";
 import type { ProdukKategoriId, TransaksiStatus } from "./transaksi-status-utils";
+import { MOCK_TRANSAKSI_ARSIP } from "./mock-transaksi-arsip";
 
 export const MOCK_USER = {
   name: "Budi Santoso",
@@ -33,6 +34,8 @@ export type TransaksiProdukLine = {
   layers?: TransaksiLayer[];
   mixingVolume: number;
   total: number;
+  /** Durasi mixing khusus bahan ini (satu round wizard) */
+  durasiMixingMenit?: number | null;
   lainLainLabel?: string;
   lainLainSubKategori?: string;
 };
@@ -67,6 +70,8 @@ export type TransaksiRow = {
   durasiTotalMenit: number | null;
   bahan: TransaksiBahan[];
   opbId: string | null;
+  /** Tanggal OPB yang diinput admin saat menerbitkan OPB (ISO yyyy-mm-dd) */
+  tanggalOpb?: string | null;
   /** Penambahan bahan ke mobil yang sama (sebelum lock) */
   parentId?: string;
   /** Beberapa kategori produk · satu Receipt ID */
@@ -86,7 +91,7 @@ export type TransaksiRow = {
   draftWizard?: TransaksiDraftWizard;
 };
 
-export const MOCK_TRANSAKSI: TransaksiRow[] = [
+const MOCK_TRANSAKSI_TERKINI: TransaksiRow[] = [
   {
     id: "DOA-2609-2813",
     tanggal: "2026-09-26",
@@ -153,7 +158,7 @@ export const MOCK_TRANSAKSI: TransaksiRow[] = [
     kodeWarna: "3R1",
     kategori: "Red",
     tinter: "Rudi Hartono",
-    status: "Menunggu TTD",
+    status: "Menunggu OPB",
     receiptId: "RCP-DOA-CakrawalaMalang-10/09/2026-N5678XY",
     fotoSample: true,
     total: 210000,
@@ -167,13 +172,14 @@ export const MOCK_TRANSAKSI: TransaksiRow[] = [
     waktuSelesaiMixing: "2026-09-10T09:24:00",
     durasiMixingMenit: 19,
     waktuCetakNota: "2026-09-10T09:25:00",
-    waktuTTD: null,
-    durasiTotalMenit: null,
+    waktuTTD: "2026-09-10T09:28:00",
+    durasiTotalMenit: 23,
     bahan: [
       { kode: "AXT-207", nama: "AXT-207 BLACK TONER (0,9L)", gram: 12 },
       { kode: "AXT-501", nama: "AXT-501 TRANSOXIDE RED (0,9L)", gram: 38 },
     ],
-    opbId: null,
+    /* Nota 0141 sudah masuk OPB Agustus Cakrawala Malang (biar cabang ini match) */
+    opbId: "OPB-2026-0088",
   },
   {
     id: "DOA-2026-0140",
@@ -234,6 +240,13 @@ export const MOCK_TRANSAKSI: TransaksiRow[] = [
   },
 ];
 
+/**
+ * Transaksi terkini (September 2026) + arsip Agustus 2026.
+ * Arsip dipakai data contoh OPB & rekonsiliasi supaya jumlah nota tercetak
+ * nyambung dengan angka trx di header OPB (lihat mock-transaksi-arsip.ts).
+ */
+export const MOCK_TRANSAKSI: TransaksiRow[] = [...MOCK_TRANSAKSI_TERKINI, ...MOCK_TRANSAKSI_ARSIP];
+
 export function formatWaktu(iso: string | null) {
   if (!iso) return "-";
   return new Date(iso).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
@@ -260,9 +273,9 @@ export type OpbRow = {
 };
 
 export const MOCK_OPB: OpbRow[] = [
-  { id: "OPB-2026-0089", cabang: "Auto 2000 Surabaya", periode: "Agustus 2026", jumlahTrx: 47, total: 12500000, status: "Menunggu TTD", sap: "" },
-  { id: "OPB-2026-0088", cabang: "Cakrawala Malang", periode: "Agustus 2026", jumlahTrx: 23, total: 5800000, status: "Ditagihkan", sap: "SAP-2026-445" },
-  { id: "OPB-2026-0087", cabang: "Prima Jember", periode: "Agustus 2026", jumlahTrx: 31, total: 8200000, status: "Rekonsiliasi", sap: "" },
+  { id: "OPB-2026-0089", cabang: "Auto 2000 Surabaya", periode: "Agustus 2026", jumlahTrx: 47, total: 12500000, status: "Menunggu TTD", sap: "", tanggalOpb: "2026-09-05" },
+  { id: "OPB-2026-0088", cabang: "Cakrawala Malang", periode: "Agustus 2026", jumlahTrx: 23, total: 5800000, status: "Ditagihkan", sap: "SAP-2026-445", tanggalOpb: "2026-09-03" },
+  { id: "OPB-2026-0087", cabang: "Prima Jember", periode: "Agustus 2026", jumlahTrx: 31, total: 8200000, status: "Rekonsiliasi", sap: "", tanggalOpb: "2026-09-02" },
 ];
 
 export const MOCK_STOK = [
@@ -339,6 +352,17 @@ export const MOCK_DISTRIBUSI = [
   { id: "DIST-2026-018", tanggal: "2026-09-07", dari: "Pusat", ke: "Surabaya", items: 24, status: "Selesai" },
   { id: "DIST-2026-019", tanggal: "2026-09-08", dari: "Pusat", ke: "Malang", items: 12, status: "Selesai" },
   { id: "DIST-2026-020", tanggal: "2026-09-09", dari: "Pusat", ke: "Jember", items: 18, status: "Draft" },
+  // Contoh surat jalan (dummy) — sebagian masih inbound, sebagian sudah diterima
+  { id: "DIST-2026-021", tanggal: "2026-09-26", dari: "Pusat", ke: "Surabaya", items: 26, status: "Draft" },
+  { id: "DIST-2026-022", tanggal: "2026-09-25", dari: "Pusat", ke: "Malang", items: 10, status: "Draft" },
+  { id: "DIST-2026-023", tanggal: "2026-09-24", dari: "Pusat", ke: "Jember", items: 15, status: "Draft" },
+  { id: "DIST-2026-024", tanggal: "2026-09-23", dari: "Pusat", ke: "Surabaya", items: 14, status: "Draft" },
+  { id: "DIST-2026-025", tanggal: "2026-09-22", dari: "Pusat", ke: "Malang", items: 14, status: "Selesai" },
+  { id: "DIST-2026-026", tanggal: "2026-09-20", dari: "Pusat", ke: "Surabaya", items: 10, status: "Selesai" },
+  { id: "DIST-2026-027", tanggal: "2026-09-18", dari: "Pusat", ke: "Jember", items: 10, status: "Draft" },
+  { id: "DIST-2026-028", tanggal: "2026-09-15", dari: "Pusat", ke: "Surabaya", items: 9, status: "Selesai" },
+  { id: "DIST-2026-029", tanggal: "2026-09-12", dari: "Pusat", ke: "Malang", items: 15, status: "Draft" },
+  { id: "DIST-2026-030", tanggal: "2026-09-10", dari: "Pusat", ke: "Surabaya", items: 27, status: "Draft" },
 ];
 
 export const MOCK_COA = [

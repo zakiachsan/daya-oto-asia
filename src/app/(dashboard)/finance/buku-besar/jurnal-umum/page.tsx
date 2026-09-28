@@ -106,9 +106,9 @@ export default function JurnalPage() {
           <table className="w-full text-[13px] mb-3">
             <thead>
               <tr className="border-b border-slds-border text-[10px] uppercase text-slds-text-weak">
-                <th className="text-left py-2 px-2">Akun</th>
-                <th className="text-right py-2 px-2 w-32">Debit</th>
-                <th className="text-right py-2 px-2 w-32">Kredit</th>
+                <th className="text-left py-2 px-2 font-semibold">Akun</th>
+                <th className="text-right py-2 px-2 w-32 font-semibold">Debit</th>
+                <th className="text-right py-2 px-2 w-32 font-semibold">Kredit</th>
                 <th className="w-8" />
               </tr>
             </thead>

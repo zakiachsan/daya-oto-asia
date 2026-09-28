@@ -40,7 +40,7 @@ export default function FinanceDashboard() {
       </div>
 
       <div>
-        <h2 className="text-sm font-bold text-slds-text mb-2">Jurnal Terbaru</h2>
+        <h2 className="text-[13px] font-bold text-slds-text mb-2">Jurnal Terbaru</h2>
         <FinanceJurnalRecent />
       </div>
     </div>

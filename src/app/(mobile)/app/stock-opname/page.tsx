@@ -218,33 +218,32 @@ export default function AppStockOpnamePage() {
       )}
 
       <div className="fixed bottom-[4.5rem] left-0 right-0 max-w-md mx-auto px-4 z-20">
-        <div className="bg-white border border-slds-border rounded-xl p-3 shadow-lg space-y-2">
-          <div className="flex items-center justify-between text-[12px]">
-            <span className="text-slds-text-weak">Progress draft</span>
-            <span className="font-bold text-slds-text">
+        <div className="bg-white border border-slds-border rounded-xl px-2.5 py-2 shadow-lg space-y-1.5">
+          <div className="flex items-center justify-between text-[11px] px-0.5">
+            <span className="text-slds-text-weak">Draft tersimpan</span>
+            <span className="font-bold text-slds-text tabular-nums">
               {draftCount} / {items.length} produk
             </span>
           </div>
-          <button
-            type="button"
-            data-no-toast
-            onClick={handleSaveAllDraft}
-            className="w-full py-3 border-2 border-brand text-brand bg-white rounded-xl font-bold text-[14px] flex items-center justify-center gap-2"
-          >
-            <Save className="h-4 w-4" /> Simpan
-          </button>
-          <button
-            type="button"
-            data-no-toast
-            onClick={handleSubmitBatch}
-            disabled={draftCount === 0}
-            className="w-full py-3 bg-brand text-white rounded-xl font-bold text-[14px] flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            <Send className="h-4 w-4" /> Kirim ke Supervisor ({draftCount})
-          </button>
-          <p className="text-[10px] text-slds-text-weak text-center">
-            Simpan draft dulu · kirim hanya produk yang sudah tersimpan
-          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              data-no-toast
+              onClick={handleSaveAllDraft}
+              className="flex-1 py-2 border border-brand text-brand bg-white rounded-lg font-bold text-[13px] flex items-center justify-center gap-1.5"
+            >
+              <Save className="h-3.5 w-3.5" /> Simpan
+            </button>
+            <button
+              type="button"
+              data-no-toast
+              onClick={handleSubmitBatch}
+              disabled={draftCount === 0}
+              className="flex-[1.4] py-2 bg-brand text-white rounded-lg font-bold text-[13px] flex items-center justify-center gap-1.5 disabled:opacity-50"
+            >
+              <Send className="h-3.5 w-3.5" /> Kirim ({draftCount})
+            </button>
+          </div>
         </div>
       </div>
     </div>

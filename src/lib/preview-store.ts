@@ -30,11 +30,13 @@ import {
   type InventoriStokRow,
 } from "./inventori-utils";
 import { INITIAL_DISTRIBUSI, type DistribusiDetail } from "./distribusi-utils";
+import { INITIAL_KATEGORI_HARGA, type KategoriHargaRow } from "./kategori-harga-utils";
 import { INITIAL_AJUAN_STOK, type AjuanStokDetail } from "./ajuan-stok-utils";
 import { INITIAL_PENYESUAIAN, type PenyesuaianDetail } from "./penyesuaian-stok-utils";
 import { INITIAL_HUTANG_PIUTANG, type HutangPiutangDetail } from "./hutang-piutang-utils";
 import { INITIAL_KASBON, type KasbonRow } from "./kasbon-utils";
 import { INITIAL_KLAIM_NOTA, type KlaimNotaRow } from "./klaim-nota-utils";
+import { INITIAL_CABANG, type CabangRow } from "./cabang-utils";
 import { INITIAL_IZIN, type IzinDetail } from "./izin-utils";
 import { INITIAL_LEMBUR, type LemburDetail } from "./lembur-utils";
 import {
@@ -82,6 +84,7 @@ const OPNAME_KEY = "daya-oto-stock-opname";
 const OPNAME_DRAFT_KEY = "daya-oto-stock-opname-draft";
 const PO_KEY = "daya-oto-po";
 const DIST_KEY = "daya-oto-distribusi";
+const CABANG_KEY = "daya-oto-cabang";
 const INVENTORI_ADJ_KEY = "daya-oto-inventori-adj";
 const KASBON_KEY = "daya-oto-kasbon";
 const PENYESUAIAN_KEY = "daya-oto-penyesuaian-stok";
@@ -100,6 +103,7 @@ const SYARAT_BAYAR_KEY = "daya-oto-syarat-pembayaran";
 const PELANGGAN_KEY = "daya-oto-pelanggan";
 const PEMASOK_KEY = "daya-oto-pemasok";
 const TRANSFER_BANK_KEY = "daya-oto-transfer-bank";
+const KATEGORI_HARGA_KEY = "daya-oto-kategori-harga";
 
 export type AssignmentMap = Record<string, string>;
 
@@ -310,6 +314,49 @@ export function useAssignment() {
   return { map, updateCabang };
 }
 
+/** Master cabang · tambah/ubah/hapus dari halaman Operasional → Master Cabang */
+export function useCabangList() {
+  const [items, setItems] = useState<CabangRow[]>(INITIAL_CABANG);
+
+  useEffect(() => {
+    const stored = read<CabangRow>(CABANG_KEY, []);
+    if (!stored.length) {
+      setItems(INITIAL_CABANG);
+      return;
+    }
+    /* Cabang contoh yang belum ada tetap muncul; data tersimpan selalu menang */
+    const ids = new Set(stored.map((c) => c.id));
+    setItems([...stored, ...INITIAL_CABANG.filter((c) => !ids.has(c.id))]);
+  }, []);
+
+  const add = useCallback((row: Omit<CabangRow, "id">) => {
+    setItems((prev) => {
+      const nextId = String(prev.reduce((max, c) => Math.max(max, Number(c.id) || 0), 0) + 1);
+      const next = [...prev, { ...row, id: nextId }];
+      write(CABANG_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const update = useCallback((id: string, patch: Partial<CabangRow>) => {
+    setItems((prev) => {
+      const next = prev.map((c) => (c.id === id ? { ...c, ...patch } : c));
+      write(CABANG_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const remove = useCallback((id: string) => {
+    setItems((prev) => {
+      const next = prev.filter((c) => c.id !== id);
+      write(CABANG_KEY, next);
+      return next;
+    });
+  }, []);
+
+  return { items, add, update, remove };
+}
+
 export function useKlaimNota() {
   const [items, setItems] = useState<KlaimNotaRow[]>(INITIAL_KLAIM_NOTA);
 
@@ -427,6 +474,17 @@ export type ExtraKodeWarnaRow = {
   produkKategori?: string;
 };
 
+/** Kode dianggap sama hanya kalau kategorinya juga sama (baris tanpa
+    produkKategori = berlaku semua kategori, seperti hasil merge formula). */
+export function sameExtraKode(
+  a: Pick<ExtraKodeWarnaRow, "kode" | "produkKategori">,
+  b: Pick<ExtraKodeWarnaRow, "kode" | "produkKategori">,
+) {
+  if (a.kode !== b.kode) return false;
+  if (!a.produkKategori || !b.produkKategori) return true;
+  return a.produkKategori === b.produkKategori;
+}
+
 export function useExtraKodeWarna() {
   const [items, setItems] = useState<ExtraKodeWarnaRow[]>([]);
 
@@ -436,7 +494,7 @@ export function useExtraKodeWarna() {
 
   const add = useCallback((row: ExtraKodeWarnaRow) => {
     setItems((prev) => {
-      if (prev.some((p) => p.kode === row.kode)) return prev;
+      if (prev.some((p) => sameExtraKode(p, row))) return prev;
       const next = [...prev, row];
       write(EXTRA_KODE_WARNA_KEY, next);
       return next;
@@ -447,7 +505,7 @@ export function useExtraKodeWarna() {
     setItems((prev) => {
       const next = [...prev];
       rows.forEach((row) => {
-        if (!next.some((p) => p.kode === row.kode)) next.push(row);
+        if (!next.some((p) => sameExtraKode(p, row))) next.push(row);
       });
       write(EXTRA_KODE_WARNA_KEY, next);
       return next;
@@ -789,7 +847,16 @@ export function useDistribusiList() {
   const [items, setItems] = useState<DistribusiDetail[]>(INITIAL_DISTRIBUSI);
 
   useEffect(() => {
-    setItems(read(DIST_KEY, INITIAL_DISTRIBUSI));
+    const stored = read<DistribusiDetail>(DIST_KEY, []);
+    if (!stored.length) {
+      setItems(INITIAL_DISTRIBUSI);
+      return;
+    }
+    /* Surat jalan contoh yang belum ada di localStorage tetap dimunculkan,
+       supaya sample baru kelihatan; baris tersimpan (sudah diubah user) menang. */
+    const dikenal = new Set(stored.map((r) => r.id));
+    const seedBaru = INITIAL_DISTRIBUSI.filter((r) => !dikenal.has(r.id));
+    setItems(seedBaru.length ? [...stored, ...seedBaru] : stored);
   }, []);
 
   const add = useCallback((row: DistribusiDetail) => {
@@ -1204,4 +1271,32 @@ export function useTransferBank() {
   }, []);
 
   return { items, add };
+}
+
+/** Master Kategori Harga (tarif jual per liter) · dipakai Master Produk, rekap pemakaian & pricing */
+export function useKategoriHarga() {
+  const [items, setItems] = useState<KategoriHargaRow[]>(INITIAL_KATEGORI_HARGA);
+
+  useEffect(() => {
+    setItems(read<KategoriHargaRow>(KATEGORI_HARGA_KEY, INITIAL_KATEGORI_HARGA));
+  }, []);
+
+  const add = useCallback((row: KategoriHargaRow) => {
+    setItems((prev) => {
+      if (prev.some((p) => p.kategori.toLowerCase() === row.kategori.toLowerCase())) return prev;
+      const next = [...prev, row];
+      write(KATEGORI_HARGA_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const patch = useCallback((kategori: string, patchRow: Partial<KategoriHargaRow>) => {
+    setItems((prev) => {
+      const next = prev.map((p) => (p.kategori === kategori ? { ...p, ...patchRow } : p));
+      write(KATEGORI_HARGA_KEY, next);
+      return next;
+    });
+  }, []);
+
+  return { items, add, patch };
 }

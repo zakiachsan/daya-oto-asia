@@ -4,12 +4,14 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { ajuanStatusBadge } from "@/lib/ajuan-stok-utils";
-import { useAjuanStok } from "@/lib/preview-store";
+import { distribusiStatus } from "@/lib/distribusi-utils";
+import { useAjuanStok, useDistribusiList } from "@/lib/preview-store";
 
 export default function MobileAjuanDetailPage() {
   const params = useParams();
   const id = String(params.id);
   const { items } = useAjuanStok();
+  const { items: distribusiItems } = useDistribusiList();
   const found = items.find((r) => r.id === id);
 
   if (!found) {
@@ -23,6 +25,10 @@ export default function MobileAjuanDetailPage() {
 
   const row = found;
   const badge = ajuanStatusBadge(row.status);
+  const distribusi =
+    distribusiItems.find((d) => d.refAjuan === row.id) ??
+    distribusiItems.find((d) => d.id === row.refDistribusi);
+  const distStatus = distribusi ? distribusiStatus(distribusi) : null;
 
   return (
     <div className="space-y-4">
@@ -61,8 +67,18 @@ export default function MobileAjuanDetailPage() {
           </div>
         )}
 
+        {distribusi && (
+          <div className="pt-2 border-t border-slds-border">
+            <p className="text-[12px] text-green-700 font-semibold">
+              Distribusi {distribusi.id} · {distStatus === "Selesai" ? "sudah diterima cabang" : distStatus === "Dalam Perjalanan" ? "sedang dikirim ke cabang" : "disiapkan pusat"}
+            </p>
+            <p className="text-[11px] text-slds-text-weak mt-0.5">
+              Cek barangnya di menu Terima Barang begitu statusnya dikirim.
+            </p>
+          </div>
+        )}
         {row.refPo && (
-          <p className="text-[12px] text-green-700 font-semibold">PO dibuat: {row.refPo}</p>
+          <p className="text-[12px] text-slds-text-weak">Referensi internal: {row.refPo}</p>
         )}
       </div>
     </div>

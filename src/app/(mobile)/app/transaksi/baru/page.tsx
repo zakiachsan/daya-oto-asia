@@ -133,7 +133,6 @@ function BuatTransaksiContent() {
     setPrinted(!!trx.waktuCetakNota);
     setSigned(!!trx.waktuTTD);
     setShowNota(!!trx.waktuCetakNota);
-    setLainSubKategori(trx.lainLainSubKategori ?? "");
     if (trx.lainLainHarga != null) setLainHarga(trx.lainLainHarga);
     toast(`Draft dimuat · lanjutkan mixing`, "info");
   }, [ready, draftId, all, toast, router, params]);
@@ -164,11 +163,13 @@ function BuatTransaksiContent() {
   const [showNota, setShowNota] = useState(false);
   const [showLabel, setShowLabel] = useState(false);
   const [showSaveFormulaModal, setShowSaveFormulaModal] = useState(false);
+  const [showAddKodeModal, setShowAddKodeModal] = useState(false);
+  const [newKode, setNewKode] = useState("");
+  const [newNama, setNewNama] = useState("");
   const [showTonerPicker, setShowTonerPicker] = useState(false);
   const [formulaLabel, setFormulaLabel] = useState("");
   const [formulaCatatan, setFormulaCatatan] = useState("");
   const [loadedFormulaId, setLoadedFormulaId] = useState<string | null>(null);
-  const [lainSubKategori, setLainSubKategori] = useState("");
   const [lainHarga, setLainHarga] = useState(53000);
   const [produkLines, setProdukLines] = useState<TransaksiProdukLine[]>([]);
   const [tambahBahanMode, setTambahBahanMode] = useState(false);
@@ -202,6 +203,8 @@ function BuatTransaksiContent() {
   );
 
   const isBasecoat = produkKategori === "basecoat";
+  // Basecoat tidak pakai rasio/volume referensi — tabelnya cukup Kode | Bahan | Gram.
+  const tableGrid = isBasecoat ? "grid-cols-[1fr_1fr_72px]" : "grid-cols-[1fr_1fr_72px_72px]";
   const clearCoatChartKode: ClearCoatChartKode | null =
     produkKategori === "clearcoat" && (kodeWarna === "HS360" || kodeWarna === "MS280")
       ? kodeWarna
@@ -336,6 +339,11 @@ function BuatTransaksiContent() {
   function snapshotCurrentProdukLine(): TransaksiProdukLine {
     const layers = buildLayers();
     const bahan = layers.flatMap((l) => l.bahan);
+    // Ronda mixing yang baru selesai jadi milik bahan ini, bukan bahan berikutnya.
+    const durasiMixingMenit =
+      waktuMulai != null && waktuSelesaiMixing != null
+        ? Math.max(1, Math.round((waktuSelesaiMixing - waktuMulai) / 60000))
+        : null;
     return {
       produkKategori,
       kodeWarna,
@@ -345,8 +353,8 @@ function BuatTransaksiContent() {
       layers: isBasecoat && layerCount > 1 ? layers : undefined,
       mixingVolume,
       total: harga,
+      durasiMixingMenit,
       lainLainLabel: produkKategori === "lain" ? warna : undefined,
-      lainLainSubKategori: produkKategori === "lain" ? lainSubKategori : undefined,
     };
   }
 
@@ -384,8 +392,14 @@ function BuatTransaksiContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [waktuSelesaiMixing]);
 
-  function selectKodeWarna(kode: string) {
-    const kw = kodeOptions.find((k) => k.kode === kode);
+  function selectKodeWarna(
+    kode: string,
+    /* Kode yang baru dibuat lewat CTA "Tambah" belum ada di `kodeOptions`
+       (useMemo belum re-render), jadi tanpa fallback ini pemilihan kode baru
+       gagal senyap dan field tetap di kode lama. */
+    fallback?: { kode: string; nama: string; kategori?: string },
+  ) {
+    const kw = kodeOptions.find((k) => k.kode === kode) ?? fallback;
     const formula = findFormula(kode) ?? findFormula(kw?.nama ?? "");
     setLoadedFormulaId(null);
     if (!formula) {
@@ -471,35 +485,34 @@ function BuatTransaksiContent() {
     if (produkKategori !== "basecoat") applyAutoMixingFormula(kodeWarna, vol);
   }
 
-  function addCustomKode() {
-    if (produkKategori === "lain") {
-      const sub = prompt("Nama sub-kategori (mis. Degreaser):")?.trim();
-      const kode = prompt("Kode warna / produk:")?.trim();
-      if (!kode) return;
-      const nama = prompt("Nama di nota:") ?? kode;
-      const hargaStr = prompt("Harga (Rp):", String(lainHarga));
-      const harga = Number(hargaStr?.replace(/\D/g, "")) || lainHarga;
-      const normalized = kode.toUpperCase();
-      addExtraKode({
-        kode: normalized,
-        nama: nama.trim(),
-        subKategori: sub,
-        harga,
-        produkKategori: "lain",
-      });
-      setLainSubKategori(sub ?? "");
-      setLainHarga(harga);
-      selectProdukKode({ kode: normalized, nama: nama.trim(), harga });
-      toast("Lain-lain tersimpan · dipakai di nota berikutnya", "success");
+  function openAddKodeModal() {
+    setNewKode("");
+    setNewNama("");
+    setShowAddKodeModal(true);
+  }
+
+  /* Tambah kode warna: satu form, satu field wajib (kode). Nama di nota opsional,
+     karena nama itu yang tampil di dropdown dan kolom WARNA nota. */
+  function submitAddKode() {
+    const normalized = newKode.trim().toUpperCase();
+    if (!normalized) {
+      toast("Kode warna wajib diisi", "error");
       return;
     }
-    const kode = prompt("Kode warna baru (mis. 2XY):");
-    if (!kode?.trim()) return;
-    const nama = prompt("Nama warna:") ?? kode;
-    const normalized = kode.trim().toUpperCase();
-    addExtraKode({ kode: normalized, nama: nama.trim(), produkKategori });
-    selectKodeWarna(normalized);
-    toast("Kode warna ditambahkan ke daftar", "success");
+    const nama = newNama.trim() || normalized;
+
+    if (produkKategori === "lain") {
+      addExtraKode({ kode: normalized, nama, harga: lainHarga, produkKategori: "lain" });
+      selectProdukKode({ kode: normalized, nama, harga: lainHarga });
+    } else {
+      addExtraKode({ kode: normalized, nama, produkKategori });
+      selectKodeWarna(normalized, { kode: normalized, nama, kategori });
+    }
+
+    setShowAddKodeModal(false);
+    setNewKode("");
+    setNewNama("");
+    toast(`Kode ${normalized} ditambahkan · langsung terpilih`, "success");
   }
 
   function addTonerFromPicker(product: { kode: string; nama: string }) {
@@ -581,7 +594,6 @@ function BuatTransaksiContent() {
       waktuCetakLabel,
       waktuTTD: signed ? now.toISOString() : null,
       lainLainLabel: produkKategori === "lain" ? warna : undefined,
-      lainLainSubKategori: produkKategori === "lain" ? lainSubKategori : undefined,
       lainLainHarga: produkKategori === "lain" ? lainHarga : undefined,
       durasiTotalMenit: signed ? durasiMixingMenit + 3 : null,
       bahan: produkLines.length > 0 ? mergedBahan : bahan,
@@ -686,7 +698,7 @@ function BuatTransaksiContent() {
             <div>
               <div className="flex justify-between items-center">
                 <label className="text-[11px] font-semibold text-slds-text-weak uppercase">Kode Warna *</label>
-                <button type="button" data-no-toast onClick={addCustomKode} className="text-[11px] font-bold text-brand flex items-center gap-0.5">
+                <button type="button" data-no-toast onClick={openAddKodeModal} className="text-[11px] font-bold text-brand flex items-center gap-0.5">
                   <Plus className="h-3 w-3" /> Tambah
                 </button>
               </div>
@@ -703,6 +715,17 @@ function BuatTransaksiContent() {
                 ))}
               </select>
             </div>
+            {produkKategori === "lain" && (
+              <div>
+                <label className="text-[11px] font-semibold text-slds-text-weak uppercase">Harga (Rp)</label>
+                <input
+                  value={lainHarga}
+                  onChange={(e) => setLainHarga(Number(e.target.value.replace(/\D/g, "")) || 0)}
+                  inputMode="numeric"
+                  className="w-full mt-1 px-3 py-2 border border-slds-border rounded-lg text-[13px] focus:border-brand focus:outline-none"
+                />
+              </div>
+            )}
             {savedForKode.length > 0 && (
               <div className="rounded-xl border border-brand/20 bg-brand/5 p-3 space-y-2">
                 <p className="text-[11px] font-bold uppercase text-brand flex items-center gap-1">
@@ -847,7 +870,7 @@ function BuatTransaksiContent() {
               selectedTotal={mixingVolume}
               onSelectTotal={handleVolumeChange}
             />
-          ) : (
+          ) : isBasecoat ? null : (
             <div className="flex gap-1.5 flex-wrap">
               {VOLUME_PRESETS.map((v) => (
                 <button key={v} type="button" data-no-toast onClick={() => handleVolumeChange(v)} className={`px-3 py-1.5 rounded-lg text-[12px] font-bold border ${mixingVolume === v ? "bg-brand text-white border-brand" : "bg-white border-slds-border text-slds-text"}`}>
@@ -863,27 +886,31 @@ function BuatTransaksiContent() {
                 {warna}
                 {isBasecoat && layerCount > 1 ? ` · Layer ${activeLayer}` : ""}
               </p>
-              <p className="text-[11px] font-bold text-brand tabular-nums">
-                {weighedMixingGram ?? "—"}/{mixingVolume}
-              </p>
+              {!isBasecoat && (
+                <p className="text-[11px] font-bold text-brand tabular-nums">
+                  {weighedMixingGram ?? "—"}/{mixingVolume}
+                </p>
+              )}
             </div>
-            <div className="grid grid-cols-[1fr_1fr_72px_72px] gap-0 px-3 py-1.5 border-b border-slds-border bg-slds-bg/80 text-[9px] font-bold uppercase text-slds-text-weak">
+            <div className={`grid ${tableGrid} gap-0 px-3 py-1.5 border-b border-slds-border bg-slds-bg/80 text-[9px] font-bold uppercase text-slds-text-weak`}>
               <span>Kode</span>
               <span>Bahan</span>
               <span className="text-right">Gram</span>
-              <span className="text-right text-brand">Panduan</span>
+              {!isBasecoat && <span className="text-right text-brand">Panduan</span>}
             </div>
-            <p className="px-4 py-2 text-[10px] text-slds-text-weak border-b border-slds-border">
-              <span className="font-semibold text-brand">Panduan</span> = referensi volume {mixingVolume}g (tetap). Isi <span className="font-semibold">Gram</span>{" "}
-              hasil timbang · header <span className="font-semibold tabular-nums">timbang/{mixingVolume}</span>.
-            </p>
+            {!isBasecoat && (
+              <p className="px-4 py-2 text-[10px] text-slds-text-weak border-b border-slds-border">
+                <span className="font-semibold text-brand">Panduan</span> = referensi volume {mixingVolume}g (tetap). Isi <span className="font-semibold">Gram</span>{" "}
+                hasil timbang · header <span className="font-semibold tabular-nums">timbang/{mixingVolume}</span>.
+              </p>
+            )}
             {mixingGuideLines.map((line, idx) => {
               const overrideKey = `${activeLayer}-${line.kode}`;
               const weighed = gramOverrides[overrideKey];
               return (
                 <div
                   key={`${activeLayer}-${line.kode}-${idx}`}
-                  className="grid grid-cols-[1fr_1fr_72px_72px] gap-0 px-3 py-2.5 border-b border-slds-border last:border-0 items-center"
+                  className={`grid ${tableGrid} gap-0 px-3 py-2.5 border-b border-slds-border last:border-0 items-center`}
                 >
                   <p className="text-[12px] font-bold font-mono">{line.kode}</p>
                   <p className="text-[10px] text-slds-text-weak truncate">{line.nama.replace(/^AXT-\d+\s/, "")}</p>
@@ -904,9 +931,11 @@ function BuatTransaksiContent() {
                     }}
                     className="w-full px-1.5 py-1 border border-slds-border rounded text-[13px] text-right font-bold"
                   />
-                  <p className="text-[14px] font-bold text-brand text-right tabular-nums">
-                    {line.gram.toFixed(1).replace(".", ",")}
-                  </p>
+                  {!isBasecoat && (
+                    <p className="text-[14px] font-bold text-brand text-right tabular-nums">
+                      {line.gram.toFixed(1).replace(".", ",")}
+                    </p>
+                  )}
                 </div>
               );
             })}
@@ -953,6 +982,77 @@ function BuatTransaksiContent() {
         existingKodes={activeLayerTonerKodes}
         layerLabel={layerCount > 1 ? `Layer ${activeLayer}` : undefined}
       />
+
+      {showAddKodeModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" aria-hidden onClick={() => setShowAddKodeModal(false)} />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="add-kode-title"
+            className="relative w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl p-5 pb-8 sm:pb-5 shadow-xl"
+          >
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div>
+                <h2 id="add-kode-title" className="text-[15px] font-bold text-slds-text">Tambah Kode Warna</h2>
+                <p className="text-[12px] text-slds-text-weak mt-1">
+                  Masuk ke kategori{" "}
+                  {PRODUK_KATEGORI.find((p) => p.id === produkKategori)?.label ?? produkKategori}. Kode baru
+                  langsung terpilih setelah ditambah.
+                </p>
+              </div>
+              <button type="button" data-no-toast onClick={() => setShowAddKodeModal(false)} className="p-1 text-slds-text-weak" aria-label="Tutup">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <label className="block mb-3">
+              <span className="text-[11px] font-semibold text-slds-text-weak uppercase">Kode warna *</span>
+              <input
+                value={newKode}
+                onChange={(e) => setNewKode(e.target.value.toUpperCase())}
+                onKeyDown={(e) => { if (e.key === "Enter") submitAddKode(); }}
+                autoFocus
+                placeholder="Mis. 2XY"
+                className="w-full mt-1 px-3 py-2.5 border border-slds-border rounded-lg text-[13px] font-mono focus:border-brand focus:outline-none"
+              />
+            </label>
+
+            <label className="block mb-4">
+              <span className="text-[11px] font-semibold text-slds-text-weak uppercase">Nama di nota</span>
+              <input
+                value={newNama}
+                onChange={(e) => setNewNama(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") submitAddKode(); }}
+                placeholder={newKode.trim().toUpperCase() || "Opsional"}
+                className="w-full mt-1 px-3 py-2.5 border border-slds-border rounded-lg text-[13px] focus:border-brand focus:outline-none"
+              />
+              <span className="block text-[10px] text-slds-text-weak mt-1">
+                Nama ini yang tampil di dropdown dan kolom WARNA nota. Kosongkan = pakai kode.
+              </span>
+            </label>
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                data-no-toast
+                onClick={() => setShowAddKodeModal(false)}
+                className="flex-1 py-3 border border-slds-border rounded-xl font-semibold text-[13px] text-slds-text-weak"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                data-no-toast
+                onClick={submitAddKode}
+                className="flex-1 py-3 bg-brand text-white rounded-xl font-bold text-[13px]"
+              >
+                Tambah
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showSaveFormulaModal && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">

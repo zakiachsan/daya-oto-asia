@@ -11,6 +11,8 @@ export type AjuanStokDetail = {
   catatanApprover?: string;
   refPo?: string;
   refDistribusi?: string;
+  /** Kode produk pusat (AXT-xxx) — dipakai saat ajuan disetujui bikin distribusi */
+  kodeProduk?: string;
 };
 
 export const INITIAL_AJUAN_STOK: AjuanStokDetail[] = [
@@ -23,6 +25,7 @@ export const INITIAL_AJUAN_STOK: AjuanStokDetail[] = [
     tanggal: "2026-09-10",
     status: "Menunggu",
     stokSaatIni: "2 kaleng",
+    kodeProduk: "AXT-207",
     alasan: "Stok kritis · permintaan mixing meningkat pekan ini",
   },
   {
@@ -33,7 +36,8 @@ export const INITIAL_AJUAN_STOK: AjuanStokDetail[] = [
     tinter: "Eko Prasetyo",
     tanggal: "2026-09-09",
     status: "Menunggu",
-    stokSaatIni: "1 kaleng",
+    stokSaatIni: "0 kaleng · habis",
+    kodeProduk: "AXT-910",
     alasan: "Sisa stok tidak cukup untuk 2 job Pearl White minggu depan",
   },
 ];

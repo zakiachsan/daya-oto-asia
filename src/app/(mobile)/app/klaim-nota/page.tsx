@@ -50,7 +50,7 @@ export default function KlaimNotaPage() {
     setPlatNomor("");
     setReceiptId("");
     setAlasan("");
-    toast("Klaim nota terkirim · stok akan dikembalikan setelah disetujui", "success");
+    toast("Klaim nota terkirim · menunggu verifikasi admin. Stok nota yang dibatalkan tidak dikembalikan ke Inventory.", "success");
   }
 
   return (

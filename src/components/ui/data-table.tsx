@@ -2,7 +2,14 @@ interface Column<T> {
   key: string;
   label: string;
   render?: (row: T) => React.ReactNode;
+  /** class sel (td) */
   className?: string;
+  /**
+   * Class tambahan header (th). Default: perataan diambil otomatis dari
+   * `className` (text-left/right/center) supaya header tetap sebaris dengan
+   * selnya, tapi ukuran/berat font selalu ikut kanonik tabel.
+   */
+  headerClassName?: string;
 }
 
 interface DataTableProps<T extends Record<string, unknown>> {
@@ -33,7 +40,10 @@ export function DataTable<T extends Record<string, unknown>>({
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`px-4 py-2.5 text-left font-semibold text-slds-text-weak uppercase text-[10px] tracking-wide ${col.className ?? ""}`}
+                  className={`px-4 py-2.5 text-left font-semibold text-slds-text-weak uppercase text-[10px] tracking-wide ${
+                    col.headerClassName ??
+                    (col.className?.match(/text-(left|right|center)/)?.[0] ?? "")
+                  }`}
                 >
                   {col.label}
                 </th>

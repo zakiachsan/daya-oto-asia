@@ -49,14 +49,21 @@ export function formatPlatRekap(plat: string) {
   return plat.replace(/\s+/g, "").toUpperCase();
 }
 
-/** Header pelanggan Astra · referensi scan Sunter, disesuaikan per cabang OPB */
+/**
+ * Nama pelanggan di baris judul rekap · persis contoh resmi Tim Finance
+ * ("PT. ASTRA DAIHATSU INTERNATIONAL SURABAYA WARU", WhatsApp 28 Sep 2026).
+ * Kota lain belum ada contohnya — pakai "… <KOTA>" sampai Tim Finance kirim daftar resmi.
+ */
+export const ASTRA_REKAP_NAMA: Record<string, string> = {
+  Surabaya: "PT. ASTRA DAIHATSU INTERNATIONAL SURABAYA WARU",
+  Malang: "PT. ASTRA DAIHATSU INTERNATIONAL MALANG",
+  Jember: "PT. ASTRA DAIHATSU INTERNATIONAL JEMBER",
+  Kediri: "PT. ASTRA DAIHATSU INTERNATIONAL KEDIRI",
+};
+
 export function astraPelangganRekap(cabang: string) {
-  const lower = cabang.toLowerCase();
-  if (lower.includes("surabaya")) return "PT. ASTRA DAIHATSU INTERNATIONAL · SURABAYA";
-  if (lower.includes("malang")) return "PT. ASTRA DAIHATSU INTERNATIONAL · MALANG";
-  if (lower.includes("jember")) return "PT. ASTRA DAIHATSU INTERNATIONAL · JEMBER";
-  if (lower.includes("kediri")) return "PT. ASTRA DAIHATSU INTERNATIONAL · KEDIRI";
-  return "PT. ASTRA DAIHATSU INTERNATIONAL SUNTER";
+  const kota = Object.keys(ASTRA_REKAP_NAMA).find((k) => cabang.toLowerCase().includes(k.toLowerCase()));
+  return kota ? ASTRA_REKAP_NAMA[kota] : "PT. ASTRA DAIHATSU INTERNATIONAL SURABAYA WARU";
 }
 
 function cabangMatches(opbCabang: string, trxCabang: string) {
@@ -64,7 +71,8 @@ function cabangMatches(opbCabang: string, trxCabang: string) {
   return parts.some((p) => trxCabang.toLowerCase().includes(p.toLowerCase()));
 }
 
-function parsePeriodeMonth(periode: string) {
+/** "Agustus 2026" → { bulan: 8, tahun: 2026 } · dipakai rekap & nomor invoice DOA */
+export function parsePeriodeMonth(periode: string) {
   const map: Record<string, number> = {
     Januari: 1, Februari: 2, Maret: 3, April: 4, Mei: 5, Juni: 6,
     Juli: 7, Agustus: 8, September: 9, Oktober: 10, November: 11, Desember: 12,
@@ -79,11 +87,21 @@ const SYNTH_PLAT = [
   "L1234ABC", "L3456DEF", "N5678XY", "P9012JK", "B1823KLM",
 ];
 
-/** Baris rekap · transaksi real + synthetic pad sampai jumlahTrx OPB */
-export function buildRekapInvoiceLines(opb: OpbRow, transaksi: TransaksiRow[]): RekapInvoiceLine[] {
-  const real = transaksi
+/**
+ * Nota (transaksi Selesai) milik satu OPB · dipakai rekap, invoice & rekonsiliasi Finance.
+ * Sengaja TIDAK difilter per bulan: OPB dibuat dari seluruh transaksi Selesai cabang
+ * (lihat handleGenerate di /operasional/opb), jadi periode cuma label — invoice harus
+ * memakai kumpulan nota yang sama dengan OPB-nya.
+ */
+export function notaForOpb(opb: OpbRow, transaksi: TransaksiRow[]) {
+  return transaksi
     .filter((t) => t.status === "Selesai" && cabangMatches(opb.cabang, t.cabang))
     .sort((a, b) => a.tanggal.localeCompare(b.tanggal));
+}
+
+/** Baris rekap · transaksi real + synthetic pad sampai jumlahTrx OPB */
+export function buildRekapInvoiceLines(opb: OpbRow, transaksi: TransaksiRow[]): RekapInvoiceLine[] {
+  const real = notaForOpb(opb, transaksi);
 
   const { bulan, tahun } = parsePeriodeMonth(opb.periode);
   const targetCount = Math.max(opb.jumlahTrx, real.length, 1);
@@ -131,8 +149,14 @@ export function buildRekapInvoiceLines(opb: OpbRow, transaksi: TransaksiRow[]): 
   return lines;
 }
 
+/**
+ * Total baris bawah rekap.
+ * Kolom "+ PPN" DIHITUNG dari total harga (bukan jumlah PPN per baris): di contoh
+ * resmi Tim Finance total 13.389.700 → 14.862.567 = total × 1,11 (jumlah PPN per baris
+ * menghasilkan 14.862.571, beda 4 rupiah). Sekalian bikin Grand Total rekap sama
+ * dengan Grand Total invoice.
+ */
 export function rekapInvoiceTotals(lines: RekapInvoiceLine[]) {
   const totalHarga = lines.reduce((s, l) => s + l.totalHarga, 0);
-  const totalPpn = lines.reduce((s, l) => s + l.totalPpn, 0);
-  return { totalHarga, totalPpn };
+  return { totalHarga, totalPpn: calcTotalWithPpn(totalHarga) };
 }

@@ -55,7 +55,7 @@ export default function SlipGajiPage() {
         <button type="button" data-no-toast onClick={() => setMonth((m) => Math.max(0, m - 1))} className="p-2 hover:bg-slds-bg rounded-md">
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <span className="text-[14px] font-bold text-slds-text">{MONTHS[month]} 2026</span>
+        <span className="text-[13px] font-bold text-slds-text">{MONTHS[month]} 2026</span>
         <button type="button" data-no-toast onClick={() => setMonth((m) => Math.min(11, m + 1))} className="p-2 hover:bg-slds-bg rounded-md">
           <ChevronRight className="h-4 w-4" />
         </button>

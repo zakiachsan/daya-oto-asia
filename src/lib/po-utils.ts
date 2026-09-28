@@ -34,6 +34,14 @@ export type PoDetail = {
   receivedTotal?: number;
 };
 
+/** Tanggal PO (ISO) → tampilan singkat · mis. "2026-09-05" → "05 Sep 2026" */
+export function formatTanggalPo(iso?: string | null) {
+  if (!iso) return "-";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
+}
+
 export function calcReceivedTotal(lines: PoLine[]) {
   return lines.reduce((s, l) => s + (l.qtyReceived ?? 0) * l.harga, 0);
 }

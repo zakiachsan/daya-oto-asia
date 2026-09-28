@@ -13,7 +13,7 @@ export function InventoriAlertTable() {
   return (
     <>
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-sm font-bold text-slds-text">Stok Perlu Perhatian</h2>
+        <h2 className="text-[13px] font-bold text-slds-text">Stok Perlu Perhatian</h2>
         <Link href="/operasional/inventori" className="text-[12px] text-brand font-semibold">Lihat semua</Link>
       </div>
       <DataTable<InventoriStokRow>

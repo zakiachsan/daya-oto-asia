@@ -93,7 +93,7 @@ export default function HutangPiutangDetailPage() {
           <h3 className="text-[13px] font-bold text-slds-text mb-3">Riwayat Tagihan & Pembayaran</h3>
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="border-b border-slds-border text-left text-[11px] uppercase text-slds-text-weak">
+              <tr className="border-b border-slds-border text-left text-[10px] uppercase text-slds-text-weak">
                 <th className="pb-2 font-semibold">Ref</th>
                 <th className="pb-2 font-semibold">Tanggal</th>
                 <th className="pb-2 font-semibold">Keterangan</th>

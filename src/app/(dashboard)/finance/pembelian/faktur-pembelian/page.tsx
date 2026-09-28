@@ -86,7 +86,7 @@ export default function FakturPembelianPage() {
           {eligiblePo.length === 0 ? (
             <p className="text-[13px] text-slds-text-weak">
               Tidak ada PO selesai dengan GR yang belum difakturkan.{" "}
-              <Link href="/operasional/po" className="text-brand font-semibold hover:underline">
+              <Link href="/finance/pembelian/po" className="text-brand font-semibold hover:underline">
                 Cek PO & Penerimaan
               </Link>
             </p>
@@ -120,7 +120,7 @@ export default function FakturPembelianPage() {
             label: "No. Faktur",
             className: "font-mono text-[12px]",
             render: (r) => (
-              <Link href={`/operasional/po/${String((r as FakturBeliRow).po)}`} className="font-mono text-brand hover:underline" title="Lihat PO">
+              <Link href={`/finance/pembelian/po/${String((r as FakturBeliRow).po)}`} className="font-mono text-brand hover:underline" title="Lihat PO">
                 {String(r.id)}
               </Link>
             ),
@@ -132,7 +132,7 @@ export default function FakturPembelianPage() {
             label: "Ref. PO",
             className: "font-mono text-[12px]",
             render: (r) => (
-              <Link href={`/operasional/po/${String(r.po)}`} className="text-brand hover:underline">
+              <Link href={`/finance/pembelian/po/${String(r.po)}`} className="text-brand hover:underline">
                 {String(r.po)}
               </Link>
             ),

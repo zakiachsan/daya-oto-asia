@@ -9,14 +9,22 @@ import { useTransaksiList } from "@/lib/preview-store";
 import { useToast } from "@/components/ui/toast";
 import { MOBILE_USER } from "@/lib/mobile-app-utils";
 import { resolveReceiptIdDisplay } from "@/lib/recipe-id-utils";
+import { TRANSAKSI_STATUS_FILTER } from "@/lib/transaksi-status-utils";
+
+const STATUS_OPTIONS = [...TRANSAKSI_STATUS_FILTER];
 
 export default function AppTransaksiPage() {
   const { all, update } = useTransaksiList();
   const { toast } = useToast();
   const [tanggal, setTanggal] = useState("");
-  const myTrx = useMemo(
+  const [status, setStatus] = useState("Semua Status");
+  const sayaAll = useMemo(
     () => all.filter((t) => t.tinter === MOBILE_USER && (!tanggal || t.tanggal === tanggal)),
     [all, tanggal],
+  );
+  const myTrx = useMemo(
+    () => (status === "Semua Status" ? sayaAll : sayaAll.filter((t) => t.status === status)),
+    [sayaAll, status],
   );
 
   function handleSudahTtd(e: React.MouseEvent, trxId: string, durasiMixing: number | null) {
@@ -43,7 +51,25 @@ export default function AppTransaksiPage() {
         </div>
       </div>
 
+      <div className="flex items-center gap-2">
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="flex-1 px-3 py-2 border border-slds-border rounded-lg text-[13px] bg-white"
+        >
+          {STATUS_OPTIONS.map((o) => (
+            <option key={o} value={o}>{o}</option>
+          ))}
+        </select>
+        <span className="text-[12px] text-slds-text-weak whitespace-nowrap">
+          {myTrx.length} dari {sayaAll.length}
+        </span>
+      </div>
+
       <div className="space-y-2">
+        {myTrx.length === 0 && (
+          <p className="text-center text-[12px] text-slds-text-weak py-6">Tidak ada transaksi untuk filter ini.</p>
+        )}
         {myTrx.map((t) => {
           const listTitle =
             [t.mobil?.trim(), t.platNomor?.trim()].filter(Boolean).join(" · ") || t.warna;
@@ -60,7 +86,7 @@ export default function AppTransaksiPage() {
                     {t.warna} · {resolveReceiptIdDisplay(t)} · {t.tanggal}
                   </p>
                 </div>
-                <StatusBadge status={t.status} />
+                <StatusBadge status={t.status} size="xs" />
               </div>
               <div className="flex items-center justify-between mt-2 pt-2 border-t border-slds-border">
                 <span className="text-[11px] text-slds-text-weak">{t.durasiMixingMenit ? `${t.durasiMixingMenit} menit` : "-"}</span>

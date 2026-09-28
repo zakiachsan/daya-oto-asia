@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Paintbrush, LogOut, Menu, X, LayoutGrid,
 } from "lucide-react";
@@ -56,6 +56,7 @@ function ModuleMenuLinks({
             <Link
               href={menu.href}
               onClick={onNavigate}
+              data-nav-active={active ? "true" : undefined}
               className={`flex items-center gap-3 px-3 py-2 rounded-md text-[13px] transition-all
                 ${active ? "bg-brand/10 text-brand font-bold" : "text-slds-text hover:bg-slds-bg"}`}
             >
@@ -72,9 +73,28 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "";
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navRef = useRef<HTMLElement | null>(null);
   const activeModule = getModuleByPath(pathname);
   const isMobileApp = pathname.startsWith("/app");
   const isGuidePage = pathname.endsWith("/panduan");
+
+  /**
+   * Sidebar punya scroll sendiri · tiap refresh / pindah halaman, menu aktif dibawa ke tengah
+   * biar nggak balik mulai dari paling atas (menu Finance & Operasional panjang).
+   */
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+    const el = nav.querySelector<HTMLElement>('[data-nav-active="true"]');
+    if (!el) return;
+    const navRect = nav.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+    const sudahKelihatan = elRect.top >= navRect.top && elRect.bottom <= navRect.bottom;
+    if (sudahKelihatan) return;
+    const maxScroll = Math.max(0, nav.scrollHeight - nav.clientHeight);
+    const target = nav.scrollTop + (elRect.top - navRect.top) - nav.clientHeight / 2 + elRect.height / 2;
+    nav.scrollTop = Math.max(0, Math.min(target, maxScroll));
+  }, [pathname, sidebarOpen]);
 
   const isActive = (href: string) =>
     pathname === href || (href !== `/${activeModule?.id}` && pathname.startsWith(href + "/"));
@@ -104,10 +124,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
+        <nav ref={navRef} className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
           <Link
             href="/modules"
             data-no-toast onClick={() => setSidebarOpen(false)}
+            data-nav-active={pathname === "/modules" ? "true" : undefined}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] font-medium transition-all
               ${pathname === "/modules" ? "bg-brand/10 text-brand font-bold" : "text-slds-text hover:bg-slds-bg"}`}
           >

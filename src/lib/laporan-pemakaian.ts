@@ -113,6 +113,11 @@ export function formatBulanLaporan(bulan: string) {
   return new Date(`${bulan}-01`).toLocaleDateString("id-ID", { month: "long", year: "numeric" });
 }
 
+/** Tanggal lengkap dari bulan (YYYY-MM) + hari ke-N · mis. ("2026-09", 26) → "26/09/2026" */
+export function formatTanggalHariLaporan(bulan: string, hari: number) {
+  return `${String(hari).padStart(2, "0")}/${bulan.slice(5, 7)}/${bulan.slice(0, 4)}`;
+}
+
 export function formatTanggalCetakLaporan() {
   const d = new Date();
   return `${d.getDate()}-${d.toLocaleDateString("id-ID", { month: "short" })}-${String(d.getFullYear()).slice(-2)}`;

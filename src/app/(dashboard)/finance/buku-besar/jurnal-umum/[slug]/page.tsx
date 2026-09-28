@@ -102,7 +102,7 @@ export default function JurnalDetailPage() {
           <h3 className="text-[13px] font-bold text-slds-text mb-3">Baris Jurnal (Double Entry)</h3>
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="border-b border-slds-border text-left text-[11px] uppercase text-slds-text-weak">
+              <tr className="border-b border-slds-border text-left text-[10px] uppercase text-slds-text-weak">
                 <th className="pb-2 font-semibold">Kode Akun</th>
                 <th className="pb-2 font-semibold">Nama Akun</th>
                 <th className="pb-2 font-semibold text-right">Debit</th>

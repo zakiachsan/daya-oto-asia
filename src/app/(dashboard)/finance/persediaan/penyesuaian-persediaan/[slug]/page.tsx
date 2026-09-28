@@ -90,7 +90,7 @@ export default function PenyesuaianStokDetailPage() {
           <h3 className="text-[13px] font-bold text-slds-text mb-3">Detail Selisih per Produk</h3>
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="border-b border-slds-border text-left text-[11px] uppercase text-slds-text-weak">
+              <tr className="border-b border-slds-border text-left text-[10px] uppercase text-slds-text-weak">
                 <th className="pb-2 font-semibold">Kode</th>
                 <th className="pb-2 font-semibold">Produk</th>
                 <th className="pb-2 font-semibold text-right">Selisih</th>

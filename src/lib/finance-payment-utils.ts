@@ -20,8 +20,15 @@ export function nextPaymentId(tipe: FinancePaymentRow["tipe"], seq: number) {
   return `${prefix}/2026/09/${String(seq).padStart(3, "0")}`;
 }
 
+/**
+ * Piutang milik faktur · cocokkan dulu lewat refFaktur (1 faktur = 1 kartu piutang).
+ * Fallback nama pelanggan hanya untuk kartu lama yang belum punya refFaktur,
+ * supaya tagihan pelanggan yang sama tidak saling tertukar.
+ */
 export function piutangForFaktur(items: HutangPiutangDetail[], faktur: FakturJualRow) {
-  return items.find((h) => h.tipe === "Piutang" && (h.refFaktur === faktur.id || h.pihak === faktur.pelanggan));
+  const byRef = items.find((h) => h.tipe === "Piutang" && h.refFaktur === faktur.id);
+  if (byRef) return byRef;
+  return items.find((h) => h.tipe === "Piutang" && !h.refFaktur && h.pihak === faktur.pelanggan);
 }
 
 export function hutangForFakturBeli(items: HutangPiutangDetail[], faktur: FakturBeliRow) {

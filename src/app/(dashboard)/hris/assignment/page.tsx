@@ -53,7 +53,7 @@ export default function AssignmentPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div>
-          <h3 className="text-sm font-bold text-slds-text mb-2">Tinter per Cabang</h3>
+          <h3 className="text-[13px] font-bold text-slds-text mb-2">Tinter per Cabang</h3>
           <DataTable
             columns={[
               { key: "nama", label: "Nama" },
@@ -102,7 +102,7 @@ export default function AssignmentPage() {
         </div>
 
         <div>
-          <h3 className="text-sm font-bold text-slds-text mb-2">Kapasitas Cabang</h3>
+          <h3 className="text-[13px] font-bold text-slds-text mb-2">Kapasitas Cabang</h3>
           <div className="space-y-2">
             {capacity.map((c) => (
               <div key={c.label} className="bg-white border border-slds-border rounded-lg p-3 flex justify-between items-center">

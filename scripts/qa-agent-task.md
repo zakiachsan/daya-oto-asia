@@ -26,7 +26,7 @@ Kamu QA otomatis. Untuk setiap item, buka halaman, interaksi jika perlu, lalu la
 15. **#48–49** `/operasional/opb` — Kartu Proses Invoice; buka detail OPB.
 16. **#50** `/operasional/rekonsiliasi` — Tab Ringkasan, Detail OPB, Deteksi Leakage.
 17. **#51** `/modules` — Tidak ada verifikasi-klaim.
-18. **#52** `/operasional/po` — List/detail PO.
+18. **#52** `/finance/pembelian/po` — List/detail PO (pindah dari Operasional ke Finance).
 19. **#53** `/operasional/ajuan-stok` — Detail ajuan + distribusi ID.
 20. **#54** `/operasional/surat-jalan` — List/detail SJ.
 

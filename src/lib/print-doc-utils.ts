@@ -28,23 +28,43 @@ export const PRINT_DOC_CSS = `
 `;
 
 export function printHtmlDocument(title: string, htmlBody: string, extraCss = "") {
-  const el = typeof htmlBody === "string" && htmlBody.startsWith("<")
-    ? htmlBody
-    : null;
-  const content = el ?? (() => {
-    const node = document.getElementById(htmlBody);
-    return node?.outerHTML ?? "";
-  })();
-
+  const content = resolveDocContent(htmlBody);
   if (!content) return;
 
   const w = window.open("", "_blank", "width=920,height=1100");
   if (!w) return;
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
-    <style>${PRINT_DOC_CSS}${extraCss}</style></head><body>${content}</body></html>`);
+  w.document.write(wrapDocHtml(title, content, extraCss));
   w.document.close();
   w.focus();
   w.print();
+}
+
+/** Isi dokumen: elemen di halaman (id) atau string HTML siap pakai */
+function resolveDocContent(elementIdOrHtml: string) {
+  if (elementIdOrHtml.startsWith("<")) return elementIdOrHtml;
+  return document.getElementById(elementIdOrHtml)?.outerHTML ?? "";
+}
+
+function wrapDocHtml(title: string, content: string, extraCss: string) {
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
+    <style>${PRINT_DOC_CSS}${extraCss}</style></head><body>${content}</body></html>`;
+}
+
+/** Unduh dokumen sebagai file .html (bisa dibuka, lalu Save as PDF dari browser) */
+export function downloadElementById(elementId: string, filename: string, title: string, extraCss = "") {
+  const content = resolveDocContent(elementId);
+  if (!content) return false;
+
+  const blob = new Blob([wrapDocHtml(title, content, extraCss)], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return true;
 }
 
 export function printElementById(elementId: string, title: string, extraCss = "") {

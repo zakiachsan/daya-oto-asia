@@ -39,6 +39,7 @@ export const financeGuideNav: ModuleGuideNav = {
       key: "penjualan",
       label: "Penjualan",
       items: [
+        { id: "proses-invoice", label: "Proses Invoice" },
         { id: "faktur-penjualan", label: "Faktur Penjualan" },
         { id: "penerimaan-penjualan", label: "Penerimaan Penjualan" },
         { id: "uang-muka-penjualan", label: "Uang Muka Penjualan" },
@@ -50,7 +51,7 @@ export const financeGuideNav: ModuleGuideNav = {
       key: "pembelian",
       label: "Pembelian",
       items: [
-        { id: "pesanan-pembelian", label: "Pesanan Pembelian" },
+        { id: "pesanan-pembelian", label: "PO & Penerimaan" },
         { id: "penerimaan-barang-pembelian", label: "Penerimaan Barang" },
         { id: "faktur-pembelian", label: "Faktur Pembelian" },
         { id: "uang-muka-pembelian", label: "Uang Muka Pembelian" },
@@ -245,17 +246,36 @@ export const financeGuideNav: ModuleGuideNav = {
     ),
 
 
+    "proses-invoice": g(
+      "proses-invoice",
+      "Proses Invoice per Cabang (alur penagihan)",
+      "Proses Invoice",
+      "/finance/penjualan/proses-invoice",
+      "Alur penagihan Finance: OPB terbit → Proses Invoice per cabang → cetak 2 dokumen → rekonsiliasi vs OPB → kirim invoice → Lunas.",
+      [
+        a(O, "OPB Terbit & TTD Admin Cabang", "/operasional/opb"),
+        a(F, "Pilih Cabang → Centang OPB Terbit"),
+        a(F, "Proses Invoice → 1 Faktur per OPB (total dari OPB)"),
+        a(F, "Cetak 2 Dokumen: Faktur Penjualan + Rekap Invoice"),
+        a(F, "Rekonsiliasi vs OPB (catatan wajib kalau selisih)"),
+        a(F, "Post Faktur → Jurnal Piutang Otomatis"),
+        a(F, "Kirim Invoice (tanggal · metode · catatan)"),
+        a(F, "Catat Penerimaan → status Lunas", "/finance/penjualan/penerimaan-penjualan"),
+      ]
+    ),
     "faktur-penjualan": g(
       "faktur-penjualan",
-      "Faktur Penjualan (OPB → Faktur → Piutang)",
+      "Faktur Penjualan (OPB → Faktur → Rekonsiliasi → Lunas)",
       "Faktur Penjualan",
       "/finance/penjualan/faktur-penjualan",
-      "Buat faktur dari OPB yang sudah ditagihkan · post jurnal piutang & pendapatan otomatis.",
+      "Faktur dari OPB yang sudah terbit · dua dokumen cetak, rekonsiliasi vs OPB, kirim invoice, Lunas dari piutang.",
       [
         a(O, "OPB Status Ditagihkan", "/operasional/opb", { module: F, href: "/finance/penjualan/faktur-penjualan" }),
-        a(F, "Buat Faktur Penjualan dari OPB"),
-        a(F, "Review PPN & Total Tagihan"),
+        a(F, "Buat Faktur Penjualan dari OPB", "/finance/penjualan/proses-invoice"),
+        a(F, "Cetak / Unduh Faktur Penjualan + Rekap Invoice"),
+        a(F, "Tandai Terekonsiliasi (selisih OPB vs nota)"),
         a(F, "Post Faktur → Jurnal Otomatis"),
+        a(F, "Kirim Invoice ke Pelanggan"),
         a(F, "Catat Penerimaan Penjualan", "/finance/penjualan/penerimaan-penjualan"),
       ]
     ),
@@ -313,12 +333,12 @@ export const financeGuideNav: ModuleGuideNav = {
 
     "pesanan-pembelian": g(
       "pesanan-pembelian",
-      "Pesanan Pembelian (PO)",
-      "Pesanan Pembelian",
-      "/finance/pembelian/pesanan-pembelian",
-      "Monitor PO Operasional · urutan: DP (opsional) → terima barang → faktur → pelunasan.",
+      "PO & Penerimaan",
+      "PO & Penerimaan",
+      "/finance/pembelian/po",
+      "Kelola PO ke pabrik + goods received · urutan: DP (opsional) → terima barang → faktur → pelunasan.",
       [
-        a(O, "Buat PO & Goods Received", "/operasional/po", { module: F, href: "/finance/pembelian/pesanan-pembelian" }),
+        a(F, "Buat PO & Goods Received", "/finance/pembelian/po"),
         a(F, "Review PO"),
         a(F, "Bayar Uang Muka (opsional)", "/finance/pembelian/uang-muka-pembelian"),
         a(F, "Catat Faktur Pembelian", "/finance/pembelian/faktur-pembelian"),
@@ -332,7 +352,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "/finance/pembelian/penerimaan-barang",
       "Mirror penerimaan Operasional · setelah GR lanjut faktur & pelunasan.",
       [
-        a(O, "Goods Received di Operasional", "/operasional/po", { module: F, href: "/finance/pembelian/penerimaan-barang" }),
+        a(F, "Goods Received (GR)", "/finance/pembelian/po"),
         a(F, "Review GR"),
         a(F, "Catat Faktur Pembelian", "/finance/pembelian/faktur-pembelian"),
       ]
@@ -379,7 +399,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "Data supplier/pabrik cat · dipakai di PO & faktur pembelian.",
       [
         a(F, "Kelola Data Pemasok", "/finance/pembelian/pemasok"),
-        a(O, "Buat PO ke Pemasok", "/operasional/po"),
+        a(F, "Buat PO ke Pemasok", "/finance/pembelian/po"),
       ]
     ),
 
@@ -392,7 +412,7 @@ export const financeGuideNav: ModuleGuideNav = {
       "/finance/persediaan/penerimaan-barang",
       "Mirror penerimaan barang masuk gudang pusat · review dari sisi Finance.",
       [
-        a(O, "Goods Received di Operasional", "/operasional/po"),
+        a(F, "Goods Received", "/finance/pembelian/po"),
         a(F, "Review Penerimaan Barang", "/finance/persediaan/penerimaan-barang"),
         a(F, "Post → Jurnal Persediaan"),
       ]

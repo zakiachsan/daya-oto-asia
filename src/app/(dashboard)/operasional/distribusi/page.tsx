@@ -2,13 +2,21 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Plus, Truck, Search, Trash2 } from "lucide-react";
+import { Plus, Truck, Search, Trash2, Package, CheckCircle2, Undo2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { DataTable } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ActionFormPanel, fieldClass, labelClass } from "@/components/ui/action-form-panel";
 import { MOCK_CABANG } from "@/lib/mock-data";
-import type { DistLine, DistribusiDetail } from "@/lib/distribusi-utils";
+import {
+  DISTRIBUSI_STATUS,
+  distribusiStatus,
+  nextDistribusiId,
+  suratJalanId,
+  suratJalanTerbit,
+  type DistLine,
+  type DistribusiDetail,
+} from "@/lib/distribusi-utils";
 import { listProdukAktif } from "@/lib/inventori-utils";
 import { useDistribusiList } from "@/lib/preview-store";
 import { useToast } from "@/components/ui/toast";
@@ -37,7 +45,7 @@ export default function DistribusiPage() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return items.filter((r) => {
-      if (statusFilter !== "Semua Status" && r.status !== statusFilter) return false;
+      if (statusFilter !== "Semua Status" && distribusiStatus(r) !== statusFilter) return false;
       if (!q) return true;
       return r.id.toLowerCase().includes(q) || r.ke.toLowerCase().includes(q);
     });
@@ -66,11 +74,12 @@ export default function DistribusiPage() {
     }
     const totalQty = valid.reduce((s, l) => s + l.qty, 0);
     const newRow: DistribusiDetail = {
-      id: `DIST-2026-${String(21 + items.length).padStart(3, "0")}`,
+      id: nextDistribusiId(items),
       tanggal,
       dari: "Pusat",
       ke,
       items: totalQty,
+      /* Draft = belum dikirim; status berikutnya muncul dari waktuKirim/waktuTerima */
       status: "Draft",
       lines: valid,
     };
@@ -84,7 +93,7 @@ export default function DistribusiPage() {
     <div>
       <PageHeader
         title="Distribusi Cabang"
-        desc="Kirim beberapa item produk sekaligus dari pusat ke cabang"
+        desc="Kirim item dari pusat ke cabang · status otomatis: Draft → Dalam Perjalanan → Selesai; surat jalan terbit saat dikirim"
         breadcrumb={[{ label: "Operasional", href: "/operasional" }, { label: "Distribusi Cabang" }]}
         actions={
           <button type="button" data-no-toast onClick={() => setShowForm(!showForm)} className="inline-flex items-center gap-1.5 px-3 py-2 bg-brand text-white rounded-md text-[13px] font-semibold hover:bg-brand-dark">
@@ -160,19 +169,20 @@ export default function DistribusiPage() {
         </ActionFormPanel>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
         {[
-          { label: "Distribusi Bulan Ini", value: String(items.length) },
-          { label: "Dalam Perjalanan", value: String(items.filter((i) => i.status === "Draft").length) },
-          { label: "Selesai Diterima", value: String(items.filter((i) => i.status === "Selesai").length) },
+          { label: "Distribusi Bulan Ini", value: String(items.length), icon: Truck },
+          { label: "Belum Dikirim", value: String(items.filter((i) => distribusiStatus(i) === "Draft").length), icon: Undo2 },
+          { label: "Dalam Perjalanan", value: String(items.filter((i) => distribusiStatus(i) === "Dalam Perjalanan").length), icon: Package },
+          { label: "Selesai Diterima", value: String(items.filter((i) => distribusiStatus(i) === "Selesai").length), icon: CheckCircle2 },
         ].map((s) => (
           <div key={s.label} className="bg-white border border-slds-border rounded-lg p-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50">
-              <Truck className="h-5 w-5 text-orange-600" />
+              <s.icon className="h-5 w-5 text-orange-600" />
             </div>
             <div>
               <p className="text-[11px] text-slds-text-weak uppercase font-semibold">{s.label}</p>
-              <p className="text-xl font-bold text-slds-text">{s.value}</p>
+              <p className="text-2xl font-bold text-slds-text">{s.value}</p>
             </div>
           </div>
         ))}
@@ -184,7 +194,7 @@ export default function DistribusiPage() {
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari no. distribusi, cabang..." className="w-full pl-9 pr-3 py-2 border border-slds-border rounded-md text-[13px] focus:border-brand focus:outline-none" />
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-3 py-2 border border-slds-border rounded-md text-[13px] bg-white">
-          {["Semua Status", "Draft", "Selesai"].map((o) => (
+          {["Semua Status", ...DISTRIBUSI_STATUS].map((o) => (
             <option key={o} value={o}>{o}</option>
           ))}
         </select>
@@ -197,9 +207,19 @@ export default function DistribusiPage() {
             key: "id",
             label: "No. Distribusi",
             render: (r) => (
-              <Link href={`/operasional/distribusi/${r.id}`} className="font-mono font-semibold text-brand hover:underline">
-                {String(r.id)}
-              </Link>
+              <div>
+                <Link href={`/operasional/distribusi/${r.id}`} className="font-mono font-semibold text-brand hover:underline">
+                  {String(r.id)}
+                </Link>
+                {r.refAjuan && (
+                  <p className="text-[11px] text-slds-text-weak mt-0.5">
+                    dari{" "}
+                    <Link href={`/operasional/ajuan-stok/${r.refAjuan}`} className="text-brand hover:underline">
+                      {r.refAjuan}
+                    </Link>
+                  </p>
+                )}
+              </div>
             ),
           },
           { key: "ke", label: "Ke Cabang" },
@@ -213,7 +233,19 @@ export default function DistribusiPage() {
               return `${kinds} jenis · ${r.items} kaleng`;
             },
           },
-          { key: "status", label: "Status", render: (r) => <StatusBadge status={String(r.status)} /> },
+          {
+            key: "sj",
+            label: "Surat Jalan",
+            render: (r) =>
+              suratJalanTerbit(r) ? (
+                <Link href={`/operasional/surat-jalan/${suratJalanId(r.id)}`} className="font-mono text-brand hover:underline">
+                  {suratJalanId(r.id)}
+                </Link>
+              ) : (
+                <span className="text-slds-text-weak">belum terbit</span>
+              ),
+          },
+          { key: "status", label: "Status", render: (r) => <StatusBadge status={distribusiStatus(r)} /> },
         ]}
         data={filtered}
       />

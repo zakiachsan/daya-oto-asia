@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatIDR, formatDurasi } from "@/lib/mock-data";
 import { useToast } from "@/components/ui/toast";
@@ -14,7 +14,7 @@ import { TransaksiFotoNotaSection } from "@/components/mobile/transaksi-foto-not
 import { draftNeedsWizardSteps } from "@/lib/transaksi-foto-nota-utils";
 import { buildDraftWizardSnapshot } from "@/lib/transaksi-draft-utils";
 import { MOBILE_CABANG, MOBILE_USER } from "@/lib/mobile-app-utils";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 export default function TransaksiDetailPage() {
   const params = useParams();
@@ -29,6 +29,8 @@ export default function TransaksiDetailPage() {
     [all, id, rawId],
   );
   const auditLogs = byTrxId(trx?.id ?? id);
+  // Detail mobil/produk/total disembunyikan dulu — tinter fokus ke bahan & checklist.
+  const [showDetail, setShowDetail] = useState(false);
 
   if (!trx) {
     return (
@@ -75,39 +77,43 @@ export default function TransaksiDetailPage() {
       </Link>
 
       <div className="bg-white rounded-xl border border-slds-border overflow-hidden">
-        <div className="px-4 py-3 bg-brand text-white flex justify-between items-start gap-2">
+        <button
+          type="button"
+          data-no-toast
+          onClick={() => setShowDetail((v) => !v)}
+          aria-expanded={showDetail}
+          className="w-full px-4 py-3 bg-brand text-white flex justify-between items-start gap-2 text-left"
+        >
           <div className="min-w-0">
             <p className="text-[15px] font-bold leading-snug">{listTitle}</p>
             <p className="text-[11px] opacity-90 font-mono break-all mt-1">{resolveReceiptIdDisplay(row)}</p>
           </div>
-          <StatusBadge status={row.status} />
-        </div>
-        <div className="p-4 grid grid-cols-2 gap-x-3 gap-y-2 text-[12px]">
-          <div>
-            <p className="text-slds-text-weak text-[10px] uppercase font-semibold">Produk</p>
-            <p className="font-semibold text-slds-text">{row.warna}</p>
+          <div className="flex items-center gap-2 shrink-0">
+            <StatusBadge status={row.status} />
+            {showDetail ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </div>
-          <div>
-            <p className="text-slds-text-weak text-[10px] uppercase font-semibold">Tanggal</p>
-            <p className="font-semibold">{row.tanggal}</p>
+        </button>
+        {showDetail && (
+          <div className="p-4 grid grid-cols-2 gap-x-3 gap-y-2 text-[12px]">
+            <div>
+              <p className="text-slds-text-weak text-[10px] uppercase font-semibold">Produk</p>
+              <p className="font-semibold text-slds-text">{row.warna}</p>
+            </div>
+            <div>
+              <p className="text-slds-text-weak text-[10px] uppercase font-semibold">Tanggal</p>
+              <p className="font-semibold">{row.tanggal}</p>
+            </div>
+            <div>
+              <p className="text-slds-text-weak text-[10px] uppercase font-semibold">Durasi mixing</p>
+              <p className="font-bold text-brand">{formatDurasi(row.durasiMixingMenit)}</p>
+            </div>
+            <div>
+              <p className="text-slds-text-weak text-[10px] uppercase font-semibold">Total</p>
+              <p className="font-bold text-brand">{formatIDR(row.total)}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-slds-text-weak text-[10px] uppercase font-semibold">Durasi mixing</p>
-            <p className="font-bold text-brand">{formatDurasi(row.durasiMixingMenit)}</p>
-          </div>
-          <div>
-            <p className="text-slds-text-weak text-[10px] uppercase font-semibold">Total</p>
-            <p className="font-bold text-brand">{formatIDR(row.total)}</p>
-          </div>
-        </div>
+        )}
       </div>
-
-      {isDraft && (
-        <p className="text-[11px] text-center text-slds-text-weak px-2">
-          Fase 3 · Foto & Nota
-          {editableDraft ? " · checklist bisa dilanjutkan di bawah" : ""}
-        </p>
-      )}
 
       {needsWizard ? (
         <div className="rounded-xl border border-brand/30 bg-brand/5 p-4 space-y-3">

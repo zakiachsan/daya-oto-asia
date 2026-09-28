@@ -56,8 +56,9 @@ export function FinancePaymentPage({ mode }: { mode: PaymentMode }) {
   const title = isPenerimaan ? "Penerimaan Penjualan" : "Pembayaran Pembelian";
   const section = isPenerimaan ? "Penjualan" : "Pembelian";
 
+  /* Faktur sudah di-posting ke AR (Posted) atau sudah dikirim ke pelanggan (Terkirim) masih bisa diterima pembayarannya */
   const postedJual = useMemo(
-    () => fakturJual.filter((f) => f.status === "Posted"),
+    () => fakturJual.filter((f) => f.status === "Posted" || f.status === "Terkirim"),
     [fakturJual],
   );
   const postedBeli = useMemo(

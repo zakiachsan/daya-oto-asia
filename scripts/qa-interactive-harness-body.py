@@ -232,8 +232,8 @@ if js_click_href("/operasional/surat-jalan/"):
 else:
     mark(54, "Surat Jalan list", "surat jalan" in body_lower())
 
-go("/operasional/po")
-if js_click_href("/operasional/po/"):
+go("/finance/pembelian/po")
+if js_click_href("/finance/pembelian/po/"):
     time.sleep(2)
     mark(52, "PO detail generate/print", "po" in body_lower() and ("print" in body_lower() or "supplier" in body_lower() or "item" in body_lower()))
 else:
@@ -267,7 +267,7 @@ mark(57, "Batch faktur cabang+periode panel", "batch" in body_lower() or "period
 
 go("/finance/pembelian/po", wait=2.5)
 _po_path = js("return location.pathname") or ""
-mark(58, "Finance PO redirect ke operasional", "/operasional/po" in str(_po_path))
+mark(58, "PO & Penerimaan ada di Finance", "/finance/pembelian/po" in str(_po_path))
 
 go("/finance/surat-jalan")
 mark(59, "Finance SJ view only", "view only" in body_lower() or "view" in body_lower())

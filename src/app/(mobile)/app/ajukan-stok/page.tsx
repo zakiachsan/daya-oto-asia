@@ -33,11 +33,12 @@ export default function AjukanStokPage() {
   const myAjuan = items.filter((i) => i.tinter === MOBILE_USER);
   const diajukanSet = new Set(myAjuan.map((i) => i.produk));
 
-  function handleAjukan(produk: string, sisa: string) {
+  function handleAjukan(produk: string, sisa: string, kodeProduk?: string) {
     const id = `AJ-${Date.now()}`;
     add({
       id,
       produk,
+      kodeProduk,
       qty,
       cabang: "Surabaya",
       tinter: MOBILE_USER,
@@ -103,7 +104,7 @@ export default function AjukanStokPage() {
                     <input type="number" min={1} value={qty} onChange={(e) => setQty(Number(e.target.value) || 1)} className="w-full mt-1 px-3 py-2 border border-slds-border rounded-lg text-[14px]" />
                   </div>
                   <div className="flex gap-2">
-                    <button type="button" data-no-toast onClick={() => handleAjukan(item.produk, item.sisa)} className="flex-1 py-2 bg-brand text-white rounded-lg text-[12px] font-semibold">
+                    <button type="button" data-no-toast onClick={() => handleAjukan(item.produk, item.sisa, item.kode)} className="flex-1 py-2 bg-brand text-white rounded-lg text-[12px] font-semibold">
                       Kirim
                     </button>
                     <button type="button" data-no-toast onClick={() => setActiveForm(null)} className="flex-1 py-2 border border-slds-border rounded-lg text-[12px]">

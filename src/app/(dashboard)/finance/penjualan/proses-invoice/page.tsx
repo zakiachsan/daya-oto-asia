@@ -1,90 +1,176 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
+import { FileText, Receipt } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
-import { useOpbList, useFakturJual, useHutangPiutang, useTransaksiList } from "@/lib/preview-store";
-import { formatIDR } from "@/lib/mock-data";
+import { DataTable } from "@/components/ui/data-table";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { formatIDR, MOCK_CABANG, type OpbRow } from "@/lib/mock-data";
+import { formatTanggalOpb, opbSiapInvoice, opbStatusLabel } from "@/lib/opb-utils";
+import { fakturSlug } from "@/lib/faktur-utils";
+import { buildFakturUntukOpb } from "@/lib/finance-invoice-batch-utils";
+import { useFakturJual, useOpbList } from "@/lib/preview-store";
 import { useToast } from "@/components/ui/toast";
-import { buildBatchFaktur } from "@/lib/finance-invoice-batch-utils";
 
-/** Alur Finance #56: OPB terbit → Proses Invoice → cetak 2 format → rekonsiliasi → kirim → Lunas */
+/** Alur penagihan Finance (#56): OPB terbit → Proses Invoice per cabang → cetak 2 dokumen → rekonsiliasi → kirim → Lunas */
 const STEPS = ["OPB Terbit", "Proses Invoice", "Cetak 2 Invoice", "Rekonsiliasi", "Kirim", "Lunas"] as const;
+
+const CABANG_OPTIONS = MOCK_CABANG.map((c) => c.nama.replace(/^Bengkel /, ""));
 
 export default function ProsesInvoicePage() {
   const { toast } = useToast();
-  const { items: opb, patch } = useOpbList();
-  const { all: trx } = useTransaksiList();
-  const { all: faktur, add: addFaktur } = useFakturJual();
-  const { items: hutang } = useHutangPiutang();
-  const [cabang, setCabang] = useState("Auto 2000 Surabaya");
-  const [dari, setDari] = useState("2026-09-01");
-  const [sampai, setSampai] = useState("2026-09-30");
-  const [stepIdx, setStepIdx] = useState(1);
+  const { items: opbList, patch: patchOpb } = useOpbList();
+  const { all: fakturJual, add: addFaktur } = useFakturJual();
+  const [cabang, setCabang] = useState(CABANG_OPTIONS[0]);
+  const [terpilih, setTerpilih] = useState<string[]>([]);
 
-  const opbCabang = opb.filter((o) => o.cabang.includes(cabang.split(" ").pop() ?? cabang));
+  const opbCabang = useMemo(
+    () =>
+      opbList
+        .filter((o) => o.cabang.includes(cabang))
+        .sort((a, b) => (b.tanggalOpb ?? "").localeCompare(a.tanggalOpb ?? "")),
+    [opbList, cabang],
+  );
 
-  function prosesInvoice() {
-    const pair = buildBatchFaktur({ cabang, dari, sampai, transaksi: trx, seq: faktur.length });
-    pair.forEach((f) => addFaktur(f));
-    opbCabang.forEach((o) => patch(o.id, { status: "Rekonsiliasi" }));
-    setStepIdx(2);
-    toast(`2 dokumen invoice digenerate untuk ${cabang}`, "success");
+  const siapInvoice = opbCabang.filter((o) => opbSiapInvoice(o, fakturJual));
+  const totalTerpilih = opbCabang
+    .filter((o) => terpilih.includes(o.id))
+    .reduce((s, o) => s + o.total, 0);
+
+  function toggle(id: string) {
+    setTerpilih((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }
 
-  function tandaiLunas() {
-    setStepIdx(5);
-    toast("Status cabang → Lunas (preview)", "success");
+  function prosesInvoice() {
+    const pilihan = opbCabang.filter((o) => terpilih.includes(o.id) && opbSiapInvoice(o, fakturJual));
+    if (pilihan.length === 0) {
+      toast("Centang minimal 1 OPB yang sudah terbit & belum difakturkan", "error");
+      return;
+    }
+    const fakturBaru = buildFakturUntukOpb(pilihan, fakturJual);
+    fakturBaru.forEach((f) => addFaktur(f));
+    /* OPB masuk penagihan → status Ditagihkan (dari sisi Ops: "masuk faktur penjualan") */
+    pilihan.forEach((o) => patchOpb(o.id, { status: "Ditagihkan" }));
+    setTerpilih([]);
+    toast(
+      `${fakturBaru.length} faktur digenerate · cetak Faktur + Rekap dari detail: ${fakturBaru.map((f) => f.id).join(", ")}`,
+      "success",
+    );
   }
 
   return (
     <div>
       <PageHeader
         title="Proses Invoice per Cabang"
-        desc="Pipeline Finance: OPB → invoice ganda → rekonsiliasi → lunas"
-        breadcrumb={[{ label: "Finance", href: "/finance" }, { label: "Proses Invoice" }]}
+        desc="Pilih cabang · centang OPB yang sudah terbit · generate faktur (total ambil dari OPB, bukan dibagi)"
+        breadcrumb={[
+          { label: "Finance", href: "/finance" },
+          { label: "Penjualan" },
+          { label: "Proses Invoice" },
+        ]}
       />
+
       <div className="flex gap-1 mb-4 flex-wrap">
-        {STEPS.map((s, i) => (
-          <span
-            key={s}
-            className={`px-2 py-1 rounded text-[11px] font-semibold ${i <= stepIdx ? "bg-brand text-white" : "bg-slds-bg text-slds-text-weak"}`}
-          >
+        {STEPS.map((s) => (
+          <span key={s} className="px-2 py-1 rounded text-[11px] font-semibold bg-slds-bg text-slds-text-weak">
             {s}
           </span>
         ))}
       </div>
-      <div className="bg-white border border-slds-border rounded-lg p-4 max-w-xl space-y-3 mb-4">
-        <label className="block text-[12px]">
-          Cabang
-          <select value={cabang} onChange={(e) => setCabang(e.target.value)} className="w-full mt-1 px-3 py-2 border rounded-md text-[13px]">
-            <option>Auto 2000 Surabaya</option>
-            <option>Cakrawala Malang</option>
-            <option>Prima Jember</option>
+
+      <div className="bg-white border border-slds-border rounded-lg p-4 mb-4 flex flex-wrap items-end gap-3">
+        <label className="block text-[12px] min-w-[220px]">
+          <span className="text-[11px] text-slds-text-weak uppercase font-semibold">Cabang</span>
+          <select
+            value={cabang}
+            onChange={(e) => {
+              setCabang(e.target.value);
+              setTerpilih([]);
+            }}
+            className="w-full mt-1 px-3 py-2 border border-slds-border rounded-md text-[13px] bg-white"
+          >
+            {CABANG_OPTIONS.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
           </select>
         </label>
-        <div className="grid grid-cols-2 gap-2">
-          <label className="text-[12px]">
-            Dari
-            <input type="date" value={dari} onChange={(e) => setDari(e.target.value)} className="w-full mt-1 px-2 py-1.5 border rounded-md" />
-          </label>
-          <label className="text-[12px]">
-            Sampai
-            <input type="date" value={sampai} onChange={(e) => setSampai(e.target.value)} className="w-full mt-1 px-2 py-1.5 border rounded-md" />
-          </label>
+        <div className="text-[12px] text-slds-text-weak">
+          {siapInvoice.length} OPB siap invoice · {terpilih.length} dicentang · {formatIDR(totalTerpilih)}
         </div>
-        <p className="text-[11px] text-slds-text-weak">OPB cabang: {opbCabang.length} · Piutang aktif: {hutang.length}</p>
-        <button type="button" data-no-toast onClick={prosesInvoice} className="w-full py-2.5 bg-brand text-white rounded-md font-semibold text-[13px]">
-          Proses Invoice · Generate 2 Format
-        </button>
-        <button type="button" data-no-toast onClick={tandaiLunas} className="w-full py-2 border border-green-600 text-green-700 rounded-md font-semibold text-[13px]">
-          Tandai Lunas
+        <button
+          type="button"
+          data-no-toast
+          onClick={prosesInvoice}
+          className="ml-auto inline-flex items-center gap-1.5 px-4 py-2 bg-brand text-white rounded-md text-[13px] font-semibold hover:bg-brand-dark"
+        >
+          <FileText className="h-4 w-4" /> Proses Invoice ({terpilih.length})
         </button>
       </div>
-      <Link href="/finance/penjualan/faktur-penjualan" className="text-brand text-[13px] font-semibold">
-        Lihat faktur penjualan →
-      </Link>
-      <p className="text-[11px] text-slds-text-weak mt-2">Total OPB cabang: {formatIDR(opbCabang.reduce((s, o) => s + o.total, 0))}</p>
+
+      <DataTable
+        columns={[
+          {
+            key: "pilih",
+            label: "Pilih",
+            render: (r) => (
+              <input
+                type="checkbox"
+                data-no-toast
+                aria-label={`Pilih ${String(r.id)}`}
+                checked={terpilih.includes(String(r.id))}
+                disabled={!opbSiapInvoice(r as OpbRow, fakturJual)}
+                onChange={() => toggle(String(r.id))}
+              />
+            ),
+          },
+          {
+            key: "id",
+            label: "No. OPB",
+            render: (r) => (
+              <Link href={`/operasional/opb/${r.id}`} className="font-mono font-semibold text-brand hover:underline">
+                {String(r.id)}
+              </Link>
+            ),
+          },
+          { key: "periode", label: "Periode" },
+          { key: "tanggalOpb", label: "Tgl. OPB", render: (r) => formatTanggalOpb(r.tanggalOpb as string) },
+          { key: "jumlahTrx", label: "Nota" },
+          { key: "total", label: "Total OPB", render: (r) => formatIDR(Number(r.total)) },
+          {
+            key: "sap",
+            label: "No. SAP",
+            render: (r) => (r.sap ? <span className="font-mono">{String(r.sap)}</span> : <span className="text-slds-text-weak">belum ada</span>),
+          },
+          { key: "status", label: "Status OPB", render: (r) => <StatusBadge status={opbStatusLabel(String(r.status))} /> },
+          {
+            key: "faktur",
+            label: "Faktur",
+            render: (r) => {
+              const f = fakturJual.find((x) => x.opbId === r.id);
+              return f ? (
+                <Link href={`/finance/penjualan/faktur-penjualan/${fakturSlug(f.id)}`} className="font-mono font-semibold text-brand hover:underline">
+                  {f.id}
+                </Link>
+              ) : (
+                <span className="text-slds-text-weak">belum</span>
+              );
+            },
+          },
+        ]}
+        data={opbCabang}
+      />
+
+      <div className="mt-4 bg-slds-bg border border-slds-border rounded-lg p-4 text-[12px] text-slds-text-weak">
+        <p className="font-semibold text-slds-text mb-1 flex items-center gap-1">
+          <Receipt className="h-3.5 w-3.5" /> Setelah klik Proses Invoice
+        </p>
+        <p>
+          Tiap OPB jadi 1 faktur penjualan (total = total OPB). Dua dokumen cetak tersedia di detail faktur:
+          <strong> Faktur Penjualan</strong> dan <strong>Rekap Invoice</strong> (lampiran). Lanjut: rekonsiliasi vs OPB →
+          kirim invoice → status Lunas muncul otomatis saat piutang lunas.
+        </p>
+      </div>
     </div>
   );
 }

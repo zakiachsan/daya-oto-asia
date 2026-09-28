@@ -36,7 +36,7 @@ export default function LabaRugiPage() {
               </span>
             </div>
           ))}
-          <div className="flex justify-between text-[15px] font-bold pt-4 border-t-2 border-slds-border">
+          <div className="flex justify-between text-[13px] font-bold pt-4 border-t-2 border-slds-border">
             <span>Laba Bersih</span>
             <span className="text-brand">{formatIDR(labaBersih)}</span>
           </div>

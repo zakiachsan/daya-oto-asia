@@ -60,7 +60,7 @@ export default function DaftarLaporanPage() {
         </aside>
 
         <div className="flex-1 bg-white border border-slds-border rounded-lg p-4">
-          <h2 className="text-[15px] font-bold text-slds-text mb-3">{active.label}</h2>
+          <h2 className="text-[13px] font-bold text-slds-text mb-3">{active.label}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {reports.map((r) => (
               <button

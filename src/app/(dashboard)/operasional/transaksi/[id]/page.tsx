@@ -9,7 +9,8 @@ import { formatIDR, formatWaktu, formatDurasi, type TransaksiRow } from "@/lib/m
 import { NotaPenjualanPreview, printNotaPenjualanPreview } from "@/components/ui/nota-penjualan-preview";
 import { LaporanPemakaianPreview } from "@/components/ui/laporan-pemakaian-preview";
 import { buildLaporanPemakaian } from "@/lib/laporan-pemakaian";
-import { useNotaPrint, useTransaksiList } from "@/lib/preview-store";
+import { useNotaPrint, useOpbList, useTransaksiList } from "@/lib/preview-store";
+import { formatTanggalOpb } from "@/lib/opb-utils";
 import { CetakNotaAudit } from "@/components/ui/cetak-nota-audit";
 import { useToast } from "@/components/ui/toast";
 import { canActorUpdateStatus, nextTransaksiStatus, normalizeTransaksiStatus } from "@/lib/transaksi-status-utils";
@@ -21,9 +22,11 @@ export default function TransaksiDetailPage() {
   const { toast } = useToast();
   const { all, update } = useTransaksiList();
   const { recordPrint, byTrxId } = useNotaPrint();
+  const { items: opbList, patch: patchOpb } = useOpbList();
   const trx = all.find((t) => t.id === id);
   const auditLogs = byTrxId(id);
   const [opbInput, setOpbInput] = useState("");
+  const [opbTanggalInput, setOpbTanggalInput] = useState("");
   const trxStatus = trx ? normalizeTransaksiStatus(trx.status) : "Draft";
 
   if (!trx) {
@@ -50,12 +53,29 @@ export default function TransaksiDetailPage() {
 
   const penambahan = all.filter((t) => t.parentId === trx.id);
 
+  /* Tanggal OPB · pakai nilai yang sudah tersimpan (transaksi / data OPB), default hari ini */
+  const opbRecord = opbList.find((o) => o.id === trx.opbId);
+  const tanggalOpbValue =
+    opbTanggalInput || trx.tanggalOpb || opbRecord?.tanggalOpb || new Date().toISOString().slice(0, 10);
+  /* Nomor OPB efektif · dari input manual atau yang sudah tertaut di transaksi */
+  const opbNumberValue = (opbInput || trx.opbId || "").trim();
+
+  function handleOpbNumberChange(value: string) {
+    setOpbInput(value);
+    /* Nomor OPB yang sudah ada di daftar → tanggal OPB ikut data OPB itu */
+    const match = opbList.find((o) => o.id === value.trim());
+    if (match?.tanggalOpb) setOpbTanggalInput(match.tanggalOpb);
+  }
+
   function advanceAdminStatus() {
     const next = nextTransaksiStatus(trxStatus, "admin");
     if (!next) return;
     const patch: Partial<TransaksiRow> = { status: next };
-    if (next === "OPB Terbit" && opbInput.trim()) {
-      patch.opbId = opbInput.trim();
+    if (next === "OPB Terbit" && opbNumberValue) {
+      patch.opbId = opbNumberValue;
+      patch.tanggalOpb = tanggalOpbValue;
+      /* Tanggal OPB ditulis ke data OPB juga (field yang sama dengan halaman OPB) */
+      if (opbList.some((o) => o.id === opbNumberValue)) patchOpb(opbNumberValue, { tanggalOpb: tanggalOpbValue });
     }
     update(row.id, patch);
     toast(`Status → ${next}`, "success");
@@ -97,16 +117,30 @@ export default function TransaksiDetailPage() {
         <div className="mb-4 bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-3">
           <h3 className="text-[13px] font-bold text-amber-900">Admin / Supervisor · OPB & Status</h3>
           {trxStatus === "Menunggu OPB" && (
-            <div className="flex gap-2 flex-wrap items-end">
-              <label className="flex-1 min-w-[200px]">
-                <span className="text-[11px] font-semibold text-slds-text-weak uppercase">Nomor OPB (input manual)</span>
-                <input
-                  value={opbInput}
-                  onChange={(e) => setOpbInput(e.target.value)}
-                  placeholder="OPB-2026-xxxx"
-                  className="w-full mt-1 px-3 py-2 border border-slds-border rounded-md text-[13px]"
-                />
-              </label>
+            <div className="space-y-2">
+              <div className="flex gap-2 flex-wrap items-end">
+                <label className="flex-1 min-w-[200px]">
+                  <span className="text-[11px] font-semibold text-slds-text-weak uppercase">Nomor OPB (input manual)</span>
+                  <input
+                    value={opbInput || trx.opbId || ""}
+                    onChange={(e) => handleOpbNumberChange(e.target.value)}
+                    placeholder="OPB-2026-xxxx"
+                    className="w-full mt-1 px-3 py-2 border border-slds-border rounded-md text-[13px]"
+                  />
+                </label>
+                <label className="min-w-[180px]">
+                  <span className="text-[11px] font-semibold text-slds-text-weak uppercase">Tanggal OPB</span>
+                  <input
+                    type="date"
+                    value={tanggalOpbValue}
+                    onChange={(e) => setOpbTanggalInput(e.target.value)}
+                    className="w-full mt-1 px-3 py-2 border border-slds-border rounded-md text-[13px]"
+                  />
+                </label>
+              </div>
+              <p className="text-[11px] text-slds-text-weak">
+                Tanggal ini tersimpan di transaksi, dan ikut ditulis ke data OPB (field Tanggal OPB di halaman OPB) kalau nomornya sudah ada di daftar.
+              </p>
             </div>
           )}
           {canActorUpdateStatus(trxStatus, "admin") && (
@@ -114,7 +148,7 @@ export default function TransaksiDetailPage() {
               type="button"
               data-no-toast
               onClick={advanceAdminStatus}
-              disabled={trxStatus === "Menunggu OPB" && !opbInput.trim() && !trx.opbId}
+              disabled={trxStatus === "Menunggu OPB" && !opbNumberValue}
               className="px-4 py-2 bg-brand text-white rounded-md text-[12px] font-semibold disabled:opacity-50"
             >
               {trxStatus === "Menunggu OPB" ? "Terbitkan OPB" : trxStatus === "OPB Terbit" ? "Proses Invoice" : "Tandai Selesai"}
@@ -178,9 +212,10 @@ export default function TransaksiDetailPage() {
               <span>Total Tagihan</span><span className="text-brand">{formatIDR(trx.total)}</span>
             </div>
             {trx.opbId && (
-              <div className="sm:col-span-2 flex items-center gap-2 text-[12px]">
+              <div className="sm:col-span-2 flex items-center gap-2 text-[12px] flex-wrap">
                 <FileText className="h-3.5 w-3.5 text-slds-text-weak" />
-                <Link href="/operasional/opb" className="text-brand font-semibold hover:underline">{trx.opbId}</Link>
+                <Link href={`/operasional/opb/${trx.opbId}`} className="text-brand font-semibold hover:underline">{trx.opbId}</Link>
+                <span className="text-slds-text-weak">· Tanggal OPB {formatTanggalOpb(trx.tanggalOpb ?? opbRecord?.tanggalOpb)}</span>
               </div>
             )}
           </div>
@@ -205,8 +240,9 @@ export default function TransaksiDetailPage() {
       </div>
 
       <div className="mb-4 overflow-x-auto">
-        <h3 className="text-[13px] font-bold text-slds-text mb-2">Nota Pemakaian (layout laporan · per detail proyek)</h3>
+        <h3 className="text-[13px] font-bold text-slds-text mb-2">Nota Pemakaian</h3>
         <LaporanPemakaianPreview
+          layout="transaksi"
           bengkel={trx.cabang}
           tinter={trx.tinter}
           bulan={trx.tanggal.slice(0, 7)}
@@ -252,8 +288,9 @@ export default function TransaksiDetailPage() {
           </div>
           <table className="w-full text-[13px]">
             <tbody>
-              {trx.bahan.map((b) => (
-                <tr key={b.kode} className="border-b border-slds-border last:border-0">
+              {trx.bahan.map((b, bi) => (
+                /* kode bisa sama 2x dalam 1 nota (mis. AXT-101 dari 2 layer basecoat) → key pakai indeks */
+                <tr key={`${b.kode}-${bi}`} className="border-b border-slds-border last:border-0">
                   <td className="py-2 font-mono font-semibold">{b.kode}</td>
                   <td className="py-2 text-slds-text-weak">{b.nama}</td>
                   <td className="py-2 text-right font-semibold">{b.gram}</td>

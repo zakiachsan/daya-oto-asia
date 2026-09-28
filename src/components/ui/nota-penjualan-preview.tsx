@@ -156,11 +156,12 @@ export function NotaPenjualanPreview({ trx, className = "" }: NotaPenjualanPrevi
 
 const NOTA_PENJUALAN_PRINT_CSS = `
   .nota-penjualan { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #000; max-width: 190mm; margin: 0 auto; }
-  .np-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 10px; }
-  .np-header-left { flex: 1.1; } .np-header-right { flex: 0.9; min-width: 200px; }
+  .np-header { display: flex; justify-content: space-between; gap: 12px 16px; margin-bottom: 10px; flex-wrap: wrap; }
+  .np-header-left { flex: 1.1 1 240px; min-width: 0; }
+  .np-header-right { flex: 0.9 1 240px; min-width: 0; }
   .np-brand-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
   .np-brand-name { font-weight: 700; font-size: 12pt; }
-  .np-alamat { font-size: 8.5pt; margin: 2px 0 8px; line-height: 1.35; }
+  .np-alamat { font-size: 8.5pt; margin: 2px 0 8px; line-height: 1.35; padding-left: 98px; }
   .np-field { display: flex; align-items: baseline; margin-bottom: 4px; font-size: 10pt; }
   .np-field-label { min-width: 88px; } .np-field-colon { width: 10px; }
   .np-field-value { flex: 1; border-bottom: 1px solid #000; min-height: 14px; }

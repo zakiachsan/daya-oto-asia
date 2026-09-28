@@ -6,9 +6,11 @@ import { PageHeader } from "@/components/ui/page-header";
 import { DataTable } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ActionFormPanel, fieldClass, labelClass } from "@/components/ui/action-form-panel";
-import { MOCK_PRODUK } from "@/lib/mock-data";
+import { MOCK_PRODUK, formatIDR } from "@/lib/mock-data";
 import { MIXING_RATIO_MASTER } from "@/lib/mixing-ratio-master";
 import { useToast } from "@/components/ui/toast";
+import { hargaPerLiterProduk } from "@/lib/kategori-harga-utils";
+import { useKategoriHarga } from "@/lib/preview-store";
 import { useBukaKaleng } from "@/lib/preview-store";
 
 type ProdukRow = (typeof MOCK_PRODUK)[number];
@@ -16,6 +18,8 @@ const TABS = ["Semua", "1K SOLID COLORS", "1K SILVER COLORS", "1K PEARL COLORS",
 
 export default function ProdukPage() {
   const { toast } = useToast();
+  /* tarif jual per liter dari master Kategori Harga */
+  const { items: kategoriHarga } = useKategoriHarga();
   const { items: bukaKalengLog } = useBukaKaleng();
   const [showForm, setShowForm] = useState(false);
   const [tab, setTab] = useState<(typeof TABS)[number]>("Semua");
@@ -103,6 +107,14 @@ export default function ProdukPage() {
           { key: "nama", label: "Nama Produk" },
           { key: "kategori", label: "Kategori Axalta", render: (r) => <span className="text-[11px]">{r.kategori}</span> },
           { key: "kategoriTarif", label: "Tarif" },
+          {
+            key: "harga",
+            /* Tarif diambil dari master Kategori Harga berdasarkan kolom Tarif produk */
+            label: "Harga / Liter",
+            render: (r) => (
+              <span className="text-right tabular-nums">{formatIDR(hargaPerLiterProduk(String(r.kode), kategoriHarga))}</span>
+            ),
+          },
           { key: "satuan", label: "Satuan" },
           { key: "beratKaleng", label: "Berat Kaleng", render: (r) => `${r.beratKaleng} gr` },
           { key: "status", label: "Status", render: (r) => <StatusBadge status={String(r.status)} /> },
@@ -112,12 +124,12 @@ export default function ProdukPage() {
 
       <div className="mt-4 bg-white border border-slds-border rounded-lg p-4">
         <p className="text-[13px] font-bold text-slds-text mb-2">Mixing Ratio → App Tinter (#31)</p>
-        <table className="w-full text-[12px]">
+        <table className="w-full text-[13px]">
           <thead>
-            <tr className="text-left text-slds-text-weak border-b">
-              <th className="pb-2">Kode</th>
-              <th className="pb-2">Produk</th>
-              <th className="pb-2">Rasio</th>
+            <tr className="text-left text-[10px] uppercase text-slds-text-weak border-b">
+              <th className="pb-2 font-semibold">Kode</th>
+              <th className="pb-2 font-semibold">Produk</th>
+              <th className="pb-2 font-semibold">Rasio</th>
             </tr>
           </thead>
           <tbody>
@@ -146,7 +158,7 @@ export default function ProdukPage() {
           <p className="text-[13px] font-bold text-slds-text mb-3">Log Buka Kaleng (App Tinter)</p>
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="border-b border-slds-border text-left text-slds-text-weak text-[11px] uppercase">
+              <tr className="border-b border-slds-border text-left text-slds-text-weak text-[10px] uppercase">
                 <th className="pb-2 font-semibold">Tanggal</th>
                 <th className="pb-2 font-semibold">Produk</th>
                 <th className="pb-2 font-semibold">Tinter</th>

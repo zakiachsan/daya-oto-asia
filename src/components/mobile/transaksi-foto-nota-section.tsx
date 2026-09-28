@@ -52,11 +52,6 @@ export function TransaksiFotoNotaSection({
     trx.status === "OPB Terbit" ||
     trx.status === "Proses Invoice" ||
     trx.status === "Selesai";
-  const kirimDone =
-    trx.status === "Menunggu OPB" ||
-    trx.status === "OPB Terbit" ||
-    trx.status === "Proses Invoice" ||
-    trx.status === "Selesai";
 
   const [showNota, setShowNota] = useState(printed);
 
@@ -68,18 +63,6 @@ export function TransaksiFotoNotaSection({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-slds-border bg-white px-4 py-3 flex items-center justify-between gap-3">
-        <div>
-          <p className="text-[10px] font-bold uppercase text-slds-text-weak">Mixing selesai</p>
-          <p className="text-xl font-bold text-brand tabular-nums">{formatDurasi(trx.durasiMixingMenit)}</p>
-        </div>
-        <p className="text-[11px] text-slds-text-weak text-right leading-snug">
-          {trx.mobil}
-          <br />
-          <span className="font-mono font-semibold text-slds-text">{trx.platNomor}</span>
-        </p>
-      </div>
-
       <TransaksiCatatanPanel trx={trx} compact />
 
       {editable && onTambahBahan && !printed && (
@@ -94,7 +77,7 @@ export function TransaksiFotoNotaSection({
       )}
 
       <div className="rounded-xl border border-slds-border bg-white overflow-hidden divide-y divide-slds-border">
-        <p className="px-4 py-2.5 text-[11px] font-bold uppercase text-slds-text-weak bg-slds-bg">Checklist selesai</p>
+        <p className="px-4 py-2.5 text-[11px] font-bold uppercase text-slds-text-weak bg-slds-bg">Daftar Checklist</p>
 
         {canEditChecklist ? (
           <button
@@ -198,11 +181,6 @@ export function TransaksiFotoNotaSection({
             <p className="text-[13px] font-semibold text-slds-text">Tanda tangan GH</p>
           </div>
         )}
-
-        <div className="px-4 py-3.5 flex items-center gap-3">
-          <CheckIcon done={kirimDone} />
-          <p className="text-[13px] font-semibold text-slds-text">Kirim · Menunggu OPB</p>
-        </div>
       </div>
 
       {showLabelPreview && <LabelCatPreview trx={trx} className="mx-auto shadow-sm" />}
