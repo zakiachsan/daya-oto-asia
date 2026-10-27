@@ -220,6 +220,8 @@ export const JURNAL_BUILDERS: Record<JurnalSourceType, BuilderFn> = {
   "kas-penerimaan": (s, id) => buildKasPenerimaanJurnal(s as KasVoucherRow, id),
   "kas-pembayaran": (s, id) => buildKasPembayaranJurnal(s as KasVoucherRow, id),
   "transfer-bank": (s, id) => buildTransferBankJurnal(s as TransferBankRow, id),
+  /* Jurnal komisi dibentuk utuh di komisi-utils (buildKomisiJurnal) · builder ini hanya meneruskan */
+  "komisi-bengkel": (s, id) => ({ ...(s as JurnalDetail), id }),
   "jurnal-manual": (s, id) => s as JurnalDetail,
 };
 

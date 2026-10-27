@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronRight, Check, Clock, Plus, Scale, Save, Bookmark, X } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { isDraftFotoNotaPhase } from "@/lib/transaksi-foto-nota-utils";
-import { useExtraKodeWarna, useSavedFormulas, useTransaksiList } from "@/lib/preview-store";
+import { useCabangList, useExtraKodeWarna, useSavedFormulas, useTransaksiList } from "@/lib/preview-store";
 import { formatIDR, getHargaKategori, MOCK_KODE_WARNA } from "@/lib/mock-data";
 import type { TransaksiLayer, TransaksiProdukLine, TransaksiRow } from "@/lib/mock-data";
 import { findFormula } from "@/lib/kode-warna-formulas";
@@ -23,6 +23,7 @@ import { findAxtProduct } from "@/lib/formula-utils";
 import { TonerPickerModal } from "@/components/mobile/toner-picker-modal";
 import { buildDraftWizardSnapshot, hydrateDraftWizard } from "@/lib/transaksi-draft-utils";
 import { createDoaTransaksiId } from "@/lib/transaksi-id-utils";
+import { cabangKodeForName } from "@/lib/cabang-utils";
 import { formatRecipeId } from "@/lib/recipe-id-utils";
 import {
   extraKodeOptionsForProdukKategori,
@@ -76,14 +77,25 @@ function BuatTransaksiContent() {
   const parentId = params.get("parent");
   const isPenambahan = !!parentId;
   const [trxId, setTrxId] = useState("");
+  const { items: cabangItems } = useCabangList();
+  const trxIdAssignedRef = useRef(false);
 
   useEffect(() => {
     if (draftId) {
       setTrxId(draftId);
+      trxIdAssignedRef.current = true;
       return;
     }
-    setTrxId(createDoaTransaksiId());
-  }, [draftId]);
+    /* ID dibuat sekali saat data transaksi & master cabang siap, supaya nomor urut harian akurat */
+    if (trxIdAssignedRef.current || !ready) return;
+    trxIdAssignedRef.current = true;
+    setTrxId(
+      createDoaTransaksiId({
+        kodeCabang: cabangKodeForName(cabangItems, MOBILE_CABANG),
+        existingIds: all.map((t) => t.id),
+      }),
+    );
+  }, [draftId, ready, all, cabangItems]);
 
   useEffect(() => {
     if (!ready || !draftId || draftLoadedRef.current) return;
@@ -654,8 +666,8 @@ function BuatTransaksiContent() {
   return (
     <div className="space-y-4">
       <div className="bg-brand/10 border border-brand/20 rounded-xl px-3 py-2">
-        <p className="text-[10px] font-bold uppercase text-brand">Receipt ID</p>
-        <p className="text-[13px] font-mono font-bold text-slds-text leading-snug break-all">{recipeId || "…"}</p>
+        <p className="text-[10px] font-bold uppercase text-brand">ID Transaksi</p>
+        <p className="text-[13px] font-mono font-bold text-slds-text leading-snug break-all">{trxId || "…"}</p>
         {isResumingDraft && (
           <p className="text-[10px] text-brand font-semibold mt-1">
             Melanjutkan draft · bahan tercatat tidak bisa diubah (lihat detail DOA)

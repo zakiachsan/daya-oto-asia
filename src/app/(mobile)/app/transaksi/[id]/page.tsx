@@ -9,7 +9,6 @@ import { useToast } from "@/components/ui/toast";
 import { useNotaPrint, useTransaksiList } from "@/lib/preview-store";
 import { CetakNotaAudit } from "@/components/ui/cetak-nota-audit";
 import { normalizeTransaksiId } from "@/lib/transaksi-id-utils";
-import { resolveReceiptIdDisplay } from "@/lib/recipe-id-utils";
 import { TransaksiFotoNotaSection } from "@/components/mobile/transaksi-foto-nota-section";
 import { draftNeedsWizardSteps } from "@/lib/transaksi-foto-nota-utils";
 import { buildDraftWizardSnapshot } from "@/lib/transaksi-draft-utils";
@@ -86,7 +85,7 @@ export default function TransaksiDetailPage() {
         >
           <div className="min-w-0">
             <p className="text-[15px] font-bold leading-snug">{listTitle}</p>
-            <p className="text-[11px] opacity-90 font-mono break-all mt-1">{resolveReceiptIdDisplay(row)}</p>
+            <p className="text-[11px] opacity-90 font-mono break-all mt-1">{row.id}</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <StatusBadge status={row.status} />

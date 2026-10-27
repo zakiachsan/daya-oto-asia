@@ -82,6 +82,8 @@ const PLAT_PREFIX: Record<string, string> = {
 const HURUF = ["AB", "CD", "EF", "GH", "JK", "LM", "NP", "QR", "ST", "UV", "WX", "YZ"];
 
 type CabangSeed = {
+  /** Kode cabang 3 huruf untuk ID transaksi (DOA-<kode>-<ddMMyy>-<urut>) */
+  kode: string;
   cabang: string;
   tinter: string;
   prefixReceipt: string;
@@ -92,8 +94,9 @@ type CabangSeed = {
 
 const SEED: CabangSeed[] = [
   /* Agustus: Auto 2000 Surabaya — OPB-2026-0089 mencatat 47 trx, semua sudah ada notanya,
-     2 nota belum masuk OPB (transaksi terkini DOA-2609-2813 + 1 arsip) */
+     2 nota belum masuk OPB (transaksi terkini DOA-SBY-260926-001 + 1 arsip) */
   {
+    kode: "SBY",
     cabang: "Auto 2000 Surabaya",
     tinter: "Andi Wijaya",
     prefixReceipt: "Auto2000Surabaya",
@@ -103,6 +106,7 @@ const SEED: CabangSeed[] = [
   },
   /* Agustus: Cakrawala Malang — OPB-2026-0088 mencatat 23 trx, nota juga 23 (match bersih) */
   {
+    kode: "MLG",
     cabang: "Cakrawala Malang",
     tinter: "Rudi Hartono",
     prefixReceipt: "CakrawalaMalang",
@@ -113,6 +117,7 @@ const SEED: CabangSeed[] = [
   /* Agustus: Prima Jember — OPB-2026-0087 mencatat 31 trx (semua ada notanya);
      4 nota lagi belum masuk OPB */
   {
+    kode: "JBR",
     cabang: "Prima Jember",
     tinter: "Eko Prasetyo",
     prefixReceipt: "PrimaJember",
@@ -132,12 +137,24 @@ function geserMenit(isoTanpaTz: string, menit: number) {
 
 type Jenis = "notaDiOpb" | "notaLuarOpb";
 
-function buildRow(seed: CabangSeed, jenis: Jenis, seq: number, nomorUrut: number): TransaksiRow {
+function buildRow(
+  seed: CabangSeed,
+  jenis: Jenis,
+  seq: number,
+  urutHarian: Map<string, number>,
+): TransaksiRow {
   const hari = String(1 + (seq % 28)).padStart(2, "0");
   const tanggal = `2026-08-${hari}`;
   const jam = String(8 + (seq % 8)).padStart(2, "0");
   const menit = String((seq * 7) % 60).padStart(2, "0");
   const waktuMulai = `${tanggal}T${jam}:${menit}:00`;
+
+  /* ID transaksi: DOA-<kode cabang>-<ddMMyy>-<urut harian cabang itu> */
+  const tokenTanggal = `${hari}0826`;
+  const kunciUrut = `${seed.kode}-${tokenTanggal}`;
+  const urut = (urutHarian.get(kunciUrut) ?? 0) + 1;
+  urutHarian.set(kunciUrut, urut);
+  const id = `DOA-${seed.kode}-${tokenTanggal}-${String(urut).padStart(3, "0")}`;
 
   const durasiMixingMenit = 12 + (seq % 4) * 6;
   const waktuSelesaiMixing = geserMenit(waktuMulai, durasiMixingMenit);
@@ -157,7 +174,7 @@ function buildRow(seed: CabangSeed, jenis: Jenis, seq: number, nomorUrut: number
     jenis === "notaLuarOpb" ? "Menunggu OPB" : seq % 5 === 0 ? "Proses Invoice" : "OPB Terbit";
 
   return {
-    id: `DOA-2608-${2000 + nomorUrut}`,
+    id,
     tanggal,
     cabang: seed.cabang,
     warna: palet.warna,
@@ -188,8 +205,9 @@ function buildRow(seed: CabangSeed, jenis: Jenis, seq: number, nomorUrut: number
 
 export const MOCK_TRANSAKSI_ARSIP: TransaksiRow[] = (() => {
   const rows: TransaksiRow[] = [];
+  /* urut harian per cabang, reset tiap tanggal */
+  const urutHarian = new Map<string, number>();
   let seq = 0;
-  let nomorUrut = 1;
 
   for (const seed of SEED) {
     const jadwal: Jenis[] = [
@@ -197,9 +215,8 @@ export const MOCK_TRANSAKSI_ARSIP: TransaksiRow[] = (() => {
       ...Array<Jenis>(seed.notaLuarOpb).fill("notaLuarOpb"),
     ];
     for (const jenis of jadwal) {
-      rows.push(buildRow(seed, jenis, seq, nomorUrut));
+      rows.push(buildRow(seed, jenis, seq, urutHarian));
       seq += 1;
-      nomorUrut += 1;
     }
   }
 

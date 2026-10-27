@@ -6,6 +6,12 @@ import { MOCK_CABANG } from "./mock-data";
  */
 export type CabangRow = {
   id: string;
+  /**
+   * Kode 3 huruf cabang untuk ID transaksi (mis. STR).
+   * Opsional karena data cabang lama di localStorage belum punya field ini;
+   * selalu baca lewat normalizeKodeCabang() / cabangKodeForName().
+   */
+  kode?: string;
   /** Nama bengkel, mis. "Bengkel Auto 2000 Surabaya" */
   nama: string;
   kota: string;
@@ -21,12 +27,53 @@ export type CabangRow = {
   radiusMeter: number;
   /** Koordinat pusat geofence */
   koordinat: string;
+  /** Nama kepala bengkel · dipakai sebagai penerima komisi 5% di Finance (opsional) */
+  kepalaBengkel?: string;
+  /** Nama penerima komisi manual GH Head Vendor (opsional) */
+  ghHeadVendor?: string;
+  /** Nama penerima komisi manual Tukang Cat (opsional) */
+  tukangCat?: string;
+  /** Nama penerima komisi manual Admin Astra (opsional) */
+  adminAstra?: string;
   status: "Aktif" | "Nonaktif";
 };
 
 /** Label pendek cabang (tanpa kata "Bengkel") · dipakai assignment tinter & inventori */
 export function cabangShort(nama: string) {
   return nama.replace(/^Bengkel /, "");
+}
+
+/**
+ * Kode cabang 3 huruf untuk ID transaksi.
+ * Diambil dari field `kode` di Master Cabang; kalau kosong (data lama) diturunkan dari nama
+ * supaya ID transaksi tidak pernah kosong di tengah format.
+ */
+export function normalizeKodeCabang(kode: string | undefined, nama: string) {
+  const dariField = String(kode ?? "")
+    .toUpperCase()
+    .replace(/[^A-Z]/g, "")
+    .slice(0, 3);
+  if (dariField.length === 3) return dariField;
+  const inisial = cabangShort(String(nama ?? ""))
+    .split(/\s+/)
+    .map((kata) => kata[0] ?? "")
+    .join("")
+    .toUpperCase()
+    .replace(/[^A-Z]/g, "");
+  const dariNama = String(nama ?? "")
+    .toUpperCase()
+    .replace(/[^A-Z]/g, "");
+  return `${dariField}${inisial}${dariNama}XXX`.slice(0, 3);
+}
+
+/** Cari kode cabang dari daftar Master Cabang berdasarkan nama (boleh dengan/tanpa prefix "Bengkel") */
+export function cabangKodeForName(items: CabangRow[], nama: string) {
+  const target = cabangShort(String(nama ?? "").trim()).toLowerCase();
+  const cocok =
+    items.find((c) => cabangShort(c.nama).toLowerCase() === target) ??
+    items.find((c) => String(c.nama ?? "").trim().toLowerCase() === String(nama ?? "").trim().toLowerCase());
+  if (cocok) return normalizeKodeCabang(cocok.kode, cocok.nama);
+  return normalizeKodeCabang(undefined, nama);
 }
 
 const KOORDINAT_KOTA: Record<string, string> = {
@@ -54,6 +101,11 @@ export const INITIAL_CABANG: CabangRow[] = MOCK_CABANG.map((c) => ({
 
 /** Form kosong buat tambah cabang baru */
 export const CABANG_BARU = {
+  kode: "",
+  kepalaBengkel: "",
+  ghHeadVendor: "",
+  tukangCat: "",
+  adminAstra: "",
   nama: "",
   kota: "",
   alamat: "",

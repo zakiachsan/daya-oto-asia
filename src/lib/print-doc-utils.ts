@@ -41,8 +41,11 @@ export function printHtmlDocument(title: string, htmlBody: string, extraCss = ""
 
 /** Isi dokumen: elemen di halaman (id) atau string HTML siap pakai */
 function resolveDocContent(elementIdOrHtml: string) {
-  if (elementIdOrHtml.startsWith("<")) return elementIdOrHtml;
-  return document.getElementById(elementIdOrHtml)?.outerHTML ?? "";
+  /* String HTML sering diawali newline/indentasi dari template literal — trim dulu,
+     kalau tidak seluruh HTML dianggap id elemen dan dokumen tidak pernah tercetak. */
+  const value = String(elementIdOrHtml ?? "").trim();
+  if (value.startsWith("<")) return value;
+  return document.getElementById(value)?.outerHTML ?? "";
 }
 
 function wrapDocHtml(title: string, content: string, extraCss: string) {

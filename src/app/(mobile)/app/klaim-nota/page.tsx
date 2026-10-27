@@ -23,7 +23,7 @@ export default function KlaimNotaPage() {
 
   function handleSubmit() {
     if (!platNomor.trim() || !receiptId.trim()) {
-      toast("No. polisi dan Receipt ID wajib diisi", "error");
+      toast("No. polisi dan ID transaksi wajib diisi", "error");
       return;
     }
     if (!alasan.trim()) {
@@ -86,8 +86,8 @@ export default function KlaimNotaPage() {
             <input value={platNomor} onChange={(e) => setPlatNomor(e.target.value)} className="w-full mt-1 px-3 py-2 border border-slds-border rounded-lg text-[13px]" />
           </label>
           <label className="block">
-            <span className="text-[11px] font-semibold text-slds-text-weak uppercase">Receipt ID *</span>
-            <input value={receiptId} onChange={(e) => setReceiptId(e.target.value)} placeholder="DOA-2026-xxxx" className="w-full mt-1 px-3 py-2 border border-slds-border rounded-lg text-[13px] font-mono" />
+            <span className="text-[11px] font-semibold text-slds-text-weak uppercase">ID Transaksi / No. Nota *</span>
+            <input value={receiptId} onChange={(e) => setReceiptId(e.target.value)} placeholder="DOA-SBY-261026-001" className="w-full mt-1 px-3 py-2 border border-slds-border rounded-lg text-[13px] font-mono" />
           </label>
           <label className="block">
             <span className="text-[11px] font-semibold text-slds-text-weak uppercase">Alasan Pembatalan *</span>

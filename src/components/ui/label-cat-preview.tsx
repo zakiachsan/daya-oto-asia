@@ -1,32 +1,18 @@
 "use client";
 
 import type { TransaksiRow } from "@/lib/mock-data";
-import { resolveReceiptIdDisplay } from "@/lib/recipe-id-utils";
+import { labelDefaultForTrx, labelWaktu, type LabelLine } from "@/lib/label-cat-utils";
 
 type LabelCatPreviewProps = {
-  trx: Pick<
-    TransaksiRow,
-    "tanggal" | "mobil" | "kodeWarna" | "warna" | "tinter" | "receiptId" | "id" | "waktuCetakLabel" | "waktuCetakNota"
-  >;
+  trx: TransaksiRow;
+  /** Baris bahan yang mau dicetak · default basecoat */
+  line?: LabelLine;
   className?: string;
 };
 
-export function LabelCatPreview({ trx, className = "" }: LabelCatPreviewProps) {
-  const stamp = trx.waktuCetakLabel ?? trx.waktuCetakNota;
-  const tanggal = stamp
-    ? new Date(stamp).toLocaleString("id-ID", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : new Date(trx.tanggal).toLocaleDateString("id-ID", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      });
-  const receipt = resolveReceiptIdDisplay(trx);
+/** Stiker kaleng · satu label per batch bahan (basecoat default) */
+export function LabelCatPreview({ trx, line, className = "" }: LabelCatPreviewProps) {
+  const bahan = line ?? labelDefaultForTrx(trx);
 
   return (
     <div
@@ -35,13 +21,14 @@ export function LabelCatPreview({ trx, className = "" }: LabelCatPreviewProps) {
       style={{ width: "280px", minHeight: "120px" }}
     >
       <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">PT Daya Oto Asia</p>
-      <p className="text-[13px] font-bold mt-1">{tanggal}</p>
+      <p className="text-[13px] font-bold mt-1">{labelWaktu(trx)}</p>
       <p className="text-[12px] font-semibold mt-1 truncate">{trx.mobil}</p>
       <p className="text-[11px] font-mono font-bold text-brand mt-0.5">
-        {trx.kodeWarna} · {trx.warna}
+        {bahan.kodeWarna} · {bahan.warna}
       </p>
+      <p className="text-[10px] text-gray-700 mt-0.5">{bahan.kategoriLabel}</p>
       <p className="text-[10px] mt-2 text-gray-600">Tinter: {trx.tinter}</p>
-      <p className="text-[9px] font-mono text-gray-400 mt-1">{receipt}</p>
+      <p className="text-[9px] font-mono text-gray-400 mt-1">{trx.id}</p>
     </div>
   );
 }

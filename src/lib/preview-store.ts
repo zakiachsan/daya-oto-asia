@@ -31,6 +31,8 @@ import {
 } from "./inventori-utils";
 import { INITIAL_DISTRIBUSI, type DistribusiDetail } from "./distribusi-utils";
 import { INITIAL_KATEGORI_HARGA, type KategoriHargaRow } from "./kategori-harga-utils";
+import { INITIAL_AKUN, MODUL_BY_ROLE, type AkunRole, type AkunRow } from "./akun-utils";
+import type { KomisiCabangRow, KomisiPihakManual } from "./komisi-utils";
 import { INITIAL_AJUAN_STOK, type AjuanStokDetail } from "./ajuan-stok-utils";
 import { INITIAL_PENYESUAIAN, type PenyesuaianDetail } from "./penyesuaian-stok-utils";
 import { INITIAL_HUTANG_PIUTANG, type HutangPiutangDetail } from "./hutang-piutang-utils";
@@ -104,6 +106,8 @@ const PELANGGAN_KEY = "daya-oto-pelanggan";
 const PEMASOK_KEY = "daya-oto-pemasok";
 const TRANSFER_BANK_KEY = "daya-oto-transfer-bank";
 const KATEGORI_HARGA_KEY = "daya-oto-kategori-harga";
+const KOMISI_KEY = "daya-oto-komisi-bengkel";
+const AKUN_KEY = "daya-oto-akun";
 
 export type AssignmentMap = Record<string, string>;
 
@@ -324,9 +328,21 @@ export function useCabangList() {
       setItems(INITIAL_CABANG);
       return;
     }
-    /* Cabang contoh yang belum ada tetap muncul; data tersimpan selalu menang */
+    /* Cabang contoh yang belum ada tetap muncul; data tersimpan selalu menang.
+       Field `kode` (dipakai ID transaksi) di-backfill dari master contoh kalau data lama belum punya. */
     const ids = new Set(stored.map((c) => c.id));
-    setItems([...stored, ...INITIAL_CABANG.filter((c) => !ids.has(c.id))]);
+    const lengkap = stored.map((c) => {
+      const contoh = INITIAL_CABANG.find((i) => i.id === c.id || i.nama === c.nama);
+      return {
+        ...c,
+        kode: c.kode ?? contoh?.kode,
+        kepalaBengkel: c.kepalaBengkel ?? contoh?.kepalaBengkel,
+        ghHeadVendor: c.ghHeadVendor ?? contoh?.ghHeadVendor,
+        tukangCat: c.tukangCat ?? contoh?.tukangCat,
+        adminAstra: c.adminAstra ?? contoh?.adminAstra,
+      };
+    });
+    setItems([...lengkap, ...INITIAL_CABANG.filter((c) => !ids.has(c.id))]);
   }, []);
 
   const add = useCallback((row: Omit<CabangRow, "id">) => {
@@ -1299,4 +1315,207 @@ export function useKategoriHarga() {
   }, []);
 
   return { items, add, patch };
+}
+
+/* ------------------------------------------------------------------------------------------------
+ * Komisi bengkel (Finance) · input manual 3 pihak + status periode (Draft/Final)
+ * Aturan hitung ada di src/lib/komisi-utils.ts, yang disimpan di sini hanya input user.
+ * ---------------------------------------------------------------------------------------------- */
+
+export type KomisiManualRow = {
+  /** `${periode}-${cabang}-${pihak}` · satu nominal per pihak per cabang per bulan */
+  id: string;
+  cabang: string;
+  /** "2026-08" */
+  periode: string;
+  pihak: KomisiPihakManual;
+  nominal: number;
+  catatan?: string;
+};
+
+export type KomisiPeriodeRow = {
+  periode: string;
+  status: "Draft" | "Final";
+  oleh?: string;
+  waktu?: string;
+  /** baris komisi saat periode ditutup · supaya angka arsip tidak ikut berubah */
+  snapshot?: KomisiCabangRow[];
+  /** jurnal beban komisi yang sudah diposting (manual, setelah periode ditutup) */
+  jurnalId?: string;
+  jurnalWaktu?: string;
+};
+
+export type KomisiBayarRow = {
+  /** `${periode}-${cabang}` */
+  id: string;
+  periode: string;
+  cabang: string;
+  tanggal: string;
+  oleh: string;
+};
+
+type KomisiState = { manual: KomisiManualRow[]; periode: KomisiPeriodeRow[]; bayar: KomisiBayarRow[] };
+
+const KOMISI_KOSONG: KomisiState = { manual: [], periode: [], bayar: [] };
+
+export function useKomisiBengkel() {
+  const [state, setState] = useState<KomisiState>(KOMISI_KOSONG);
+
+  useEffect(() => {
+    const stored = readObj<Partial<KomisiState>>(KOMISI_KEY, KOMISI_KOSONG);
+    setState({
+      manual: stored.manual ?? [],
+      periode: stored.periode ?? [],
+      bayar: stored.bayar ?? [],
+    });
+  }, []);
+
+  const simpan = useCallback((next: KomisiState) => {
+    writeObj(KOMISI_KEY, next);
+    setState(next);
+  }, []);
+
+  /** Set nominal manual satu pihak · nominal 0 menghapus barisnya */
+  const setManual = useCallback(
+    (input: { cabang: string; periode: string; pihak: KomisiPihakManual; nominal: number; catatan?: string }) => {
+      setState((prev) => {
+        const id = `${input.periode}-${input.cabang}-${input.pihak}`;
+        const rest = prev.manual.filter((m) => m.id !== id);
+        const nominal = Number(input.nominal) || 0;
+        const manual =
+          nominal > 0
+            ? [...rest, { id, cabang: input.cabang, periode: input.periode, pihak: input.pihak, nominal, catatan: input.catatan }]
+            : rest;
+        const next = { ...prev, manual };
+        writeObj(KOMISI_KEY, next);
+        return next;
+      });
+    },
+    [],
+  );
+
+  const finalkanPeriode = useCallback((periode: string, snapshot: KomisiCabangRow[], oleh = "Finance") => {
+    setState((prev) => {
+      const row: KomisiPeriodeRow = { periode, status: "Final", oleh, waktu: new Date().toISOString(), snapshot };
+      const next = { ...prev, periode: [...prev.periode.filter((p) => p.periode !== periode), row] };
+      writeObj(KOMISI_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const bukaPeriode = useCallback((periode: string) => {
+    setState((prev) => {
+      const row: KomisiPeriodeRow = { periode, status: "Draft" };
+      const next = { ...prev, periode: [...prev.periode.filter((p) => p.periode !== periode), row] };
+      writeObj(KOMISI_KEY, next);
+      return next;
+    });
+  }, []);
+
+  /** Catat jurnal yang sudah diposting untuk periode ini */
+  const setJurnal = useCallback((periode: string, jurnalId: string) => {
+    setState((prev) => {
+      const ada = prev.periode.find((p) => p.periode === periode);
+      const row: KomisiPeriodeRow = {
+        ...(ada ?? { periode, status: "Final" as const }),
+        jurnalId,
+        jurnalWaktu: new Date().toISOString(),
+      };
+      const next = { ...prev, periode: [...prev.periode.filter((p) => p.periode !== periode), row] };
+      writeObj(KOMISI_KEY, next);
+      return next;
+    });
+  }, []);
+
+  /** Tandai komisi satu bengkel sudah dibayar (tanggal hari ini) */
+  const tandaiBayar = useCallback((periode: string, cabang: string, oleh = "Finance") => {
+    setState((prev) => {
+      const id = `${periode}-${cabang}`;
+      const row: KomisiBayarRow = { id, periode, cabang, tanggal: new Date().toISOString().slice(0, 10), oleh };
+      const next = { ...prev, bayar: [...prev.bayar.filter((b) => b.id !== id), row] };
+      writeObj(KOMISI_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const batalBayar = useCallback((periode: string, cabang: string) => {
+    setState((prev) => {
+      const id = `${periode}-${cabang}`;
+      const next = { ...prev, bayar: prev.bayar.filter((b) => b.id !== id) };
+      writeObj(KOMISI_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const periodeRow = useCallback(
+    (periode: string) => state.periode.find((p) => p.periode === periode),
+    [state.periode],
+  );
+
+  const bayarRow = useCallback(
+    (periode: string, cabang: string) => state.bayar.find((b) => b.periode === periode && b.cabang === cabang),
+    [state.bayar],
+  );
+
+  return {
+    manual: state.manual,
+    periode: state.periode,
+    bayar: state.bayar,
+    setManual,
+    finalkanPeriode,
+    bukaPeriode,
+    setJurnal,
+    tandaiBayar,
+    batalBayar,
+    periodeRow,
+    bayarRow,
+    simpan,
+  };
+}
+
+/* ------------------------------------------------------------------------------------------------
+ * Akun user (HRIS → Users & Akun) · sumber dropdown penerima komisi di Master Cabang
+ * ---------------------------------------------------------------------------------------------- */
+
+export function useAkunList() {
+  const [items, setItems] = useState<AkunRow[]>(INITIAL_AKUN);
+
+  useEffect(() => {
+    setItems(read<AkunRow>(AKUN_KEY, INITIAL_AKUN));
+  }, []);
+
+  const add = useCallback((row: { nama: string; email: string; role: AkunRole; status?: AkunRow["status"] }) => {
+    setItems((prev) => {
+      const next = [
+        ...prev,
+        {
+          nama: row.nama,
+          email: row.email,
+          role: row.role,
+          modul: MODUL_BY_ROLE[row.role] ?? "App",
+          status: row.status ?? "Aktif",
+        },
+      ];
+      write(AKUN_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const update = useCallback((email: string, patchRow: Partial<AkunRow>) => {
+    setItems((prev) => {
+      const next = prev.map((a) => (a.email === email ? { ...a, ...patchRow } : a));
+      write(AKUN_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const remove = useCallback((email: string) => {
+    setItems((prev) => {
+      const next = prev.filter((a) => a.email !== email);
+      write(AKUN_KEY, next);
+      return next;
+    });
+  }, []);
+
+  return { items, add, update, remove };
 }

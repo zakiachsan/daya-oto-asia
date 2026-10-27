@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
@@ -7,50 +7,42 @@ import { DataTable } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ActionFormPanel, fieldClass, labelClass } from "@/components/ui/action-form-panel";
 import { useToast } from "@/components/ui/toast";
+import { useAkunList } from "@/lib/preview-store";
+import { AKUN_ROLES, type AkunRole } from "@/lib/akun-utils";
 
-const INITIAL_USERS = [
-  { email: "admin@dayaoto.com", nama: "Budi Santoso", role: "Admin", modul: "Semua", status: "Aktif" },
-  { email: "ahmad@dayaoto.com", nama: "Pak Ahmad", role: "Supervisor", modul: "Operasional, HRIS", status: "Aktif" },
-  { email: "siti@dayaoto.com", nama: "Siti Rahayu", role: "HR", modul: "HRIS", status: "Aktif" },
-  { email: "finance@dayaoto.com", nama: "Finance Team", role: "Finance", modul: "Finance", status: "Aktif" },
-  { email: "andi@dayaoto.com", nama: "Andi Wijaya", role: "Tinter", modul: "App", status: "Aktif" },
-];
-
-type UserRow = (typeof INITIAL_USERS)[number];
-
+/**
+ * Users & Akun · sumber data akun aplikasi.
+ * Akun yang dibuat di sini dipakai sebagai pilihan penerima komisi di Master Cabang.
+ */
 export default function UsersPage() {
   const { toast } = useToast();
+  const { items, add } = useAkunList();
   const [showForm, setShowForm] = useState(false);
-  const [items, setItems] = useState<UserRow[]>(INITIAL_USERS);
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("Tinter");
-
-  const modulMap: Record<string, string> = {
-    Admin: "Semua",
-    Supervisor: "Operasional, HRIS",
-    HR: "HRIS",
-    Finance: "Finance",
-    Tinter: "App",
-  };
+  const [role, setRole] = useState<AkunRole>("Tinter");
 
   function handleSave() {
     if (!nama.trim() || !email.trim()) {
       toast("Nama dan email wajib diisi", "error");
       return;
     }
-    setItems((prev) => [...prev, { email: email.trim(), nama: nama.trim(), role, modul: modulMap[role] ?? "App", status: "Aktif" }]);
+    if (items.some((a) => a.email.toLowerCase() === email.trim().toLowerCase())) {
+      toast("Email itu sudah dipakai akun lain", "error");
+      return;
+    }
+    add({ nama: nama.trim(), email: email.trim(), role });
     setShowForm(false);
     setNama("");
     setEmail("");
-    toast(`User ${email} dibuat`, "success");
+    toast(`User ${email.trim()} dibuat`, "success");
   }
 
   return (
     <div>
       <PageHeader
         title="Users & Akun"
-        desc="Kelola user, role, dan hak akses modul"
+        desc="Kelola user, role, dan hak akses modul · akun di sini jadi pilihan penerima komisi di Master Cabang"
         breadcrumb={[{ label: "HRIS", href: "/hris" }, { label: "Users & Akun" }]}
         actions={
           <button
@@ -77,8 +69,14 @@ export default function UsersPage() {
             </div>
             <div>
               <label className={labelClass}>Role</label>
-              <select value={role} onChange={(e) => setRole(e.target.value)} className={`${fieldClass} bg-white`}>
-                {Object.keys(modulMap).map((r) => <option key={r}>{r}</option>)}
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value as AkunRole)}
+                className={`${fieldClass} bg-white`}
+              >
+                {AKUN_ROLES.map((r) => (
+                  <option key={r}>{r}</option>
+                ))}
               </select>
             </div>
           </div>

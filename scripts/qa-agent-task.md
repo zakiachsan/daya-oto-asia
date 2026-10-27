@@ -14,7 +14,7 @@ Kamu QA otomatis. Untuk setiap item, buka halaman, interaksi jika perlu, lalu la
 6. **#39** `/app/buka-kaleng` — Konfirmasi buka kaleng (opsional, hati-hati mutasi stok).
 7. **#40** `/app/notifikasi` — Notifikasi admin.
 8. **#41** `/app/stock-opname` — Tombol Simpan sticky terlihat.
-9. **#42** `/app/tukar-nota` — Form Tukar-Tambah Nota.
+9. ~~**#42** `/app/tukar-nota`~~ — fitur di-take out (tidak diuji).
 10. **#43** `/app/terima-barang` — Checklist terima barang.
 11. **#44** `/app/klaim-nota` — Halaman klaim.
 12. **#55** `/app/ajukan-stok` — List ajuan.

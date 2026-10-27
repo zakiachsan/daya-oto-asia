@@ -93,7 +93,6 @@ export default function AppHome() {
           { href: "/app/stock-opname", icon: Scale, label: "Stock Opname", sub: "Timbang mingguan" },
           { href: "/app/ajukan-stok", icon: Package, label: "Ajukan Stok", sub: "Permintaan bahan ke pusat" },
           { href: "/app/klaim-nota", icon: Palette, label: "Klaim Nota", sub: "Batalkan nota tercetak" },
-          { href: "/app/tukar-nota", icon: Palette, label: "Tukar-Tambah Nota", sub: "Gabung nota batal" },
           { href: "/app/terima-barang", icon: Package, label: "Terima Barang", sub: "Inbound distribusi" },
         ].map(({ href, icon: Icon, label, sub }) => (
           <Link

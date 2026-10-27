@@ -155,7 +155,7 @@ export default function TransaksiDetailPage() {
             </button>
           )}
           {trx.receiptId && (
-            <p className="text-[11px] text-slds-text-weak">Receipt ID: <span className="font-mono font-bold">{trx.receiptId}</span></p>
+            <p className="text-[11px] text-slds-text-weak">Receipt ID (internal): <span className="font-mono font-bold">{trx.receiptId}</span></p>
           )}
         </div>
       )}

@@ -10,6 +10,7 @@ export type JurnalSourceType =
   | "kas-penerimaan"
   | "kas-pembayaran"
   | "transfer-bank"
+  | "komisi-bengkel"
   | "jurnal-manual";
 
 export const JURNAL_SOURCE_LABELS: Record<JurnalSourceType, string> = {
@@ -21,6 +22,7 @@ export const JURNAL_SOURCE_LABELS: Record<JurnalSourceType, string> = {
   "kas-penerimaan": "Penerimaan Kas/Bank",
   "kas-pembayaran": "Pembayaran Kas/Bank",
   "transfer-bank": "Transfer Bank",
+  "komisi-bengkel": "Komisi Bengkel",
   "jurnal-manual": "Jurnal Manual",
 };
 
@@ -44,6 +46,8 @@ export type JurnalDetail = {
   refFaktur?: string;
   refAdj?: string;
   refPayment?: string;
+  /** Periode komisi bengkel "2026-08" untuk jurnal dari Tutup Periode komisi */
+  refKomisi?: string;
 };
 
 export const MOCK_JURNAL_DETAILS: JurnalDetail[] = [

@@ -29,6 +29,10 @@ export function PreviewClickHandler() {
     const handler = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
 
+      /* Klik di area notifikasi (termasuk tombol X) tidak boleh memunculkan toast baru,
+         kalau tidak notifikasi seolah tidak bisa ditutup dan malah menumpuk. */
+      if (target.closest("[data-no-toast]")) return;
+
       const dataToastEl = target.closest("[data-toast]") as HTMLElement | null;
       if (dataToastEl && !dataToastEl.hasAttribute("data-no-toast")) {
         const msg = dataToastEl.getAttribute("data-toast");

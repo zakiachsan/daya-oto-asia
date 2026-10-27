@@ -106,6 +106,7 @@ export const financeGuideNav: ModuleGuideNav = {
         { id: "syarat-pembayaran", label: "Syarat Pembayaran" },
         { id: "proses-akhir-bulan", label: "Proses Akhir Bulan" },
         { id: "gaji-tunjangan", label: "Gaji & Tunjangan" },
+        { id: "komisi-bengkel", label: "Komisi Bengkel" },
         { id: "karyawan", label: "Karyawan" },
         { id: "transaksi-berulang", label: "Transaksi Berulang" },
         { id: "kalender", label: "Kalender" },
@@ -246,6 +247,21 @@ export const financeGuideNav: ModuleGuideNav = {
     ),
 
 
+    "komisi-bengkel": g(
+      "komisi-bengkel",
+      "Komisi Bengkel (bulanan)",
+      "Komisi Bengkel",
+      "/finance/komisi",
+      "Hitung komisi tiap bengkel: kepala bengkel 5% dari DPP sebelum PPN, tinter Rp 1.000 per nota OPB, dan tiga pihak yang diisi manual.",
+      [
+        a(F, "Pilih Periode (bulan)"),
+        a(F, "Cek OPB yang sudah masuk faktur (status Ditagihkan)"),
+        a(F, "Isi Komisi Manual: GH Head Vendor, Tukang Cat, Admin Astra"),
+        a(F, "Buka Detail Bengkel → review rincian nota per tinter"),
+        a(F, "Cetak Rekap Komisi"),
+        a(F, "Tutup Periode supaya angka dikunci"),
+      ]
+    ),
     "proses-invoice": g(
       "proses-invoice",
       "Proses Invoice per Cabang (alur penagihan)",

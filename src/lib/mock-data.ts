@@ -10,10 +10,10 @@ export const MOCK_USER = {
 };
 
 export const MOCK_CABANG = [
-  { id: "1", nama: "Bengkel Auto 2000 Surabaya", kota: "Surabaya", tinter: 2, stokAlert: 1, minStokGram: 500 },
-  { id: "2", nama: "Bengkel Cakrawala Malang", kota: "Malang", tinter: 1, stokAlert: 0, minStokGram: 300 },
-  { id: "3", nama: "Bengkel Prima Jember", kota: "Jember", tinter: 2, stokAlert: 2, minStokGram: 400 },
-  { id: "4", nama: "Bengkel Surya Kediri", kota: "Kediri", tinter: 1, stokAlert: 0, minStokGram: 350 },
+  { id: "1", kode: "SBY", kepalaBengkel: "Hendra Gunawan", ghHeadVendor: "Agus Salim", tukangCat: "Sutrisno", adminAstra: "Dewi Lestari", nama: "Bengkel Auto 2000 Surabaya", kota: "Surabaya", tinter: 2, stokAlert: 1, minStokGram: 500 },
+  { id: "2", kode: "MLG", kepalaBengkel: "Bambang Setiawan", ghHeadVendor: "Hariyanto", tukangCat: "Joko Prasetyo", adminAstra: "Rina Wati", nama: "Bengkel Cakrawala Malang", kota: "Malang", tinter: 1, stokAlert: 0, minStokGram: 300 },
+  { id: "3", kode: "JBR", kepalaBengkel: "Yusuf Maulana", ghHeadVendor: "Sumarno", tukangCat: "Bambang Riyadi", adminAstra: "Fitri Handayani", nama: "Bengkel Prima Jember", kota: "Jember", tinter: 2, stokAlert: 2, minStokGram: 400 },
+  { id: "4", kode: "KDR", kepalaBengkel: "Rizky Pratama", ghHeadVendor: "Wahyu Santoso", tukangCat: "Darmanto", adminAstra: "Ayu Puspita", nama: "Bengkel Surya Kediri", kota: "Kediri", tinter: 1, stokAlert: 0, minStokGram: 350 },
 ];
 
 export type TransaksiBahan = { kode: string; nama: string; gram: number };
@@ -93,7 +93,7 @@ export type TransaksiRow = {
 
 const MOCK_TRANSAKSI_TERKINI: TransaksiRow[] = [
   {
-    id: "DOA-2609-2813",
+    id: "DOA-SBY-260926-001",
     tanggal: "2026-09-26",
     cabang: "Auto 2000 Surabaya",
     warna: "Silver Metallic",
@@ -119,7 +119,7 @@ const MOCK_TRANSAKSI_TERKINI: TransaksiRow[] = [
     opbId: null,
   },
   {
-    id: "DOA-2026-0142",
+    id: "DOA-SBY-100926-001",
     tanggal: "2026-09-10",
     cabang: "Auto 2000 Surabaya",
     warna: "Silver Metallic",
@@ -151,7 +151,7 @@ const MOCK_TRANSAKSI_TERKINI: TransaksiRow[] = [
     opbId: "OPB-2026-0089",
   },
   {
-    id: "DOA-2026-0141",
+    id: "DOA-MLG-100926-001",
     tanggal: "2026-09-10",
     cabang: "Cakrawala Malang",
     warna: "Merah Solid",
@@ -178,11 +178,11 @@ const MOCK_TRANSAKSI_TERKINI: TransaksiRow[] = [
       { kode: "AXT-207", nama: "AXT-207 BLACK TONER (0,9L)", gram: 12 },
       { kode: "AXT-501", nama: "AXT-501 TRANSOXIDE RED (0,9L)", gram: 38 },
     ],
-    /* Nota 0141 sudah masuk OPB Agustus Cakrawala Malang (biar cabang ini match) */
+    /* Nota 10/09 Malang sudah masuk OPB Agustus Cakrawala Malang (biar cabang ini match) */
     opbId: "OPB-2026-0088",
   },
   {
-    id: "DOA-2026-0140",
+    id: "DOA-JBR-090926-001",
     tanggal: "2026-09-09",
     cabang: "Prima Jember",
     warna: "Pearl White",
@@ -210,7 +210,7 @@ const MOCK_TRANSAKSI_TERKINI: TransaksiRow[] = [
     opbId: null,
   },
   {
-    id: "DOA-2026-0139",
+    id: "DOA-SBY-090926-001",
     tanggal: "2026-09-09",
     cabang: "Auto 2000 Surabaya",
     warna: "Hitam Special",
@@ -292,6 +292,23 @@ export const MOCK_KARYAWAN = [
   { id: "3", nama: "Eko Prasetyo", jabatan: "Tinter", cabang: "Prima Jember", status: "Aktif" },
   { id: "4", nama: "Pak Ahmad", jabatan: "Supervisor", cabang: "Pusat", status: "Aktif" },
   { id: "5", nama: "Siti Rahayu", jabatan: "HR", cabang: "Pusat", status: "Aktif" },
+  /* Staf per bengkel · Kepala Bengkel & tiga pihak penerima komisi manual (Finance) */
+  { id: "6", nama: "Hendra Gunawan", jabatan: "Kepala Bengkel", cabang: "Auto 2000 Surabaya", status: "Aktif" },
+  { id: "7", nama: "Agus Salim", jabatan: "GH Head Vendor", cabang: "Auto 2000 Surabaya", status: "Aktif" },
+  { id: "8", nama: "Sutrisno", jabatan: "Tukang Cat", cabang: "Auto 2000 Surabaya", status: "Aktif" },
+  { id: "9", nama: "Dewi Lestari", jabatan: "Admin Astra", cabang: "Auto 2000 Surabaya", status: "Aktif" },
+  { id: "10", nama: "Bambang Setiawan", jabatan: "Kepala Bengkel", cabang: "Cakrawala Malang", status: "Aktif" },
+  { id: "11", nama: "Hariyanto", jabatan: "GH Head Vendor", cabang: "Cakrawala Malang", status: "Aktif" },
+  { id: "12", nama: "Joko Prasetyo", jabatan: "Tukang Cat", cabang: "Cakrawala Malang", status: "Aktif" },
+  { id: "13", nama: "Rina Wati", jabatan: "Admin Astra", cabang: "Cakrawala Malang", status: "Aktif" },
+  { id: "14", nama: "Yusuf Maulana", jabatan: "Kepala Bengkel", cabang: "Prima Jember", status: "Aktif" },
+  { id: "15", nama: "Sumarno", jabatan: "GH Head Vendor", cabang: "Prima Jember", status: "Aktif" },
+  { id: "16", nama: "Bambang Riyadi", jabatan: "Tukang Cat", cabang: "Prima Jember", status: "Aktif" },
+  { id: "17", nama: "Fitri Handayani", jabatan: "Admin Astra", cabang: "Prima Jember", status: "Aktif" },
+  { id: "18", nama: "Rizky Pratama", jabatan: "Kepala Bengkel", cabang: "Surya Kediri", status: "Aktif" },
+  { id: "19", nama: "Wahyu Santoso", jabatan: "GH Head Vendor", cabang: "Surya Kediri", status: "Aktif" },
+  { id: "20", nama: "Darmanto", jabatan: "Tukang Cat", cabang: "Surya Kediri", status: "Aktif" },
+  { id: "21", nama: "Ayu Puspita", jabatan: "Admin Astra", cabang: "Surya Kediri", status: "Aktif" },
 ];
 
 export const MOCK_JURNAL = [
@@ -373,6 +390,8 @@ export const MOCK_COA = [
   { kode: "210101", nama: "Hutang Usaha", tipe: "Kewajiban", sub: "Hutang", saldo: 45000000 },
   { kode: "410101", nama: "Pendapatan Jasa Cat", tipe: "Pendapatan", sub: "Pendapatan", saldo: 452000000 },
   { kode: "510101", nama: "HPP Bahan Cat", tipe: "Beban", sub: "Beban", saldo: 180000000 },
+  { kode: "510201", nama: "Beban Komisi Bengkel", tipe: "Beban", sub: "Beban", saldo: 0 },
+  { kode: "210201", nama: "Hutang Komisi", tipe: "Kewajiban", sub: "Hutang", saldo: 0 },
 ];
 
 export const MOCK_KAS_BANK = [

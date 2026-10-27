@@ -19,7 +19,11 @@ export function formatRecipeId(params: {
 
 /** ID internal transaksi (DOA-…) — bukan Receipt ID nota */
 export function isInternalTransaksiId(value: string): boolean {
-  return /^DOA-\d{4}-\d{4}$/.test(value) || /^DOA-\d{2}\d{2}-\d{4}$/.test(value);
+  return (
+    /^DOA-[A-Z]{3}-\d{6}-\d{3}$/.test(value) ||
+    /^DOA-\d{4}-\d{4}$/.test(value) ||
+    /^DOA-\d{2}\d{2}-\d{4}$/.test(value)
+  );
 }
 
 type ReceiptIdSource = {

@@ -102,5 +102,8 @@ export function tarifRowForKategori(kategori: string): { grup: string; label: st
 }
 
 export function notaNoFromTrxId(trxId: string) {
-  return trxId.replace(/^DOA-/, "").replace(/^TRX-/, "");
+  const id = String(trxId ?? "").trim();
+  /* Format baru DOA-<kode cabang>-<ddMMyy>-<urut> tampil utuh sebagai nomor nota */
+  if (/^DOA-[A-Z]{3}-\d{6}-\d{3}$/i.test(id)) return id.toUpperCase();
+  return id.replace(/^DOA-/, "").replace(/^TRX-/, "");
 }

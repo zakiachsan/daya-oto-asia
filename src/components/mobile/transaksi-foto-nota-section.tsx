@@ -15,6 +15,7 @@ import type { TransaksiRow } from "@/lib/mock-data";
 import { formatDurasi } from "@/lib/mock-data";
 import { TransaksiCatatanPanel } from "@/components/mobile/transaksi-catatan-panel";
 import { LabelCatPreview } from "@/components/ui/label-cat-preview";
+import { labelDefaultForTrx, labelLinesForTrx, printLabelCat } from "@/lib/label-cat-utils";
 import { NotaPenjualanPreview, printNotaPenjualanPreview } from "@/components/ui/nota-penjualan-preview";
 import type { TransaksiStatus } from "@/lib/transaksi-status-utils";
 
@@ -57,6 +58,11 @@ export function TransaksiFotoNotaSection({
 
   const labelDone = !!trx.waktuCetakLabel;
   const showLabelPreview = labelDone;
+
+  /* Satu label per bahan · default basecoat (yang dipakai di lapangan) */
+  const labelLines = labelLinesForTrx(trx);
+  const [labelKey, setLabelKey] = useState(() => labelDefaultForTrx(trx).key);
+  const labelLine = labelLines.find((l) => l.key === labelKey) ?? labelLines[0];
 
   const canEditChecklist = editable && !printed;
   const canTtd = trx.status === "Menunggu TTD" && !signed;
@@ -183,7 +189,38 @@ export function TransaksiFotoNotaSection({
         )}
       </div>
 
-      {showLabelPreview && <LabelCatPreview trx={trx} className="mx-auto shadow-sm" />}
+      {showLabelPreview && (
+        <div className="rounded-xl border border-slds-border overflow-hidden">
+          <div className="px-4 py-2 bg-slds-bg flex items-center justify-between gap-2">
+            <p className="text-[11px] font-bold uppercase text-slds-text-weak">Preview label</p>
+            {labelLines.length > 1 && (
+              <select
+                value={labelLine.key}
+                onChange={(e) => setLabelKey(e.target.value)}
+                className="text-[11px] border border-slds-border rounded-md px-2 py-1 bg-white max-w-[60%]"
+              >
+                {labelLines.map((l) => (
+                  <option key={l.key} value={l.key}>
+                    {l.kategoriLabel}
+                    {l.isBasecoat ? " · default" : ""}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+          <div className="p-3 flex flex-col items-center gap-2">
+            <LabelCatPreview trx={trx} line={labelLine} className="shadow-sm" />
+            <button
+              type="button"
+              data-no-toast
+              onClick={() => printLabelCat(trx, labelLine)}
+              className="w-full py-2.5 bg-brand text-white rounded-xl text-[13px] font-semibold flex items-center justify-center gap-2"
+            >
+              <Printer className="h-4 w-4" /> Cetak Label {labelLine.kategoriLabel}
+            </button>
+          </div>
+        </div>
+      )}
 
       {(showNota || printed) && (
         <div className="rounded-xl border border-slds-border overflow-hidden">

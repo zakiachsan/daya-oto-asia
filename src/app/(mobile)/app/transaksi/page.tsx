@@ -8,7 +8,6 @@ import { formatIDR } from "@/lib/mock-data";
 import { useTransaksiList } from "@/lib/preview-store";
 import { useToast } from "@/components/ui/toast";
 import { MOBILE_USER } from "@/lib/mobile-app-utils";
-import { resolveReceiptIdDisplay } from "@/lib/recipe-id-utils";
 import { TRANSAKSI_STATUS_FILTER } from "@/lib/transaksi-status-utils";
 
 const STATUS_OPTIONS = [...TRANSAKSI_STATUS_FILTER];
@@ -83,7 +82,7 @@ export default function AppTransaksiPage() {
                 <div>
                   <p className="text-[13px] font-bold text-slds-text leading-snug">{listTitle}</p>
                   <p className="text-[11px] text-slds-text-weak mt-0.5">
-                    {t.warna} · {resolveReceiptIdDisplay(t)} · {t.tanggal}
+                    {t.warna} · {t.id} · {t.tanggal}
                   </p>
                 </div>
                 <StatusBadge status={t.status} size="xs" />

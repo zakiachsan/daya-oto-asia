@@ -20,6 +20,8 @@ export default function AssignmentPage() {
   const [draft, setDraft] = useState<Record<string, string>>({});
 
   const tinterList = MOCK_KARYAWAN.filter((k) => k.jabatan === "Tinter");
+  /* Semua karyawan bisa dipindah cabang · penerima komisi ikut assignment ini */
+  const karyawanList = MOCK_KARYAWAN;
 
   function getCabang(karyawanId: string) {
     return draft[karyawanId] ?? map[karyawanId] ?? "";
@@ -47,16 +49,17 @@ export default function AssignmentPage() {
     <div>
       <PageHeader
         title="Assignment Cabang"
-        desc="Penugasan tinter ke bengkel/cabang · bisa pindah assignment"
+        desc="Penugasan karyawan ke bengkel/cabang · penerima komisi di Master Cabang ikut assignment ini"
         breadcrumb={[{ label: "HRIS", href: "/hris" }, { label: "Assignment Cabang" }]}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div>
-          <h3 className="text-[13px] font-bold text-slds-text mb-2">Tinter per Cabang</h3>
+          <h3 className="text-[13px] font-bold text-slds-text mb-2">Karyawan per Cabang</h3>
           <DataTable
             columns={[
               { key: "nama", label: "Nama" },
+              { key: "jabatan", label: "Jabatan" },
               {
                 key: "cabang",
                 label: "Cabang Saat Ini",
@@ -97,7 +100,7 @@ export default function AssignmentPage() {
                 },
               },
             ]}
-            data={tinterList}
+            data={karyawanList}
           />
         </div>
 
